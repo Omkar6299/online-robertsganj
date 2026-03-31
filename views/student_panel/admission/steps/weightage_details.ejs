@@ -1,0 +1,44 @@
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+            <% }); %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/student/weightage_details_post" method="POST">
+    <div class="row g-3">
+        <% if (typeof weightages !== 'undefined' && weightages.length > 0) { %>
+            <% weightages.forEach(function(weightage) { %>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body py-2 px-3">
+                            <div class="form-check d-flex align-items-center mb-0">
+                                <input class="form-check-input me-3" type="checkbox"
+                                    name="weightage_ids[]"
+                                    id="weightage_<%= weightage.id %>"
+                                    value="<%= weightage.id %>"
+                                    <%= (typeof selectedWeightageIds !== 'undefined' && selectedWeightageIds.includes(weightage.id.toString())) ? 'checked' : '' %>>
+                                <label class="form-check-label flex-grow-1" for="weightage_<%= weightage.id %>" style="cursor: pointer; font-weight: 500;">
+                                    <%= weightage.name %>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="col-md-12">
+                <div class="alert alert-info">No weightages available for selection.</div>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="/student/registration?tab=subject" class="btn btn-secondary">Previous</a>
+        <button type="submit" class="btn btn-primary">Save & Continue</button>
+    </div>
+</form>
+

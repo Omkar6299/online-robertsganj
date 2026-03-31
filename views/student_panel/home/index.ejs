@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Student Dashboard' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Student Dashboard</h4>
+                        </div>
+                        <div class="card-body">
+                            <% if (typeof success !== 'undefined' && success.length > 0) { %>
+                                <div class="alert alert-success">
+                                    <%= success[0] %>
+                                </div>
+                            <% } %>
+
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <i class="bi bi-file-earmark-text-fill fa-3x text-primary mb-3"></i>
+                                            <h5>Registration</h5>
+                                            <% if (student) { %>
+                                                <div class="mb-2">
+                                                    <small class="text-secondary d-block">
+                                                        <strong>Course:</strong> <%= student.courseName ? student.courseName.name : 'N/A' %>
+                                                    </small>
+                                                    <small class="text-secondary d-block">
+                                                        <strong>Semester:</strong> <%= student.semsterName ? student.semsterName.name : 'N/A' %>
+                                                    </small>
+                                                    <small class="text-secondary d-block">
+                                                        <strong>Session:</strong> <%= student.academicYear ? student.academicYear.session : 'N/A' %>
+                                                    </small>
+                                                </div>
+                                                <% if (student.declaration_status === '1') { %>
+                                                    <p class="text-success fw-bold">Form Submitted</p>
+                                                    <a href="/student/print_application_form" class="btn btn-outline-primary">View Application</a>
+                                                <% } else { %>
+                                                    <p class="text-muted">Complete your admission form</p>
+                                                    <a href="/student/registration" class="btn btn-primary">Continue Registration</a>
+                                                <% } %>
+                                            <% } else if (previousYearStudent) { %>
+                                                <div class="mb-2">
+                                                    <p class="text-info">Returning Student</p>
+                                                    <small class="text-secondary d-block">
+                                                        <strong>Last Session:</strong> <%= previousYearStudent.academicYear ? previousYearStudent.academicYear.session : 'N/A' %>
+                                                    </small>
+                                                </div>
+                                                <p class="text-muted">Register for the current session <%= activeYear ? activeYear.session : '' %>.</p>
+                                                <a href="/student/re_register" class="btn btn-primary shadow-sm">Renew Registration</a>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <i class="bi bi-receipt-cutoff fa-3x text-success mb-3"></i>
+                                            <h5>Fee Payment</h5>
+                                            
+                                            <% if (student) { %>
+                                                <!-- Current Semester Payment -->
+                                                <div class="mb-3 border-bottom pb-2">
+                                                    <small class="d-block text-muted">Current: <%= student.semsterName ? student.semsterName.name : 'Semester' %></small>
+                                                    <% if (typeof admissionPayment !== 'undefined' && admissionPayment) { %>
+                                                        <span class="badge bg-success mb-2">Paid ₹<%= admissionPayment.amount %></span><br>
+                                                        <a href="/student/admission_receipt?txn_id=<%= admissionPayment.merchant_txn_id %>" class="btn btn-sm btn-outline-success">Receipt</a>
+                                                    <% } else if (student.declaration_status !== '1') { %>
+                                                        <span class="text-info small">Registration Pending</span><br>
+                                                        <button class="btn btn-sm btn-secondary mt-1" disabled title="Please complete and submit your registration first">Pay Fee</button>
+                                                    <% } else if (student.admission_status === 'Approved') { %>
+                                                        <p class="text-muted small">Approved. Please pay.</p>
+                                                        <a href="/student/fees_payment" class="btn btn-success">Pay Fee</a>
+                                                    <% } else if (student.semsterName && student.semsterName.approval_required == 0) { %>
+                                                        <p class="text-success small">Form Submitted. Please pay fee.</p>
+                                                        <a href="/student/fees_payment" class="btn btn-success">Pay Fee</a>
+                                                    <% } else if (student.admission_status === 'Disapproved') { %>
+                                                        <span class="text-danger small">Disapproved</span>
+                                                    <% } else { %>
+                                                        <span class="text-warning small">Pending Approval</span><br>
+                                                        <button class="btn btn-sm btn-secondary mt-1" disabled>Pay Fee</button>
+                                                    <% } %>
+                                                </div>
+
+                                                <!-- Next Semester Payment (if enabled) -->
+                                                <% if (typeof nextSemester !== 'undefined' && nextSemester) { %>
+                                                    <div class="mt-2">
+                                                        <small class="d-block text-muted">Next: <%= nextSemester.name %></small>
+                                                        <% if (typeof nextSemesterPayment !== 'undefined' && nextSemesterPayment) { %>
+                                                            <span class="badge bg-success mb-2">Paid ₹<%= nextSemesterPayment.amount %></span><br>
+                                                            <a href="/student/admission_receipt?txn_id=<%= nextSemesterPayment.merchant_txn_id %>" class="btn btn-sm btn-outline-success">Receipt</a>
+                                                        <% } else { %>
+                                                            <p class="text-success small mb-1">Payment Enabled!</p>
+                                                            <a href="/student/fees_payment?semester_id=<%= nextSemester.id %>" class="btn btn-sm btn-primary">Pay Next Sem Fee</a>
+                                                        <% } %>
+                                                    </div>
+                                                <% } %>
+                                            <% } else { %>
+                                                <p class="text-muted">Register to enable payments</p>
+                                                <button class="btn btn-secondary" disabled>Pay Fee</button>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <i class="bi bi-printer fa-3x text-info mb-3"></i>
+                                            <h5>Print Center</h5>
+                                            <% if (student && student.declaration_status === '1') { %>
+                                                <p class="text-muted">Print your application form</p>
+                                                <a href="/student/print_application_form" class="btn btn-info">Print Form</a>
+                                            <% } else { %>
+                                                <p class="text-muted">Available after completion</p>
+                                                <button class="btn btn-secondary" disabled>Print Form</button>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
+

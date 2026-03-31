@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Form Preview' %></title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 11px;
+            color: #000;
+            background: #f5f5f5;
+        }
+        .page {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 10px auto;
+            background: #fff;
+            padding: 10mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            .page {
+                margin: 0;
+                padding: 5mm;
+                box-shadow: none;
+                max-width: none;
+                min-height: auto;
+            }
+            .fieldset-box { page-break-inside: avoid; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+        .text-center { text-align: center; }
+        .college-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            position: relative;
+        }
+        .college-header h2 { font-size: 22px; font-weight: bold; margin: 0 0 5px 0; color: #333; text-transform: uppercase; }
+        .college-header h5 { font-size: 14px; margin: 0; color: #555; }
+        .college-header h4 { font-size: 15px; font-weight: bold; margin-top: 10px; display: inline-block; border-radius: 4px; padding: 2px 0;}
+        
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .fieldset-box {
+            border: 1px solid #bcc9a8;
+            padding: 12px 10px 8px 10px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .legend-box {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #fff;
+            padding: 0 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .row { display: flex; flex-wrap: wrap; margin-left: -5px; margin-right: -5px; }
+        .col-6 { width: 50%; padding: 0 5px; box-sizing: border-box; }
+        .col-8 { width: 66.666%; padding: 0 5px; box-sizing: border-box; }
+        .col-4 { width: 33.333%; padding: 0 5px; box-sizing: border-box; }
+
+        .kv-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .kv-table td { padding: 3px 2px; vertical-align: top; }
+        .k-col { width: 45%; color: #444; }
+        .v-col { width: 55%; font-weight: bold; color: #000; }
+        .v-col::before { content: " : "; font-weight: normal; color: #000; margin-right: 4px; }
+
+        .photo-sign-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+        .photo-sign-box {
+            border: 1px solid #000;
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+        }
+        .photo-box {
+            width: 100%;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #000;
+        }
+        .sign-box {
+            width: 100%;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-placeholder {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            font-size: 10px;
+            color: #888;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #bcc9a8;
+            padding: 4px;
+            text-align: left;
+        }
+        .data-table th { background: transparent; font-weight: bold; color: #444;}
+
+        .notes-section {
+            font-size: 10px;
+            color: #333;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        .notes-section h6 { font-weight: bold; margin: 5px 0 2px 0; font-size: 10px; }
+        .notes-list { margin: 0; padding-left: 15px; list-style-type: decimal; }
+
+        .declaration-box {
+            margin-top: 15px;
+            font-size: 10px;
+            line-height: 1.5;
+            text-align: justify;
+        }
+        
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .office-use {
+            border: 1px dashed #ccc;
+            border-top: 1px dashed #000;
+            border-bottom: 1px dashed #000;
+            border-left: none;
+            border-right: none;
+            padding: 10px 0;
+            margin-top: 15px;
+        }
+        .office-use-title { font-weight: bold; font-size: 11px; margin-bottom: 15px; }
+        .blank-line {
+            display: inline-block;
+            border-bottom: 1px solid #000;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-print {
+            padding: 2px 10px;
+            font-size: 10px;
+            border: 1px solid #000;
+            background: #fff;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="text-center no-print mb-3" style="padding-top: 20px;">
+        <button onclick="window.print()" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Print Application</button>
+        <a href="/" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+
+    <div class="page">
+        <% if (typeof student !== 'undefined' && student) { %>
+            
+            <div class="header-info">
+                <span><%= new Date().toLocaleString() %></span>
+                <span><%= fieldLabels.header.college_name_en %></span>
+            </div>
+
+            <div class="college-header text-center">
+                <h2><%= fieldLabels.header.college_name_hi %></h2>
+                <h2><%= fieldLabels.header.college_address_hi %></h2>
+                <h4><%= fieldLabels.header.application_title %> - सत्र - <%= activeAcademicYear ? activeAcademicYear.session : '' %></h4>
+            </div>
+
+            <div class="fieldset-box">
+                <div class="legend-box">Student Details</div>
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-6">
+                        <table class="kv-table">
+                            <tr><td class="k-col"><%= fieldLabels.receipt.fields.bank_ref_no %></td><td class="v-col"><%= (typeof payment !== 'undefined' && payment && payment.merchant_txn_id) ? payment.merchant_txn_id : '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.registration_no %></td><td class="v-col" style="font-size: 14px; color: #000;"><%= student.registration_no || '-' %></td></tr>
+                            <tr><td class="k-col">Class</td><td class="v-col"><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.name %></td><td class="v-col"><%= student.user ? student.user.name : '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.dob %></td><td class="v-col"><%= student.dob || '-' %></td></tr>
+                            <tr><td class="k-col">Contact No.</td><td class="v-col"><%= student.user ? student.user.phone : '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.gender %></td><td class="v-col"><%= student.gender || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.category %></td><td class="v-col"><%= student.category || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.religion %></td><td class="v-col"><%= student.religion || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.father_name %></td><td class="v-col"><%= student.father_name || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.mother_name %></td><td class="v-col"><%= student.mother_name || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.local_guardian %></td><td class="v-col"><%= student.local_guadian || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.guardian_contact %></td><td class="v-col"><%= student.guadian_contact || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.family_income %></td><td class="v-col"><%= student.family_annual_income || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.computer_literate %></td><td class="v-col"><%= student.computer_literate || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.bank_name %></td><td class="v-col"><%= student.bank_name || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.ifsc_code %></td><td class="v-col"><%= student.ifsc_code || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.year_gap %></td><td class="v-col"><%= student.year_gap || '-' %></td></tr>
+                            <% if (student.year_gap === 'Yes') { %>
+                                <tr><td class="k-col"><%= fieldLabels.application.fields.gap_reason %></td><td class="v-col"><%= student.gap_reason || '-' %></td></tr>
+                            <% } %>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.adhar_no %></td><td class="v-col"><%= student.adhar_no || '-' %></td></tr>
+                            <tr><td class="k-col">Subject Apply</td><td class="v-col" style="font-size: 9px; line-height: 1.2;">
+                                <%
+                                    let majors = [];
+                                    if (student.major1 && student.major1.subject_name) majors.push(student.major1.subject_name);
+                                    if (student.major2 && student.major2.subject_name) majors.push(student.major2.subject_name);
+                                %>
+                                <strong>Major Subject 1 -</strong> <%= majors[0] || 'N/A' %> &nbsp; <strong>Major Subject 2 -</strong> <%= majors[1] || 'N/A' %> <br>
+                                <strong>Minor Subject -</strong> <%= student.minor && student.minor.subject_name ? student.minor.subject_name : 'N/A' %> <br>
+                                <strong>Skill Development - Sem I -</strong> <%= student.skill && student.skill.name ? student.skill.name : 'N/A' %> <br>
+                                <strong>Co-Curricular - Sem I -</strong> <%= student.cocurricular && student.cocurricular.name ? student.cocurricular.name : 'N/A' %>
+                            </td></tr>
+                            <tr><td colspan="2" style="font-size: 10px; color: #444; padding-top: 5px;"><%= fieldLabels.application.fields.previous_student %> : <strong><%= student.is_previous_student || 'No' %></strong></td></tr>
+                            <tr><td colspan="2">
+                                <table style="width: 100%; font-size: 10px; color: #444;">
+                                    <tr>
+                                        <td style="width: 50%;"><%= fieldLabels.application.fields.disability %> : <strong><%= student.disability_percentage ? 'Yes' : 'No' %></strong></td>
+                                        <td style="width: 50%;"><%= fieldLabels.application.fields.disability_percentage_label %> : <strong><%= student.disability_percentage || '-' %></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= fieldLabels.application.fields.is_18_plus %> : <strong><%= student.is_18_plus || 'No' %></strong></td>
+                                        <td><%= fieldLabels.application.fields.epic_no %> : <strong><%= student.epic_no || '-' %></strong></td>
+                                    </tr>
+                                </table>
+                            </td></tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="col-6">
+                        <table class="kv-table">
+                            <% 
+                                let formattedRegDate = '-';
+                                if (typeof payment !== 'undefined' && payment) {
+                                    if (payment.txnCompleteDate) {
+                                        formattedRegDate = new Date(payment.txnCompleteDate).toLocaleDateString('en-IN');
+                                    } else if (payment.transaction_date) {
+                                        formattedRegDate = new Date(payment.transaction_date).toLocaleDateString('en-IN');
+                                    } else if (payment.created_at) {
+                                        formattedRegDate = new Date(payment.created_at).toLocaleDateString('en-IN');
+                                    }
+                                } else if (student.createdAt) {
+                                    formattedRegDate = new Date(student.createdAt).toLocaleDateString('en-IN');
+                                }
+                            %>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.registration_date %></td><td class="v-col"><%= formattedRegDate %></td></tr>
+                            <tr>
+                                <td colspan="2" style="padding: 10px 0;">
+                                    <div class="photo-sign-container">
+                                        <div class="photo-sign-box">
+                                            <div class="photo-box">
+                                                <% if(student.photo) { %>
+                                                    <img src="<%= student.photo %>?t=<%= Date.now() %>" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                                                <% } else { %>
+                                                    <span style="font-size: 9px; color:#999;">Photo</span>
+                                                <% } %>
+                                            </div>
+                                            <div class="sign-box">
+                                                <% if(student.sign) { %>
+                                                    <img src="<%= student.sign %>?t=<%= Date.now() %>" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                                <% } else { %>
+                                                    <span style="font-size: 9px; color:#999;">Signature</span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.caste_cert_no %></td><td class="v-col"><%= student.cast_certificate_no || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.caste %></td><td class="v-col"><%= student.caste || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.blood_group %></td><td class="v-col"><%= student.blood_group || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.father_occupation %></td><td class="v-col"><%= student.father_occupation || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.mother_occupation %></td><td class="v-col"><%= student.mother_occupation || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.local_guardian_address %></td><td class="v-col"><%= student.local_guadian_address || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.income_cert_no %></td><td class="v-col"><%= student.income_certificate_no || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.weightage_activity %></td><td class="v-col"><%= student.extracurricular_activity || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.bank_account_no %></td><td class="v-col"><%= student.bank_account_no || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.year_gap_inter %></td><td class="v-col"><%= student.year_gap_after_inter || 'NA' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.samarth_no %></td><td class="v-col"><%= student.samarth_no || '-' %></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="text-align: right; font-size: 8px; color: #666; margin-top: 5px;">1/3</div>
+
+            <% 
+                let claimedWeightageIds = [];
+                let studentWeightageObj = student.weightage;
+                if (typeof studentWeightageObj === 'string') {
+                    try { studentWeightageObj = JSON.parse(studentWeightageObj); } catch(e) {}
+                }
+                if (studentWeightageObj) {
+                    Object.keys(studentWeightageObj).forEach(key => {
+                        if(studentWeightageObj[key] === "1" || studentWeightageObj[key] === true) {
+                            claimedWeightageIds.push(key.toString());
+                        }
+                    });
+                }
+            %>
+
+            <div class="fieldset-box" style="page-break-before: always; margin-top: 30px;">
+                <div class="legend-box">Weightage Information</div>
+                <div class="row">
+                    <div class="col-8">
+                        <table class="kv-table" style="font-size: 10px;">
+                            <% if (typeof weightages !== 'undefined' && weightages.length > 0) { %>
+                                <% weightages.forEach((w, index) => { %>
+                                    <tr>
+                                        <td style="width: 5%; color: #444;"><%= index + 1 %>.</td>
+                                        <td style="width: 80%; color: #444;"><%= w.name %></td>
+                                        <td style="width: 15%; font-weight: bold;">: <%= claimedWeightageIds.includes(w.id.toString()) ? 'Yes' : 'No' %></td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td>No weightage options available</td></tr>
+                            <% } %>
+                        </table>
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+            </div>
+
+            <div class="fieldset-box">
+                <div class="legend-box">Address</div>
+                <div class="row">
+                    <div class="col-6">
+                        <table class="kv-table">
+                            <tr><td class="k-col" style="width: 30%"><%= fieldLabels.application.fields.mailing_address %></td><td class="v-col" style="width: 70%"><%= student.mailing_address || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.state %></td><td class="v-col"><%= student.mailing_state || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.district %></td><td class="v-col"><%= student.mailing_district || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.tehsil %></td><td class="v-col"><%= student.mailing_tehsil || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.pincode %></td><td class="v-col"><%= student.mailing_pincode || '-' %></td></tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="kv-table">
+                            <tr><td class="k-col" style="width: 30%"><%= fieldLabels.application.fields.permanent_address %></td><td class="v-col" style="width: 70%"><%= student.permanent_address || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.state %></td><td class="v-col"><%= student.permanent_state || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.district %></td><td class="v-col"><%= student.permanent_district || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.tehsil %></td><td class="v-col"><%= student.permanent_tehsil || '-' %></td></tr>
+                            <tr><td class="k-col"><%= fieldLabels.application.fields.pincode %></td><td class="v-col"><%= student.permanent_pincode || '-' %></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fieldset-box">
+                <div class="legend-box">Payment Details</div>
+                <table class="data-table" style="border: none !important;">
+                    <thead>
+                        <tr>
+                            <th style="border: none; border-bottom: 1px solid #ccc; font-weight: bold;"><%= fieldLabels.receipt.fields.merchant_txn_id %></th>
+                            <th style="border: none; border-bottom: 1px solid #ccc; font-weight: bold;"><%= fieldLabels.receipt.fields.txn_id %></th>
+                            <th style="border: none; border-bottom: 1px solid #ccc; font-weight: bold;"><%= fieldLabels.receipt.fields.txn_date %></th>
+                            <th style="border: none; border-bottom: 1px solid #ccc; font-weight: bold;"><%= fieldLabels.receipt.fields.amount %></th>
+                            <th style="border: none; border-bottom: 1px solid #ccc; font-weight: bold;"><%= fieldLabels.receipt.fields.status %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof payment !== 'undefined' && payment && payment.merchant_txn_id) { %>
+                            <tr>
+                                <td style="border: none;"><%= payment.merchant_txn_id %></td>
+                                <td style="border: none;"><%= payment.bank_ref_no || payment.merchant_txn_id %></td>
+                                <td style="border: none;"><%= (payment.transaction_date || payment.createdAt || payment.created_at) ? new Date(payment.transaction_date || payment.createdAt || payment.created_at).toLocaleString() : '-' %></td>
+                                <td style="border: none;">₹ <%= payment.amount %></td>
+                                <td style="border: none;"><%= payment.status %></td>
+                            </tr>
+                        <% } else { %>
+                            <tr><td colspan="5" class="text-center" style="border: none;">No payment details found</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fieldset-box">
+                <div class="legend-box">Academic Details</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th><%= fieldLabels.academic.course %></th>
+                            <th><%= fieldLabels.academic.board %></th>
+                            <th><%= fieldLabels.academic.year %></th>
+                            <th><%= fieldLabels.academic.institute %></th>
+                            <th><%= fieldLabels.academic.roll_no %></th>
+                            <th><%= fieldLabels.academic.max_marks %></th>
+                            <th><%= fieldLabels.academic.obt_marks %></th>
+                            <th><%= fieldLabels.academic.place %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof educationals !== 'undefined' && educationals.length > 0) { %>
+                            <% educationals.forEach(edu => {
+                                let qualName = edu.qualification ? edu.qualification.name : edu.school_name;
+                                if (!qualName || qualName == '0' || !isNaN(qualName)) {
+                                    qualName = edu.class_name;
+                                }
+                                if (qualName == '0') qualName = '-';
+                            %>
+                                <tr>
+                                    <td><%= qualName %></td>
+                                    <td><%= edu.board_name || '-' %></td>
+                                    <td><%= edu.year_of_passing || '-' %></td>
+                                    <td><%= edu.school_name || edu.passing_institute || '-' %></td>
+                                    <td><%= edu.roll_no || '-' %></td>
+                                    <td><%= edu.total_marks || '-' %></td>
+                                    <td><%= edu.obtained_marks || '-' %></td>
+                                    <td>Any other</td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr><td colspan="8" class="text-center">No academic details found</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fieldset-box">
+                <div class="notes-section">
+                    <h6>नोट :-</h6>
+                    <ul class="notes-list">
+                        <li>प्रवेश लिए हुए सभी छात्र/छात्राओं को परीक्षा फार्म स्वयं भरकर महाविद्यालय में जमा करना होगा।</li>
+                        <li>विषयों का आवंटन नई शिक्षा नीति 2020 के सन्दर्भ में महात्मा गांधी काशी विद्यापीठ वाराणसी के निर्देशानुसार किया जाएगा।</li>
+                        <li>महाविद्यालय के संस्थागत छात्र/छात्राओं के लिए ड्रेस कोड निर्धारित है जिसे महाविद्यालय में पहनकर आना अनिवार्य है।
+                            <div style="padding-left: 20px; display: flex; margin-top: 5px;">
+                                <div style="width: 50%;">
+                                    <strong>छात्र के लिए :-</strong>
+                                    <ul style="margin: 0; padding-left: 15px; list-style-type: disc;">
+                                        <li>शर्ट - ह्वाइट आसमानी</li>
+                                        <li>पैंट - काला</li>
+                                        <li>स्वेटर/ब्लेजर - नेवी ब्लू</li>
+                                    </ul>
+                                </div>
+                                <div style="width: 50%;">
+                                    <strong>छात्रा के लिए :-</strong>
+                                    <ul style="margin: 0; padding-left: 15px; list-style-type: disc;">
+                                        <li>कुर्ता/कमीज - ह्वाइट आसमानी</li>
+                                        <li>सलवार एवं दुपट्टा - सफेद</li>
+                                        <li>स्वेटर/ब्लेजर - नेवी ब्लू</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="declaration-box text-center">
+                    <h6 style="font-weight: bold; font-size: 11px; text-decoration: underline; margin-bottom: 5px;">घोषणा</h6>
+                    <p style="margin-bottom: 5px; text-align: justify;">मैंने महाविद्यालय प्रवेश विवरणिका और ऑनलाइन एडमिशन के होम पेज पर लिखे गये नियमों एवं शर्तों को भली भांति पढ़ लिया है। मैं घोषणा करता/करती हूँ कि उपरोक्त समस्त विवरण मेरी जानकारी के अनुसार सत्य हैं। तथ्य असत्य पाये जाने पर अथवा जानबूझ कर छिपाए जाने पर मेरा प्रवेश निरस्त कर दिए जाने पर मुझे कोई आपत्ति नहीं होगी। मैं यह भी घोषणा करता/करती हूँ कि मेरे ऊपर संस्था द्वारा कोई अनुशासनात्मक कार्यवाही नहीं की गयी है और मैंने इस संस्था के अतिरिक्त अन्य किसी भी संस्था में प्रवेश नहीं लिया है।</p>
+                    <p style="margin-bottom: 20px; text-align: justify;">मैं कक्षा में नियमित रूप से उपस्थित रहूँगा/रहूँगी तथा विश्वविद्यालय द्वारा निर्धारित 75% उपस्थिति से सम्बंधित नियमों का पालन करूँगा/करूँगी।</p>
+                </div>
+
+                <div class="signature-row text-center">
+                    <div style="width: 40%;">पिता / माता / अभिभावक के हस्ताक्षर</div>
+                    <div style="width: 40%; text-align: right;">प्रवेशार्थी के हस्ताक्षर</div>
+                </div>
+            </div>
+
+            <div class="office-use">
+                
+                <div style="font-weight: bold; font-size: 11px;">प्राचार्य</div>
+                <div class="text-center no-print mt-3">
+                    <button onclick="window.print()" class="btn-print">Print this page</button>
+                </div>
+            </div>
+            
+        <% } else { %>
+            <div class="text-center" style="padding: 50px; color: red; font-size: 14px;">Student record not found.</div>
+        <% } %>
+    </div>
+
+    <!-- Empty Script tag intentionally included for specific logic later if needed -->
+    <%- include('../../layout/script_link') %>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+        <div class="d-flex flex-wrap align-items-center">
+            <div class="help-desk me-3"><i class="bi bi-info-circle-fill"></i> Help Desk</div>
+            <div class="contact-item"><i class="bi bi-telephone-fill"></i> +91 9990099900</div>
+            <div class="contact-item ms-3"><i class="bi bi-envelope-fill"></i> onlinehelpdesk12@gmail.com</div>
+        </div>
+        <div class="contact-item"><i class="bi bi-clock-fill"></i> 10:30 AM to 05:00 PM (Mon - Sat)</div>
+    </div>
+</div>
+
+<!-- Main Header -->
+<div class="main-header text-center">
+    <h1>सरदार बल्लभ भाई पटेल राजकीय महाविद्यालय</h1>
+    <p>बरकी — सेवापुरी 221011 <br> वाराणासी</p>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-center" id="navMenu">
+            <ul class="navbar-nav text-center">
+                <li class="nav-item">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('/') ? 'active' : '' %>" href="/">
+                        <i class="bi bi-house-fill"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('registration_fees_payment*') ? 'active' : '' %>" href="/registration_fees_payment"><i class="bi bi-currency-rupee"></i> Registration Fee Payment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('admission_login*') ? 'active' : '' %>" href="/admission_login"><i class="bi bi-pencil-square"></i> Apply Online</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('reprint_payment_receipt*') ? 'active' : '' %>" href="/reprint_payment_receipt"><i class="bi bi-receipt-cutoff"></i> Reprint Payment Receipt</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('print_application_form*') ? 'active' : '' %>" href="/print_application_form"><i class="bi bi-file-earmark-text-fill"></i> Print Application Form</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('know_your_registration*') ? 'active' : '' %>" href="/know_your_registration"><i class="bi bi-info-circle-fill"></i> Know Your Registration No.</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+

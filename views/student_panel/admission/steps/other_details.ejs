@@ -1,0 +1,175 @@
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+            <% }); %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/student/other_details_post" method="POST">
+    <div class="row g-3">
+        <!-- Family Details -->
+        <div class="col-md-12">
+            <h5>Family & Income Details</h5>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="father_occupation" class="form-label">Father's Occupation</label>
+                <input type="text" name="father_occupation" id="father_occupation" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.father_occupation ? oldInput.father_occupation : (typeof studentPersonalDetail !== 'undefined' && studentPersonalDetail.father_occupation ? studentPersonalDetail.father_occupation : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.father_occupation ? previousStudent.father_occupation : '')) %>"
+                    placeholder="Enter Father's Occupation">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="mother_occupation" class="form-label">Mother's Occupation</label>
+                <input type="text" name="mother_occupation" id="mother_occupation" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.mother_occupation ? oldInput.mother_occupation : (typeof studentPersonalDetail !== 'undefined' && studentPersonalDetail.mother_occupation ? studentPersonalDetail.mother_occupation : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.mother_occupation ? previousStudent.mother_occupation : '')) %>"
+                    placeholder="Enter Mother's Occupation">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="family_annual_income" class="form-label">Family Annual Income <span class="text-danger">*</span></label>
+                <input type="text" name="family_annual_income" id="family_annual_income" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.family_annual_income ? oldInput.family_annual_income : (typeof studentPersonalDetail !== 'undefined' && studentPersonalDetail.family_annual_income ? studentPersonalDetail.family_annual_income : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.family_annual_income ? previousStudent.family_annual_income : '')) %>"
+                    placeholder="Enter Annual Income" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="income_certificate_no" class="form-label">Income Certificate No.</label>
+                <input type="text" name="income_certificate_no" id="income_certificate_no" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.income_certificate_no ? oldInput.income_certificate_no : (typeof studentPersonalDetail !== 'undefined' && studentPersonalDetail.income_certificate_no ? studentPersonalDetail.income_certificate_no : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.income_certificate_no ? previousStudent.income_certificate_no : '')) %>"
+                    placeholder="Enter Income Certificate Number">
+            </div>
+        </div>
+
+        <!-- Bank Details -->
+        <div class="col-md-12 mt-3">
+            <h5>Bank Details</h5>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="bank_name" class="form-label">Bank Name</label>
+                <input type="text" name="bank_name" id="bank_name" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.bank_name ? oldInput.bank_name : (typeof studentPersonalDetail !== 'undefined' && studentPersonalDetail.bank_name ? studentPersonalDetail.bank_name : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.bank_name ? previousStudent.bank_name : '')) %>"
+                    placeholder="Enter Bank Name">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="bank_account_no" class="form-label">Account Number</label>
+                <input type="text" name="bank_account_no" id="bank_account_no" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.bank_account_no ? oldInput.bank_account_no : (typeof studentPersonalDetail !== 'undefined' && studentPersonalDetail.bank_account_no ? studentPersonalDetail.bank_account_no : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.bank_account_no ? previousStudent.bank_account_no : '')) %>"
+                    placeholder="Enter Account Number">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="ifsc_code" class="form-label">IFSC Code</label>
+                <input type="text" name="ifsc_code" id="ifsc_code" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.ifsc_code ? oldInput.ifsc_code : (typeof studentPersonalDetail !== 'undefined' && studentPersonalDetail.ifsc_code ? studentPersonalDetail.ifsc_code : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.ifsc_code ? previousStudent.ifsc_code : '')) %>"
+                    placeholder="Enter IFSC Code">
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="col-md-12 mt-3">
+            <h5>Additional Details</h5>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="computer_literate" class="form-label">Computer Literate? <span class="text-danger">*</span></label>
+                <select name="computer_literate" id="computer_literate" class="form-control" required>
+                    <%
+                    const selectedComp = (typeof oldInput !== 'undefined' && oldInput.computer_literate) ? oldInput.computer_literate : 
+                                       (typeof student !== 'undefined' && student.computer_literate ? student.computer_literate : 
+                                       (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.computer_literate ? previousStudent.computer_literate : 'No'));
+                    %>
+                    <option value="Yes" <%= selectedComp == 'Yes' ? 'selected' : '' %>>Yes</option>
+                    <option value="No" <%= selectedComp == 'No' ? 'selected' : '' %>>No</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="extracurricular_activity" class="form-label">Extracurricular Activity</label>
+                <input type="text" name="extracurricular_activity" id="extracurricular_activity" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.extracurricular_activity ? oldInput.extracurricular_activity : (typeof student !== 'undefined' && student.extracurricular_activity ? student.extracurricular_activity : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.extracurricular_activity ? previousStudent.extracurricular_activity : '')) %>"
+                    placeholder="Enter activities (Sports, NCC, etc.)">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="is_previous_student" class="form-label">Previous Student of this College? <span class="text-danger">*</span></label>
+                <select name="is_previous_student" id="is_previous_student" class="form-control" required>
+                    <%
+                    const selectedPrev = (typeof oldInput !== 'undefined' && oldInput.is_previous_student) ? oldInput.is_previous_student : 
+                                       (typeof student !== 'undefined' && student.is_previous_student ? student.is_previous_student : 
+                                       (typeof isReRegistration !== 'undefined' && isReRegistration ? 'Yes' : 'No'));
+                    %>
+                    <option value="Yes" <%= selectedPrev == 'Yes' ? 'selected' : '' %>>Yes</option>
+                    <option value="No" <%= selectedPrev == 'No' ? 'selected' : '' %>>No</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="disability_percentage" class="form-label">Disability Percentage (if any)</label>
+                <input type="text" name="disability_percentage" id="disability_percentage" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.disability_percentage ? oldInput.disability_percentage : (typeof student !== 'undefined' && student.disability_percentage ? student.disability_percentage : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.disability_percentage ? previousStudent.disability_percentage : '')) %>"
+                    placeholder="e.g. 10%">
+            </div>
+        </div>
+
+        <!-- Year Gap -->
+        <div class="col-md-12 mt-3">
+            <h5>Year Gap Information</h5>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="year_gap" class="form-label">Is there a Year Gap? <span class="text-danger">*</span></label>
+                <select name="year_gap" id="year_gap" class="form-control" required onchange="toggleGapFields()">
+                    <%
+                    const selectedGap = (typeof oldInput !== 'undefined' && oldInput.year_gap) ? oldInput.year_gap : (typeof student !== 'undefined' && student.year_gap ? student.year_gap : 'No');
+                    %>
+                    <option value="Yes" <%= selectedGap == 'Yes' ? 'selected' : '' %>>Yes</option>
+                    <option value="No" <%= selectedGap == 'No' ? 'selected' : '' %>>No</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6 gap-fields" style="display: <%= selectedGap == 'Yes' ? 'block' : 'none' %>">
+            <div class="form-group">
+                <label for="year_gap_after_inter" class="form-label">Year Gap After Intermediate</label>
+                <input type="text" name="year_gap_after_inter" id="year_gap_after_inter" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.year_gap_after_inter ? oldInput.year_gap_after_inter : (typeof student !== 'undefined' && student.year_gap_after_inter ? student.year_gap_after_inter : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.year_gap_after_inter ? previousStudent.year_gap_after_inter : '')) %>"
+                    placeholder="e.g. 2 years">
+            </div>
+        </div>
+        <div class="col-md-12 mt-2 gap-fields" style="display: <%= selectedGap == 'Yes' ? 'block' : 'none' %>">
+            <div class="form-group">
+                <label for="gap_reason" class="form-label">Reason for Gap</label>
+                <textarea name="gap_reason" id="gap_reason" class="form-control" rows="2"
+                    placeholder="Provide reason for the gap in education"><%= typeof oldInput !== 'undefined' && oldInput.gap_reason ? oldInput.gap_reason : (typeof student !== 'undefined' && student.gap_reason ? student.gap_reason : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.gap_reason ? previousStudent.gap_reason : '')) %></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="/student/registration?tab=subject" class="btn btn-secondary">Previous</a>
+        <button type="submit" class="btn btn-primary">Save & Continue</button>
+    </div>
+</form>
+
+<script>
+    function toggleGapFields() {
+        const gapSelect = document.getElementById('year_gap');
+        const gapFields = document.querySelectorAll('.gap-fields');
+        gapFields.forEach(field => {
+            field.style.display = gapSelect.value === 'Yes' ? 'block' : 'none';
+        });
+    }
+</script>

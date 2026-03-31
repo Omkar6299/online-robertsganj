@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= typeof title !== 'undefined' ? title : 'Home' %> || सरदार बल्लभ भाई पटेल राजकीय महाविद्यालय, बरकी , सेवापुरी, वाराणासी</title>
+    <%- include('css_link') %>
+</head>
+
+<body>
+    <%- include('header') %>
+    <%- typeof body !== 'undefined' ? body : '' %>
+    <%- include('footer') %>
+
+    <%- include('script_link') %>
+    <% if (typeof scripts !== 'undefined') { %>
+        <%- scripts %>
+    <% } %>
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+</body>
+
+</html>
+

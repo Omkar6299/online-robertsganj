@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/student/dashboard">
+            <strong><%= typeof user !== 'undefined' ? 'Welcome ' + user.name : 'Student Panel' %></strong>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/student/dashboard">
+                        <i class="bi bi-house-fill"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/student/registration">
+                        <i class="bi bi-file-earmark-text-fill"></i> Registration
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/student/fees_payment">
+                        <i class="bi bi-currency-rupee"></i> Fees Payment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/student/admission_logout">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+

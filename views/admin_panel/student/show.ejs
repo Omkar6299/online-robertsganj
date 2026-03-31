@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Student Preview' %></title>
+    <style>
+        .preview-label label { font-weight: 600; font-size: 13px; color: #6b7280; display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .preview-value { font-weight: 500; font-size: 15px; color: #111827; margin-bottom: 15px; border-bottom: 1px solid #f3f4f6; padding-bottom: 4px; }
+        .section-header {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-badge-lg { padding: 6px 12px; font-size: 14px; border-radius: 50px; }
+        .card-header-custom { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 15px 20px; }
+        .info-card { border: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-radius: 12px; overflow: hidden; }
+    </style>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">Student Profile</h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/register_student_list">Apply Students Report</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Student Profile</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+
+                    <% if (typeof student !== 'undefined' && student) { %>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card info-card mb-4">
+                                    <div class="card-header-custom d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Application Preview: <%= student.registration_no %></h5>
+                                        <div>
+                                            <% if (student.admission_status == 'Approved') { %>
+                                                <span class="badge bg-success status-badge-lg">Approved</span>
+                                            <% } else if (student.admission_status == 'Disapproved') { %>
+                                                <span class="badge bg-danger status-badge-lg">Disapproved</span>
+                                            <% } else { %>
+                                                <span class="badge bg-warning text-dark status-badge-lg">Pending Verification</span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-4">
+
+                                        <!-- 1. Personal & Identity -->
+                                        <div class="section-header"><i class="bi bi-person-badge"></i> Personal & Identification</div>
+                                        <div class="row preview-label">
+                                            <div class="col-md-3">
+                                                <label>Full Name</label>
+                                                <div class="preview-value"><%= student.user && student.user.name ? student.user.name : '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Father's Name</label>
+                                                <div class="preview-value"><%= student.father_name || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Mother's Name</label>
+                                                <div class="preview-value"><%= student.mother_name || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Date of Birth</label>
+                                                <div class="preview-value"><%= student.dob || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Gender</label>
+                                                <div class="preview-value"><%= student.gender || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Category</label>
+                                                <div class="preview-value"><%= student.category || '-' %> (<%= student.sub_category || 'None' %>)</div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Religion</label>
+                                                <div class="preview-value"><%= student.religion || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Aadhaar No</label>
+                                                <div class="preview-value"><%= student.adhar_no || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Caste</label>
+                                                <div class="preview-value"><%= student.caste || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Caste Certificate No</label>
+                                                <div class="preview-value"><%= student.cast_certificate_no || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Blood Group</label>
+                                                <div class="preview-value"><%= student.blood_group || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Voter ID (EPIC)</label>
+                                                <div class="preview-value"><%= student.epic_no || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Samarth No</label>
+                                                <div class="preview-value"><%= student.samarth_no || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Is 18+?</label>
+                                                <div class="preview-value"><%= student.is_18_plus || '-' %></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Photos & Signatures -->
+                                        <% if (student.photo || student.sign) { %>
+                                            <div class="row mb-4">
+                                                <% if (student.photo) { %>
+                                                    <div class="col-md-3">
+                                                        <label class="small text-muted text-uppercase fw-bold">Photograph</label>
+                                                        <div class="mt-2 border rounded p-1" style="width: fit-content;">
+                                                            <img src="<%= student.photo %>" alt="Photo" class="img-fluid" style="max-height: 180px; border-radius: 4px;">
+                                                        </div>
+                                                    </div>
+                                                <% } %>
+                                                <% if (student.sign) { %>
+                                                    <div class="col-md-3">
+                                                        <label class="small text-muted text-uppercase fw-bold">Signature</label>
+                                                        <div class="mt-2 border rounded p-1" style="width: fit-content; background: #fff;">
+                                                            <img src="<%= student.sign %>" alt="Sign" class="img-fluid" style="max-height: 80px; border-radius: 2px;">
+                                                        </div>
+                                                    </div>
+                                                <% } %>
+                                            </div>
+                                        <% } %>
+
+                                        <!-- 2. Course & Academics -->
+                                        <div class="section-header"><i class="bi bi-book"></i> Academic Selection</div>
+                                        <div class="row preview-label">
+                                            <div class="col-md-4">
+                                                <label>Target Course</label>
+                                                <div class="preview-value text-primary fw-bold"><%= student.courseName && student.courseName.name ? student.courseName.name : '-' %></div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>Academic Year</label>
+                                                <div class="preview-value"><%= student.academicYear && student.academicYear.year ? student.academicYear.year : '-' %></div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>Semester / Year</label>
+                                                <div class="preview-value"><%= student.semsterName && student.semsterName.name ? student.semsterName.name : '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Major 1</label>
+                                                <div class="preview-value"><%= student.major1 ? student.major1.subject_name : '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Major 2</label>
+                                                <div class="preview-value"><%= student.major2 ? student.major2.subject_name : '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Minor</label>
+                                                <div class="preview-value"><%= student.minor ? student.minor.subject_name : '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Skill / Voc</label>
+                                                <div class="preview-value"><%= student.skill ? student.skill.name : '-' %></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 3. Education History -->
+                                        <% if (typeof educationals !== 'undefined' && educationals.length > 0) { %>
+                                            <div class="section-header"><i class="bi bi-mortarboard"></i> Educational Qualifications</div>
+                                            <div class="table-responsive mb-4">
+                                                <table class="table table-sm table-hover border">
+                                                    <thead class="table-light small text-uppercase">
+                                                        <tr>
+                                                            <th>Class/Qualification</th>
+                                                            <th>Board/University</th>
+                                                            <th>Year</th>
+                                                            <th>Roll No</th>
+                                                            <th>Result</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% educationals.forEach(function(edu) { %>
+                                                            <tr>
+                                                                <td class="fw-bold"><%= edu.school_name || (edu.qualification ? edu.qualification.name : edu.class_name) %></td>
+                                                                <td><%= edu.board_name %></td>
+                                                                <td><%= edu.year_of_passing %></td>
+                                                                <td><%= edu.roll_no %></td>
+                                                                <td><%= edu.percentage %>% / <%= edu.cgpa %> CGPA</td>
+                                                            </tr>
+                                                        <% }); %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        <% } %>
+
+                                        <!-- 4. Contact & Address -->
+                                        <div class="section-header"><i class="bi bi-geo-alt"></i> Contact & Communication</div>
+                                        <div class="row preview-label">
+                                            <div class="col-md-4">
+                                                <label>Email ID</label>
+                                                <div class="preview-value"><%= student.user && student.user.email ? student.user.email : '-' %></div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>Phone Number</label>
+                                                <div class="preview-value"><%= student.user && student.user.phone ? student.user.phone : '-' %></div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>WhatsApp</label>
+                                                <div class="preview-value"><%= student.whatsapp_number || '-' %></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>Mailing Address</label>
+                                                <div class="preview-value small">
+                                                    <%= student.mailing_address %>, <%= student.mailing_district %>, <%= student.mailing_state %> - <%= student.mailing_pincode %>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>Permanent Address</label>
+                                                <div class="preview-value small">
+                                                    <%= student.permanent_address %>, <%= student.permanent_district %>, <%= student.permanent_state %> - <%= student.permanent_pincode %>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 5. Family & Other Details -->
+                                        <div class="section-header"><i class="bi bi-people"></i> Family & Additional Info</div>
+                                        <div class="row preview-label">
+                                            <div class="col-md-3">
+                                                <label>Father's Occupation</label>
+                                                <div class="preview-value"><%= student.father_occupation || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Mother's Occupation</label>
+                                                <div class="preview-value"><%= student.mother_occupation || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Family Annual Income</label>
+                                                <div class="preview-value"><%= student.family_annual_income || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Income Certificate No</label>
+                                                <div class="preview-value"><%= student.income_certificate_no || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Computer Literate</label>
+                                                <div class="preview-value"><%= student.computer_literate || 'No' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Extracurricular</label>
+                                                <div class="preview-value"><%= student.extracurricular_activity || '-' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Previous Student</label>
+                                                <div class="preview-value"><%= student.is_previous_student || 'No' %></div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Disability %</label>
+                                                <div class="preview-value"><%= student.disability_percentage || '-' %></div>
+                                            </div>
+                                            <% if (student.year_gap === 'Yes') { %>
+                                                <div class="col-md-3">
+                                                    <label>Year Gap After Inter</label>
+                                                    <div class="preview-value"><%= student.year_gap_after_inter || '-' %></div>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <label>Gap Reason</label>
+                                                    <div class="preview-value"><%= student.gap_reason || '-' %></div>
+                                                </div>
+                                            <% } %>
+                                        </div>
+
+                                        <!-- 6. Local Guardian & Bank Info -->
+                                        <div class="row preview-label mt-3">
+                                            <div class="col-md-6">
+                                                <div class="card bg-light border-0 shadow-none">
+                                                    <div class="card-body p-3">
+                                                        <h6 class="fw-bold mb-3 border-bottom pb-1 text-secondary">Local Guardian Info</h6>
+                                                        <div class="row">
+                                                            <div class="col-6"><label>Name</label><div class="preview-value"><%= student.local_guadian || '-' %></div></div>
+                                                            <div class="col-6"><label>Contact</label><div class="preview-value"><%= student.guadian_contact || '-' %></div></div>
+                                                            <div class="col-12"><label>Address</label><div class="preview-value small"><%= student.local_guadian_address || '-' %></div></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card bg-light border-0 shadow-none">
+                                                    <div class="card-body p-3">
+                                                        <h6 class="fw-bold mb-3 border-bottom pb-1 text-secondary">Bank Details</h6>
+                                                        <div class="row">
+                                                            <div class="col-6"><label>Bank Name</label><div class="preview-value"><%= student.bank_name || '-' %></div></div>
+                                                            <div class="col-6"><label>IFSC Code</label><div class="preview-value"><%= student.ifsc_code || '-' %></div></div>
+                                                            <div class="col-12"><label>Account Number</label><div class="preview-value"><%= student.bank_account_no || '-' %></div></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 7. Weightage Details -->
+                                        <% if (student.studentWeightages && student.studentWeightages.length > 0) { %>
+                                            <div class="section-header"><i class="bi bi-award"></i> Weightage Claims</div>
+                                            <div class="row preview-label px-2">
+                                                <% student.studentWeightages.forEach(function(sw) { %>
+                                                    <div class="col-md-6 mb-2">
+                                                        <div class="p-2 border rounded bg-white h-100 d-flex align-items-center">
+                                                            <i class="bi bi-patch-check-fill text-success me-2"></i>
+                                                            <span class="small fw-semibold"><%= sw.weightageInfo ? sw.weightageInfo.name : 'N/A' %></span>
+                                                        </div>
+                                                    </div>
+                                                <% }); %>
+                                            </div>
+                                        <% } %>
+
+                                        <hr class="my-4">
+
+                                        <div class="d-flex justify-content-end">
+                                            <a href="javascript:history.back()" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Go Back</a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else if (typeof registration_no !== 'undefined') { %>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-warning text-center">
+                                    <i class="bi bi-info-circle me-2"></i> No student found with the registration number provided. Please check and try again.
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>

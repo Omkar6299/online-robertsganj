@@ -1,0 +1,194 @@
+<aside class="app-sidebar bg-primary-subtle" data-bs-theme="dark">
+    <!--begin::Sidebar Brand-->
+    <div class="sidebar-brand">
+        <!--begin::Brand Link-->
+        <a href="/admin/dashboard" class="brand-link">
+            <!--begin::Brand Image-->
+            <img src="/admin/assets/img/AdminLTELogo.png" alt="AdminLTE Logo"
+                class="brand-image opacity-75 shadow" />
+            <!--end::Brand Image-->
+            <!--begin::Brand Text-->
+            <span class="brand-text fw-light">Admin Panel</span>
+            <!--end::Brand Text-->
+        </a>
+        <!--end::Brand Link-->
+    </div>
+    <!--end::Sidebar Brand-->
+    <!--begin::Sidebar Wrapper-->
+    <div class="sidebar-wrapper">
+        <nav class="mt-2">
+            <!--begin::Sidebar Menu-->
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation"
+                aria-label="Main navigation" data-accordion="false" id="navigation">
+                <li class="nav-item">
+                    <a href="/admin/dashboard"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/dashboard') ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-speedometer"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+
+                <% if (typeof user !== 'undefined' && user.role === 'Super Admin') { %>
+                <li class="nav-item <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/courses*','/admin/skills*', '/admin/cocurricular*','/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*']) ? 'menu-open' : '' %>">
+                    <a href="#"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active(['/admin/courses*','/admin/skills*','/admin/cocurricular*', '/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*']) ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-grid"></i>
+                        <p>
+                            Masters
+                            <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="display: <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/courses*','/admin/skills*', '/admin/cocurricular*','/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*']) ? 'block' : 'none' %>">
+                        <li class="nav-item">
+                            <a href="/admin/qualifications"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/qualifications*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Qualification</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/course_types"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/course_types*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Course Type</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/courses"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/courses*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Course</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/cocurricular"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/cocurricular*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Cocurricular Course</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/skills"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/skills*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Skills Course</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/subjects"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/subjects*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Subject</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/semesters"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/semesters*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Semester</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/registration_qualifications"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/registration_qualifications*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Registration Qualifications</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/weightages"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/weightages*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Weightage</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/fee_maintenance"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/fee_maintenance*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Fee Maintenance</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <% } %>
+                <li class="nav-item">
+                    <a href="/admin/register_student_list"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/register_student_list*') ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-people"></i>
+                        <p>Apply Students Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/admitted_student_list"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/admitted_student_list*') ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-person-check"></i>
+                        <p>Admitted Students Report</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/form_verification"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/form_verification*') ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-copy"></i>
+                        <p>Form Verification</p>
+                    </a>
+                </li>
+                <li class="nav-header">Reports</li>
+                <li class="nav-item <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/reports/counselling*','/admin/reports/student_fees_details*', '/admin/reports/subject_wise*']) ? 'menu-open' : '' %>">
+                    <a href="#" class="nav-link <%= typeof set_active !== 'undefined' && set_active(['/admin/reports/counselling*','/admin/reports/student_fees_details*', '/admin/reports/subject_wise*']) ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-bar-chart"></i>
+                        <p>
+                            MIS Reports
+                            <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview"
+                        style="display: <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/reports/counselling*','/admin/reports/student_fees_details*', '/admin/reports/subject_wise*']) ? 'block' : 'none' %>">
+                        <li class="nav-item">
+                            <a href="/admin/reports/counselling"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/reports/counselling*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Counselling Wise Report</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/reports/student_fees_details"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/reports/student_fees_details*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Student Fees Wise Report</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/reports/subject_wise"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/reports/subject_wise*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Subject Wise Report</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-header">Others</li>
+                <li class="nav-item">
+                    <a href="/admin/users"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/users*') ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-people"></i>
+                        <p>User Managment</p>
+                    </a>
+                </li>
+                <% if (typeof user !== 'undefined' && user.role === 'Super Admin') { %>
+                <li class="nav-item">
+                    <a href="/admin/roles"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/roles*') ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-phone"></i>
+                        <p>Role</p>
+                    </a>
+                </li>
+                <% } %>
+            </ul>
+            <!--end::Sidebar Menu-->
+        </nav>
+    </div>
+    <!--end::Sidebar Wrapper-->
+</aside>
+

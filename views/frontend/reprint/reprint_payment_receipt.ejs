@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Reprint Payment Receipt' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0"><i class="bi bi-receipt-cutoff me-2"></i>Reprint Registration Payment Receipt</h4>
+                        </div>
+                        <div class="card-body">
+                            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        <% errors.forEach(function(error) { %>
+                                            <li><%= error %></li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            <% } %>
+
+                            <form action="/reprint_payment_receipt_" method="POST" id="reprintForm">
+                                <!-- Academic Year -->
+                                <div class="mb-3">
+                                    <label for="academic_year" class="form-label">Academic Year <span class="text-danger">*</span></label>
+                                    <select name="academic_year" id="academic_year" class="form-control" required>
+                                        <option value="">-- Select Academic Year --</option>
+                                        <% if (typeof academicYears !== 'undefined' && academicYears.length > 0) { %>
+                                            <% academicYears.forEach(function(year) { %>
+                                                <option value="<%= year.id %>" <%= typeof oldInput !== 'undefined' && oldInput.academic_year == year.id ? 'selected' : '' %>>
+                                                    <%= year.session %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <!-- Course Type -->
+                                <div class="mb-3">
+                                    <label for="course_type_id" class="form-label">Class Name (Course Type) <span class="text-danger">*</span></label>
+                                    <select name="course_type_id" id="course_type_id" class="form-control" required>
+                                        <option value="">-- Select Class --</option>
+                                        <% if (typeof courseTypes !== 'undefined' && courseTypes.length > 0) { %>
+                                            <% courseTypes.forEach(function(type) { %>
+                                                <option value="<%= type.id %>" <%= typeof oldInput !== 'undefined' && oldInput.course_type_id == type.id ? 'selected' : '' %>>
+                                                    <%= type.name %>
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Course -->
+                                <div class="mb-3">
+                                    <label for="course_id" class="form-label">Course <span class="text-danger">*</span></label>
+                                    <select name="course_id" id="course_id" class="form-control" required disabled>
+                                        <option value="">-- Select Course --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Semester -->
+                                <div class="mb-3">
+                                    <label for="semester_id" class="form-label">Semester <span class="text-danger">*</span></label>
+                                    <select name="semester_id" id="semester_id" class="form-control" required disabled>
+                                        <option value="">-- Select Semester --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Date of Birth -->
+                                <div class="mb-3">
+                                    <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                    <input type="date" name="dob" id="dob" class="form-control"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.dob ? oldInput.dob : '' %>"
+                                        placeholder="dd-mm-yyyy" required>
+                                </div>
+
+                                <!-- Mobile Number -->
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="phone" id="phone" class="form-control" maxlength="10"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.phone ? oldInput.phone : '' %>"
+                                        placeholder="Enter 10-digit mobile number" required>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-search me-2"></i>Search Receipt
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+
+    <script>
+        $(document).ready(function() {
+            // Load courses when course type changes
+            $('#course_type_id').on('change', function() {
+                const typeId = $(this).val();
+                const courseSelect = $('#course_id');
+                const semesterSelect = $('#semester_id');
+
+                if (typeId) {
+                    courseSelect.prop('disabled', false);
+                    courseSelect.html('<option value="">Loading...</option>');
+                    semesterSelect.prop('disabled', true).html('<option value="">-- Select Semester --</option>');
+
+                    $.ajax({
+                        url: '/get-course/' + typeId,
+                        method: 'GET',
+                        success: function(courses) {
+                            courseSelect.html('<option value="">-- Select Course --</option>');
+                            courses.forEach(function(course) {
+                                const selected = (typeof oldInput !== 'undefined' && oldInput.course_id == course.id) ? 'selected' : '';
+                                courseSelect.append('<option value="' + course.id + '" ' + selected + '>' + course.name + '</option>');
+                            });
+                        },
+                        error: function() {
+                            courseSelect.html('<option value="">Error loading courses</option>');
+                        }
+                    });
+                } else {
+                    courseSelect.prop('disabled', true).html('<option value="">-- Select Course --</option>');
+                    semesterSelect.prop('disabled', true).html('<option value="">-- Select Semester --</option>');
+                }
+            });
+
+            // Load semesters when course changes
+            $('#course_id').on('change', function() {
+                const courseId = $(this).val();
+                const semesterSelect = $('#semester_id');
+
+                if (courseId) {
+                    semesterSelect.prop('disabled', false);
+                    semesterSelect.html('<option value="">Loading...</option>');
+
+                    $.ajax({
+                        url: '/get-semester/' + courseId,
+                        method: 'GET',
+                        success: function(semesters) {
+                            semesterSelect.html('<option value="">-- Select Semester --</option>');
+                            semesters.forEach(function(semester) {
+                                const selected = (typeof oldInput !== 'undefined' && oldInput.semester_id == semester.id) ? 'selected' : '';
+                                semesterSelect.append('<option value="' + semester.id + '" ' + selected + '>' + semester.name + '</option>');
+                            });
+                        },
+                        error: function() {
+                            semesterSelect.html('<option value="">Error loading semesters</option>');
+                        }
+                    });
+                } else {
+                    semesterSelect.prop('disabled', true).html('<option value="">-- Select Semester --</option>');
+                }
+            });
+
+            // Trigger course type change if it has a value (for form errors)
+            if (typeof oldInput !== 'undefined' && oldInput.course_type_id) {
+                $('#course_type_id').trigger('change');
+
+                // If course_id exists in oldInput, wait and set it
+                if (oldInput.course_id) {
+                    setTimeout(function() {
+                        $('#course_id').val(oldInput.course_id).trigger('change');
+
+                        // If semester_id exists, wait and set it
+                        if (oldInput.semester_id) {
+                            setTimeout(function() {
+                                $('#semester_id').val(oldInput.semester_id);
+                            }, 800);
+                        }
+                    }, 800);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

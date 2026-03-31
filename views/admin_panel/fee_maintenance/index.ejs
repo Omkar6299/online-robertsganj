@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Fee Maintenance' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Fee Maintenance' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Fee Maintenance</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Filter Fees</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="/admin/fee_maintenance" method="GET" id="filterForm">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label for="course_filter" class="form-label">Course</label>
+                                                <select name="course_id" id="course_filter" class="form-select">
+                                                    <option value="">All Courses</option>
+                                                    <% courses.forEach(course => { %>
+                                                        <option value="<%= course.id %>" <%= selectedCourseId == course.id ? 'selected' : '' %>><%= course.name %></option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="semester_filter" class="form-label">Semester</label>
+                                                <select name="semester_id" id="semester_filter" class="form-select">
+                                                    <option value="">All Semesters</option>
+                                                    <% (typeof semesters !== 'undefined' ? semesters : []).forEach(sem => { %>
+                                                        <option value="<%= sem.id %>" <%= selectedSemesterId == sem.id ? 'selected' : '' %>><%= sem.name %></option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 d-flex align-items-end">
+                                                <button type="submit" class="btn btn-bg-primary me-2">Filter</button>
+                                                <a href="/admin/fee_maintenance" class="btn btn-secondary">Reset</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6 text-start">
+                                            <h5 class="mb-0">Fee Maintenance List</h5>
+                                        </div>
+                                        <div class="col-md-6 text-end">
+                                            <a class="btn btn-bg-primary" href="/admin/fee_maintenance/create">Add Fee</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle" id="dataTable">
+                                            <thead class="table-bg-primary">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Course</th>
+                                                    <th>Semester</th>
+                                                    <th>Fee Name</th>
+                                                    <th>Total Amount</th>
+                                                    <th>Late Fee</th>
+                                                    <th>Fee Type</th>
+                                                    <th>Active</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (typeof fees !== 'undefined' && fees.length > 0) { %>
+                                                    <% fees.forEach(function(fee, index) { %>
+                                                        <tr>
+                                                            <td><%= index + 1 %></td>
+                                                            <td><%= fee.course ? fee.course.name : fee.Course %></td>
+                                                            <td><%= fee.semesterInfo ? fee.semesterInfo.name : fee.semester %></td>
+                                                            <td><%= fee.Fee_Name %></td>
+                                                            <td><%= fee.Total_Fee_Amount %></td>
+                                                            <td><%= fee.Late_Fee %></td>
+                                                            <td><%= fee.fee_Type %></td>
+                                                            <td>
+                                                                <% if (fee.fee_Active == 'Active' || fee.fee_Active == '1') { %>
+                                                                    <span class="badge bg-success">Active</span>
+                                                                <% } else { %>
+                                                                    <span class="badge bg-danger">Inactive</span>
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/admin/fee_maintenance/<%= fee.id %>" class="btn btn-sm btn-info text-white me-1" title="View Details">
+                                                                    <i class="bi bi-eye"></i>
+                                                                </a>
+                                                                <a href="/admin/fee_maintenance/<%= fee.id %>/edit" class="btn btn-sm btn-warning">
+                                                                    <i class="bi bi-pencil"></i> Edit
+                                                                </a>
+                                                                <form action="/admin/fee_maintenance/<%= fee.id %>" method="POST" class="d-inline"
+                                                                    onsubmit="return confirm('Are you sure you want to delete this fee record?');">
+                                                                    <input type="hidden" name="_method" value="DELETE">
+                                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                                        <i class="bi bi-trash"></i> Delete
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    <% }); %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="9" class="text-center">No records found.</td>
+                                                    </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <%- include('../layouts/datatable_init') %>
+
+    <script>
+        $(document).ready(function() {
+            $('#course_filter').on('change', function() {
+                var courseId = $(this).val();
+                var semesterSelect = $('#semester_filter');
+                semesterSelect.empty().append('<option value="">All Semesters</option>');
+                
+                if (courseId) {
+                    $.ajax({
+                        url: '/admin/fee_maintenance/get-semesters/' + courseId,
+                        type: 'GET',
+                        success: function(data) {
+                            if (data.semesters) {
+                                $.each(data.semesters, function(i, sem) {
+                                    semesterSelect.append('<option value="' + sem.id + '">' + sem.name + '</option>');
+                                });
+                            }
+                        },
+                        error: function() {
+                            alert('Error loading semesters.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

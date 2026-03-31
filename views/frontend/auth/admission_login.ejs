@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Admission Login' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Admission Login</h4>
+                        </div>
+                        <div class="card-body">
+                            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        <% errors.forEach(function(error) { %>
+                                            <li><%= error %></li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof error !== 'undefined' && error.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <%= error[0] %>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof success !== 'undefined' && success.length > 0) { %>
+                                <div class="alert alert-success">
+                                    <%= success[0] %>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof oldInput !== 'undefined' && oldInput.transaction_id && oldInput.phone) { %>
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Payment Successful!</strong> Your credentials are pre-filled. Click Login to continue with your admission form.
+                                </div>
+                            <% } %>
+
+                            <form action="/admission_login_post" method="POST" id="admissionLoginForm">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.phone ? oldInput.phone : '' %>"
+                                        placeholder="Enter 10-digit mobile number" required maxlength="10"
+                                        pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="transaction_id" class="form-label">Transaction ID <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="transaction_id" name="transaction_id"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.transaction_id ? oldInput.transaction_id : '' %>"
+                                        placeholder="Enter Transaction ID (e.g., 4518690207)" required
+                                        pattern="[0-9]{8,}" title="Transaction ID should be numeric (8-15 digits)">
+                                    <small class="form-text text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Transaction ID is the 10-digit number you received after payment
+                                    </small>
+                                </div>
+
+                                <div class="d-grid mb-3">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Login to Apply Online
+                                    </button>
+                                </div>
+
+                                <div class="row g-2 mt-2">
+                                    <div class="col-6">
+                                        <a href="/print_application_form" class="btn btn-outline-info btn-sm w-100">
+                                            <i class="bi bi-printer me-1"></i> Reprint Form
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="/know_your_registration" class="btn btn-outline-info btn-sm w-100">
+                                            <i class="bi bi-search me-1"></i> Know Reg No
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+    <script>
+        // Auto-submit form if both fields are pre-filled (from payment success redirect)
+        // Use sessionStorage to prevent multiple auto-submits
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('admissionLoginForm');
+            const phoneInput = document.getElementById('phone');
+            const transactionInput = document.getElementById('transaction_id');
+            const loginBtn = document.getElementById('loginBtn');
+
+            // Check if auto-submit already happened (prevent loops)
+            const autoSubmitKey = 'admission_auto_submit_' + (transactionInput ? transactionInput.value : '');
+            if (sessionStorage.getItem(autoSubmitKey)) {
+                console.log('Auto-submit already attempted, skipping');
+                return;
+            }
+
+            // Validate transaction ID format (should be numeric, 8-15 digits)
+            function isValidTransactionId(txnId) {
+                if (!txnId || typeof txnId !== 'string') return false;
+                // Transaction ID should be numeric and typically 8-15 digits
+                const numericOnly = /^\d{8,15}$/.test(txnId.trim());
+                if (!numericOnly) {
+                    console.warn('Invalid transaction ID format:', txnId);
+                }
+                return numericOnly;
+            }
+
+            // Validate phone number format (should be 10 digits)
+            function isValidPhone(phone) {
+                if (!phone || typeof phone !== 'string') return false;
+                return /^\d{10}$/.test(phone.trim());
+            }
+
+            // Check if both fields are pre-filled AND both are valid
+            if (form && phoneInput && transactionInput &&
+                phoneInput.value && transactionInput.value) {
+
+                // Validate transaction ID format
+                if (!isValidTransactionId(transactionInput.value)) {
+                    console.warn('Invalid transaction ID format:', transactionInput.value);
+                    // Don't auto-submit if transaction ID looks invalid
+                    const warningMsg = document.createElement('div');
+                    warningMsg.className = 'alert alert-warning mt-3';
+                    warningMsg.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i><strong>Invalid Transaction ID:</strong> Transaction ID should be numeric (8-15 digits). Please check and try again.';
+                    form.parentNode.insertBefore(warningMsg, form);
+                    // Highlight the invalid field
+                    transactionInput.classList.add('is-invalid');
+                    return;
+                }
+
+                // Validate phone number format
+                if (!isValidPhone(phoneInput.value)) {
+                    console.warn('Invalid phone format:', phoneInput.value);
+                    const warningMsg = document.createElement('div');
+                    warningMsg.className = 'alert alert-warning mt-3';
+                    warningMsg.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i><strong>Invalid Phone Number:</strong> Phone number should be 10 digits. Please check and try again.';
+                    form.parentNode.insertBefore(warningMsg, form);
+                    phoneInput.classList.add('is-invalid');
+                    return;
+                }
+
+                // Mark that auto-submit is happening
+                sessionStorage.setItem(autoSubmitKey, 'true');
+
+                // Show auto-login message
+                const autoLoginMsg = document.createElement('div');
+                autoLoginMsg.className = 'alert alert-success mt-3';
+                autoLoginMsg.innerHTML = '<i class="bi bi-check-circle me-2"></i>Auto-logging you in...';
+                form.parentNode.insertBefore(autoLoginMsg, form);
+
+                // Disable button and show loading
+                if (loginBtn) {
+                    loginBtn.disabled = true;
+                    loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
+                }
+
+                // Prevent form from submitting multiple times
+                let submitted = false;
+                form.addEventListener('submit', function(e) {
+                    if (submitted) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    submitted = true;
+                });
+
+                // Auto-submit after 1.5 seconds (give user time to see the message)
+                setTimeout(function() {
+                    if (!submitted && form) {
+                        form.submit();
+                    }
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>
+

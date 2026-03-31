@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Payment Failed' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow text-center">
+                        <div class="card-body py-5">
+                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 5rem;"></i>
+                            <h2 class="text-danger mt-3 mb-3">Payment Failed</h2>
+                            <p class="lead">Your payment could not be processed.</p>
+
+                            <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                                <div class="alert alert-danger mt-3">
+                                    <%= errorMessage %>
+                                </div>
+                            <% } %>
+
+                            <div class="mt-4">
+                                <a href="/student/fees_payment" class="btn btn-primary">Try Again</a>
+                                <a href="/student/dashboard" class="btn btn-secondary ms-2">Go to Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
+

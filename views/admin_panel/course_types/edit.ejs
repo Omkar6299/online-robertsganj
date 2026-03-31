@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Edit Course Type' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit Course Type' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/course_types">Course Types</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Edit Course Type' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit Course Type' %></h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/course_types">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/course_types/<%= typeof courseType !== 'undefined' ? courseType.id : '' %>" method="POST">
+                                        <input type="hidden" name="_method" value="PUT">
+                                        <div class="row g-3">
+                                            <!-- Course Type Name -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="name" class="form-label">Course Type Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="name" id="name" class="form-control"
+                                                        value="<%= typeof oldInput !== 'undefined' && oldInput.name ? oldInput.name : (typeof courseType !== 'undefined' && courseType.name ? courseType.name : '') %>"
+                                                        placeholder="Enter Course Type Name" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Status -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                                    <select name="status" id="status" class="form-control" required>
+                                                        <option value="">-- Select Status --</option>
+                                                        <option value="1" <%= (typeof courseType !== 'undefined' && (courseType.status == '1' || courseType.status == 1)) || (typeof oldInput !== 'undefined' && oldInput.status == '1') ? 'selected' : '' %>>Active</option>
+                                                        <option value="0" <%= (typeof courseType !== 'undefined' && (courseType.status == '0' || courseType.status == 0)) || (typeof oldInput !== 'undefined' && oldInput.status == '0') ? 'selected' : '' %>>Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Update Course Type
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>
+

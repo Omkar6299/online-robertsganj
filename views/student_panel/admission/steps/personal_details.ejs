@@ -1,0 +1,210 @@
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+            <% }); %>
+        </ul>
+    </div>
+<% } %>
+
+<div class="alert alert-info py-2" style="font-size: 0.9rem;">
+    <i class="bi bi-info-circle me-2"></i>Note: Identity details (Name, Parents' names, DOB, Contact) are pulled from your initial registration and cannot be changed.
+</div>
+
+<form action="/student/personal_details_post" method="POST">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                <input type="text" name="name" id="name" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.name ? oldInput.name : (typeof personalDetails !== 'undefined' && personalDetails.name ? personalDetails.name : '') %>"
+                    placeholder="Enter Full Name" required readonly style="background-color: #e9ecef;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="father_name" class="form-label">Father's Name <span class="text-danger">*</span></label>
+                <input type="text" name="father_name" id="father_name" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.father_name ? oldInput.father_name : (typeof student !== 'undefined' && student.father_name ? student.father_name : '') %>"
+                    placeholder="Enter Father's Name" required readonly style="background-color: #e9ecef;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="mother_name" class="form-label">Mother's Name <span class="text-danger">*</span></label>
+                <input type="text" name="mother_name" id="mother_name" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.mother_name ? oldInput.mother_name : (typeof student !== 'undefined' && student.mother_name ? student.mother_name : '') %>"
+                    placeholder="Enter Mother's Name" required readonly style="background-color: #e9ecef;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                <input type="date" name="dob" id="dob" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.dob ? oldInput.dob : (typeof student !== 'undefined' && student.dob ? student.dob : '') %>"
+                    required readonly style="background-color: #e9ecef;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                <select name="gender" id="gender" class="form-control" required>
+                    <option value="">-- Select Gender --</option>
+                    <%
+                    const selectedGender = (typeof oldInput !== 'undefined' && oldInput.gender) ? oldInput.gender : 
+                                         (typeof student !== 'undefined' && student.gender ? student.gender : 
+                                         (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.gender ? previousStudent.gender : ''));
+                    %>
+                    <option value="Male" <%= selectedGender.toString().trim() == 'Male' ? 'selected' : '' %>>Male</option>
+                    <option value="Female" <%= selectedGender.toString().trim() == 'Female' ? 'selected' : '' %>>Female</option>
+                    <option value="Other" <%= selectedGender.toString().trim() == 'Other' ? 'selected' : '' %>>Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                <select name="category" id="category" class="form-control" required>
+                    <option value="">-- Select Category --</option>
+                    <%
+                    const selectedCategory = (typeof oldInput !== 'undefined' && oldInput.category) ? oldInput.category : 
+                                           (typeof student !== 'undefined' && student.category ? student.category : 
+                                           (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.category ? previousStudent.category : ''));
+                    %>
+                    <option value="General" <%= selectedCategory.toString().trim() == 'General' ? 'selected' : '' %>>General</option>
+                    <option value="OBC" <%= selectedCategory.toString().trim() == 'OBC' ? 'selected' : '' %>>OBC</option>
+                    <option value="SC" <%= selectedCategory.toString().trim() == 'SC' ? 'selected' : '' %>>SC</option>
+                    <option value="ST" <%= selectedCategory.toString().trim() == 'ST' ? 'selected' : '' %>>ST</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="religion" class="form-label">Religion <span class="text-danger">*</span></label>
+                <select name="religion" id="religion" class="form-control" required>
+                    <option value="">-- Select Religion --</option>
+                    <%
+                    const selectedRel = (typeof oldInput !== 'undefined' && oldInput.religion) ? oldInput.religion : 
+                                      (typeof student !== 'undefined' && student.religion ? student.religion : 
+                                      (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.religion ? previousStudent.religion : ''));
+                    %>
+                    <option value="HINDU" <%= selectedRel == 'HINDU' ? 'selected' : '' %>>HINDU</option>
+                    <option value="MUSLIM" <%= selectedRel == 'MUSLIM' ? 'selected' : '' %>>MUSLIM</option>
+                    <option value="SIKH" <%= selectedRel == 'SIKH' ? 'selected' : '' %>>SIKH</option>
+                    <option value="CHRISTIAN" <%= selectedRel == 'CHRISTIAN' ? 'selected' : '' %>>CHRISTIAN</option>
+                    <option value="JAIN" <%= selectedRel == 'JAIN' ? 'selected' : '' %>>JAIN</option>
+                    <option value="BUDDHIST" <%= selectedRel == 'BUDDHIST' ? 'selected' : '' %>>BUDDHIST</option>
+                    <option value="Other" <%= selectedRel == 'Other' ? 'selected' : '' %>>Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="caste" class="form-label">Caste <span class="text-danger">*</span></label>
+                <input type="text" name="caste" id="caste" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.caste ? oldInput.caste : (typeof student !== 'undefined' && student.caste ? student.caste : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.caste ? previousStudent.caste : '')) %>"
+                    placeholder="Enter Caste" required>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="cast_certificate_no" class="form-label">Caste Certificate No.</label>
+                <input type="text" name="cast_certificate_no" id="cast_certificate_no" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.cast_certificate_no ? oldInput.cast_certificate_no : (typeof student !== 'undefined' && student.cast_certificate_no ? student.cast_certificate_no : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.cast_certificate_no ? previousStudent.cast_certificate_no : '')) %>"
+                    placeholder="Enter Caste Certificate Number">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="blood_group" class="form-label">Blood Group</label>
+                <select name="blood_group" id="blood_group" class="form-control">
+                    <option value="">-- Select Blood Group --</option>
+                    <%
+                    const selectedBG = (typeof oldInput !== 'undefined' && oldInput.blood_group) ? oldInput.blood_group : (typeof student !== 'undefined' && student.blood_group ? student.blood_group : '');
+                    %>
+                    <option value="A+" <%= selectedBG == 'A+' ? 'selected' : '' %>>A+</option>
+                    <option value="A-" <%= selectedBG == 'A-' ? 'selected' : '' %>>A-</option>
+                    <option value="B+" <%= selectedBG == 'B+' ? 'selected' : '' %>>B+</option>
+                    <option value="B-" <%= selectedBG == 'B-' ? 'selected' : '' %>>B-</option>
+                    <option value="O+" <%= selectedBG == 'O+' ? 'selected' : '' %>>O+</option>
+                    <option value="O-" <%= selectedBG == 'O-' ? 'selected' : '' %>>O-</option>
+                    <option value="AB+" <%= selectedBG == 'AB+' ? 'selected' : '' %>>AB+</option>
+                    <option value="AB-" <%= selectedBG == 'AB-' ? 'selected' : '' %>>AB-</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="adhar_no" class="form-label">Aadhar Number <span class="text-danger">*</span></label>
+                <input type="text" name="adhar_no" id="adhar_no" class="form-control" maxlength="12"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.adhar_no ? oldInput.adhar_no : (typeof student !== 'undefined' && student.adhar_no ? student.adhar_no : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.adhar_no ? previousStudent.adhar_no : '')) %>"
+                    placeholder="Enter 12-digit Aadhar number" required>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="epic_no" class="form-label">Voter ID (EPIC) No.</label>
+                <input type="text" name="epic_no" id="epic_no" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.epic_no ? oldInput.epic_no : (typeof student !== 'undefined' && student.epic_no ? student.epic_no : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.epic_no ? previousStudent.epic_no : '')) %>"
+                    placeholder="Enter Voter ID Number">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="samarth_no" class="form-label">Samarth Registration No.</label>
+                <input type="text" name="samarth_no" id="samarth_no" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.samarth_no ? oldInput.samarth_no : (typeof student !== 'undefined' && student.samarth_no ? student.samarth_no : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.samarth_no ? previousStudent.samarth_no : '')) %>"
+                    placeholder="Enter Samarth Registration Number">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="is_18_plus" class="form-label">Are you 18 years of age? <span class="text-danger">*</span></label>
+                <select name="is_18_plus" id="is_18_plus" class="form-control" required>
+                    <%
+                    const selected18 = (typeof oldInput !== 'undefined' && oldInput.is_18_plus) ? oldInput.is_18_plus : (typeof student !== 'undefined' && student.is_18_plus ? student.is_18_plus : 'No');
+                    %>
+                    <option value="Yes" <%= selected18 == 'Yes' ? 'selected' : '' %>>Yes</option>
+                    <option value="No" <%= selected18 == 'No' ? 'selected' : '' %>>No</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="phone" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                <input type="text" name="phone" id="phone" class="form-control" maxlength="10"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.phone ? oldInput.phone : (typeof personalDetails !== 'undefined' && personalDetails.phone ? personalDetails.phone : '') %>"
+                    placeholder="Enter 10-digit mobile number" required readonly style="background-color: #e9ecef;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                <input type="email" name="email" id="email" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.email ? oldInput.email : (typeof personalDetails !== 'undefined' && personalDetails.email ? personalDetails.email : '') %>"
+                    placeholder="Enter Email Address" required readonly style="background-color: #e9ecef;">
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Save & Continue</button>
+    </div>
+</form>
+

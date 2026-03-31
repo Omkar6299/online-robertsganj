@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Registered Students' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Registered Students' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Registered Students' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+
+                            <!-- Filter Bar -->
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-body py-2">
+                                    <form action="/admin/register_student_list" method="GET" class="row g-2 align-items-end">
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-1 small fw-semibold">Academic Year</label>
+                                            <select name="academic_year_id" class="form-select form-select-sm">
+                                                <% if (typeof academicYears !== 'undefined') { academicYears.forEach(function(year) { %>
+                                                    <option value="<%= year.id %>" <%= (typeof activeYearId !== 'undefined' && activeYearId == year.id) ? 'selected' : '' %>><%= year.session %></option>
+                                                <% }); } %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-1 small fw-semibold">Course</label>
+                                            <select name="course_id" class="form-select form-select-sm">
+                                                <option value="">-- All Courses --</option>
+                                                <% if (typeof courses !== 'undefined') { courses.forEach(function(course) { %>
+                                                    <option value="<%= course.id %>" <%= (typeof filters !== 'undefined' && filters.course_id == course.id) ? 'selected' : '' %>><%= course.name %></option>
+                                                <% }); } %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-1 small fw-semibold">Status</label>
+                                            <select name="status" class="form-select form-select-sm">
+                                                <option value="">-- All Statuses --</option>
+                                                <option value="Pending" <%= (typeof filters !== 'undefined' && filters.status === 'Pending') ? 'selected' : '' %>>Pending</option>
+                                                <option value="Approved" <%= (typeof filters !== 'undefined' && filters.status === 'Approved') ? 'selected' : '' %>>Approved</option>
+                                                <option value="Disapproved" <%= (typeof filters !== 'undefined' && filters.status === 'Disapproved') ? 'selected' : '' %>>Disapproved</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-auto">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-funnel me-1"></i> Filter
+                                            </button>
+                                            <a href="/admin/register_student_list" class="btn btn-sm btn-secondary ms-1">
+                                                <i class="bi bi-x-circle me-1"></i> Reset
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Students Table -->
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Registered Students' %></h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle" id="dataTable">
+                                            <thead class="table-bg-primary">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Registration No</th>
+                                                    <th>Student Name</th>
+                                                    <th>Course</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (typeof students !== 'undefined' && students.length > 0) { %>
+                                                    <% students.forEach(function(student, index) { %>
+                                                        <tr>
+                                                            <td><%= index + 1 %></td>
+                                                            <td><%= student.registration_no || '-' %></td>
+                                                            <td><%= student.user && student.user.name ? student.user.name : '-' %></td>
+                                                            <td><%= student.courseName && student.courseName.name ? student.courseName.name : '-' %></td>
+                                                            <td><%= student.user && student.user.email ? student.user.email : '-' %></td>
+                                                            <td><%= student.user && student.user.phone ? student.user.phone : '-' %></td>
+                                                            <td>
+                                                                <% if (student.admission_status == 'Approved') { %>
+                                                                    <span class="badge bg-success">Approved</span>
+                                                                <% } else if (student.admission_status == 'Disapproved') { %>
+                                                                    <span class="badge bg-danger">Disapproved</span>
+                                                                <% } else { %>
+                                                                    <span class="badge bg-warning">Pending</span>
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex flex-nowrap gap-1">
+                                                                    <a href="/admin/students/<%= student.id %>" class="btn btn-sm btn-info" title="View Application">
+                                                                        <i class="bi bi-eye"></i>
+                                                                    </a>
+                                                                    <% if (!student.admissionFeeDetails || student.admissionFeeDetails.length === 0) { %>
+                                                                        <a href="/admin/students/<%= student.id %>/edit" class="btn btn-sm btn-warning" title="Edit Student">
+                                                                            <i class="bi bi-pencil-square"></i>
+                                                                        </a>
+                                                                    <% } %>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <% }); %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <%- include('../layouts/datatable_init') %>
+</body>
+</html>

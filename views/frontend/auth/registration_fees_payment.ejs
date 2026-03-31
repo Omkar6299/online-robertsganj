@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Registration Fees Payment' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Registration Fees Payment</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Success Messages (from res.locals - set by global middleware) -->
+                            <% if (typeof success !== 'undefined' && success && (Array.isArray(success) ? success.length > 0 : success !== '')) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <strong>Success!</strong> <%= Array.isArray(success) ? success[0] : success %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+
+                            <!-- Error Messages (array) - from res.locals.errors -->
+                            <% if (typeof errors !== 'undefined' && Array.isArray(errors) && errors.length > 0) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>Error!</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <% errors.forEach(function(err) { %>
+                                            <li><%= err %></li>
+                                        <% }); %>
+                                    </ul>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+
+                            <!-- Single Error Message - from res.locals.error -->
+                            <% if (typeof error !== 'undefined' && error && (Array.isArray(error) ? error.length > 0 : error !== '' && error !== null)) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>Error!</strong> <%= Array.isArray(error) ? error[0] : error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+
+                            <form action="/registration_fees_payment_post" method="POST" id="registrationForm" novalidate>
+                                <div class="row g-3">
+                                    <!-- Registration Number (for existing students) -->
+                                    <% if (typeof is_first_time_college === 'undefined' || !is_first_time_college) { %>
+                                        <div class="col-12">
+                                            <div class="alert alert-info">
+                                                <strong>Already Registered?</strong> If you have registered in a previous academic year, enter your registration number below to auto-fill your details.
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="registration_no" class="form-label">Registration Number (Optional)</label>
+                                                <input type="text" name="registration_no" id="registration_no" class="form-control"
+                                                    placeholder="Enter your registration number"
+                                                    value="<%= typeof oldInput !== 'undefined' && oldInput.registration_no ? oldInput.registration_no : '' %>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">&nbsp;</label>
+                                                <button type="button" id="fetchStudentBtn" class="btn btn-info w-100">
+                                                    <i class="bi bi-search"></i> Fetch Details
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <% } %>
+
+                                    <!-- Course Type -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="course_type_id" class="form-label">Course Type <span class="text-danger">*</span></label>
+                                            <select name="course_type_id" id="course_type_id" class="form-control" required>
+                                                <option value="">-- Select Course Type --</option>
+                                                <% if (typeof courseTypes !== 'undefined' && courseTypes.length > 0) { %>
+                                                    <% courseTypes.forEach(function(type) { %>
+                                                        <option value="<%= type.id %>" <%= typeof oldInput !== 'undefined' && oldInput.course_type_id == type.id ? 'selected' : '' %>>
+                                                            <%= type.name %>
+                                                        </option>
+                                                    <% }); %>
+                                                <% } %>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Course -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="course_id" class="form-label">Course <span class="text-danger">*</span></label>
+                                            <select name="course_id" id="course_id" class="form-control" required disabled>
+                                                <option value="">-- Select Course --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Semester -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="semester_id" class="form-label">Semester <span class="text-danger">*</span></label>
+                                            <select name="semester_id" id="semester_id" class="form-control" required disabled>
+                                                <option value="">-- Select Semester --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Previous Registration Number (Conditional) -->
+                                    <% if (typeof is_first_time_college === 'undefined' || !is_first_time_college) { %>
+                                        <div class="col-md-6" id="previous_reg_div" style="display: none;">
+                                            <div class="form-group">
+                                                <label for="previous_registration_no" class="form-label">Previous Registration Number <span class="text-danger">*</span></label>
+                                                <input type="text" name="previous_registration_no" id="previous_registration_no" class="form-control"
+                                                    placeholder="Enter previous registration number"
+                                                    value="<%= typeof oldInput !== 'undefined' && oldInput.previous_registration_no ? oldInput.previous_registration_no : '' %>">
+                                                <small class="text-muted">Required for re-registration (Semester > I)</small>
+                                            </div>
+                                        </div>
+                                    <% } %>
+
+                                    <!-- Academic Year (Read-only, Pre-filled) -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="academic_year_display" class="form-label">Academic Year <span class="text-danger">*</span></label>
+                                            <input type="text" id="academic_year_display" class="form-control"
+                                                value="<%= typeof activeAcademicYear !== 'undefined' && activeAcademicYear ? activeAcademicYear.session : 'Not Set' %>"
+                                                readonly style="background-color: #e9ecef;">
+                                            <input type="hidden" name="academic_year_id" value="<%= typeof activeAcademicYear !== 'undefined' && activeAcademicYear ? activeAcademicYear.id : '' %>">
+                                        </div>
+                                    </div>
+
+                                    <!-- Name -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="name" class="form-label">Student Name <span class="text-danger">*</span></label>
+                                            <input type="text" name="name" id="name" class="form-control"
+                                                value="<%= typeof oldInput !== 'undefined' && oldInput.name ? oldInput.name : '' %>"
+                                                placeholder="Enter Student Name" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Father Name -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="father_name" class="form-label">Father's Name <span class="text-danger">*</span></label>
+                                            <input type="text" name="father_name" id="father_name" class="form-control"
+                                                value="<%= typeof oldInput !== 'undefined' && oldInput.father_name ? oldInput.father_name : '' %>"
+                                                placeholder="Enter Father's Name" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mother Name -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="mother_name" class="form-label">Mother's Name <span class="text-danger">*</span></label>
+                                            <input type="text" name="mother_name" id="mother_name" class="form-control"
+                                                value="<%= typeof oldInput !== 'undefined' && oldInput.mother_name ? oldInput.mother_name : '' %>"
+                                                placeholder="Enter Mother's Name" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- DOB -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                            <input type="date" name="dob" id="dob" class="form-control"
+                                                value="<%= typeof oldInput !== 'undefined' && oldInput.dob ? oldInput.dob : '' %>"
+                                                min="<%= typeof minDobDate !== 'undefined' ? minDobDate : '1900-01-01' %>"
+                                                max="<%= typeof maxDobDate !== 'undefined' ? maxDobDate : '' %>"
+                                                required>
+                                            <small class="form-text text-muted">
+                                                Minimum age: <%= typeof maxDobDateFormatted !== 'undefined' ? maxDobDateFormatted : 'N/A' %>
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phone" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                            <input type="text" name="phone" id="phone" class="form-control"
+                                                value="<%= typeof oldInput !== 'undefined' && oldInput.phone ? oldInput.phone : '' %>"
+                                                placeholder="Enter 10-digit mobile number" maxlength="10" required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                            <input type="email" name="email" id="email" class="form-control"
+                                                value="<%= typeof oldInput !== 'undefined' && oldInput.email ? oldInput.email : '' %>"
+                                                placeholder="Enter Email Address" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-currency-rupee"></i> Proceed to Payment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+    <script>
+        $(document).ready(function() {
+            // Fetch student by registration number
+            $('#fetchStudentBtn').on('click', function() {
+                const registrationNo = $('#registration_no').val().trim();
+
+                if (!registrationNo) {
+                    alert('Please enter a registration number.');
+                    return;
+                }
+
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Fetching...');
+
+                $.ajax({
+                    url: '/get-student/' + encodeURIComponent(registrationNo),
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            const data = response.data;
+
+                            // Fill form fields
+                            $('#name').val(data.name);
+                            $('#email').val(data.email);
+                            $('#phone').val(data.phone);
+                            $('#father_name').val(data.father_name);
+                            $('#mother_name').val(data.mother_name);
+                            $('#dob').val(data.dob);
+
+                            // Set course type and trigger change
+                            $('#course_type_id').val(data.course_type_id).trigger('change');
+
+                            // Also set the previous registration number field if it exists
+                            $('#previous_registration_no').val(registrationNo);
+
+                            // Wait for courses to load, then set course
+                            setTimeout(function() {
+                                if ($('#course_id option[value="' + data.course_id + '"]').length > 0) {
+                                    $('#course_id').val(data.course_id).trigger('change');
+
+                                    // Wait for semesters to load, then set semester
+                                    setTimeout(function() {
+                                        if ($('#semester_id option[value="' + data.semester_id + '"]').length > 0) {
+                                            $('#semester_id').val(data.semester_id);
+                                        } else {
+                                            console.warn('Semester ID ' + data.semester_id + ' not found in dropdown');
+                                        }
+                                    }, 800); // Increased timeout to ensure semesters are loaded
+                                } else {
+                                    console.warn('Course ID ' + data.course_id + ' not found in dropdown');
+                                    alert('Course not found. Please select course manually.');
+                                }
+                            }, 800); // Increased timeout to ensure courses are loaded
+
+                            alert('Student details loaded successfully!');
+                        } else {
+                            alert(response.message || 'Student not found with this registration number.');
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred while fetching student data. Please try again.');
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('<i class="bi bi-search"></i> Fetch Details');
+                    }
+                });
+            });
+
+            // Load courses when course type changes
+            $('#course_type_id').on('change', function() {
+                const typeId = $(this).val();
+                const courseSelect = $('#course_id');
+                const semesterSelect = $('#semester_id');
+
+                if (typeId) {
+                    courseSelect.prop('disabled', false);
+                    courseSelect.html('<option value="">Loading...</option>');
+                    semesterSelect.prop('disabled', true).html('<option value="">-- Select Semester --</option>');
+
+                    $.ajax({
+                        url: '/get-course/' + typeId,
+                        method: 'GET',
+                        success: function(courses) {
+                            courseSelect.html('<option value="">-- Select Course --</option>');
+                            courses.forEach(function(course) {
+                                const selected = (typeof oldInput !== 'undefined' && oldInput.course_id == course.id) ? 'selected' : '';
+                                courseSelect.append('<option value="' + course.id + '" ' + selected + '>' + course.name + '</option>');
+                            });
+                        },
+                        error: function() {
+                            courseSelect.html('<option value="">Error loading courses</option>');
+                        }
+                    });
+                } else {
+                    courseSelect.prop('disabled', true).html('<option value="">-- Select Course --</option>');
+                    semesterSelect.prop('disabled', true).html('<option value="">-- Select Semester --</option>');
+                    $('#previous_reg_div').hide();
+                    $('#previous_registration_no').prop('required', false);
+                }
+            });
+
+            let currentSemesters = [];
+
+            // Load semesters when course changes
+            $('#course_id').on('change', function() {
+                const courseId = $(this).val();
+                const semesterSelect = $('#semester_id');
+                $('#previous_reg_div').hide();
+                $('#previous_registration_no').prop('required', false);
+
+                if (courseId) {
+                    semesterSelect.prop('disabled', false);
+                    semesterSelect.html('<option value="">Loading...</option>');
+
+                    $.ajax({
+                        url: '/get-semester/' + courseId,
+                        method: 'GET',
+                        success: function(semesters) {
+                            currentSemesters = semesters;
+                            semesterSelect.html('<option value="">-- Select Semester --</option>');
+                            semesters.forEach(function(semester) {
+                                const selected = (typeof oldInput !== 'undefined' && oldInput.semester_id == semester.id) ? 'selected' : '';
+                                semesterSelect.append('<option value="' + semester.id + '" data-order="' + semester.order + '" ' + selected + '>' + semester.name + '</option>');
+                            });
+                            // Trigger change to check if previous registration field is needed
+                            semesterSelect.trigger('change');
+                        },
+                        error: function() {
+                            semesterSelect.html('<option value="">Error loading semesters</option>');
+                        }
+                    });
+                } else {
+                    semesterSelect.prop('disabled', true).html('<option value="">-- Select Semester --</option>');
+                    currentSemesters = [];
+                }
+            });
+
+            // Show/hide previous registration number based on semester
+            $('#semester_id').on('change', function() {
+                const semesterId = $(this).val();
+                const selectedOption = $(this).find('option:selected');
+                const order = selectedOption.data('order');
+
+                if (semesterId && order && String(order) !== '1') {
+                    $('#previous_reg_div').show();
+                    $('#previous_registration_no').prop('required', true);
+                    
+                    // Auto-fill from top registration number if empty and top one exists
+                    if (!$('#previous_registration_no').val() && $('#registration_no').val()) {
+                        $('#previous_registration_no').val($('#registration_no').val());
+                    }
+                } else {
+                    $('#previous_reg_div').hide();
+                    $('#previous_registration_no').prop('required', false);
+                }
+            });
+
+            // Trigger course type change if it has a value (for form errors)
+            if (typeof oldInput !== 'undefined' && oldInput.course_type_id) {
+                $('#course_type_id').trigger('change');
+
+                // If course_id exists in oldInput, wait and set it
+                if (oldInput.course_id) {
+                    setTimeout(function() {
+                        $('#course_id').val(oldInput.course_id).trigger('change');
+
+                        // If semester_id exists, wait and set it
+                        if (oldInput.semester_id) {
+                            setTimeout(function() {
+                                $('#semester_id').val(oldInput.semester_id);
+                            }, 800);
+                        }
+                    }, 800);
+                }
+            }
+
+            // Form submission validation
+            $('#registrationForm').on('submit', function(e) {
+                const courseId = $('#course_id').val();
+                const semesterId = $('#semester_id').val();
+                const courseTypeId = $('#course_type_id').val();
+
+                // Check if course type is selected
+                if (!courseTypeId || courseTypeId === '') {
+                    e.preventDefault();
+                    alert('Please select a course type.');
+                    $('#course_type_id').focus();
+                    return false;
+                }
+
+                // Check if course is selected
+                if (!courseId || courseId === '') {
+                    e.preventDefault();
+                    alert('Please select a course.');
+                    $('#course_id').focus();
+                    return false;
+                }
+
+                // Check if semester is selected
+                if (!semesterId || semesterId === '') {
+                    e.preventDefault();
+                    alert('Please select a semester.');
+                    $('#semester_id').focus();
+                    return false;
+                }
+
+                // Check previous registration number if visible
+                if ($('#previous_reg_div').is(':visible')) {
+                    const prevReg = $('#previous_registration_no').val().trim();
+                    if (!prevReg) {
+                        e.preventDefault();
+                        alert('Please enter your previous registration number.');
+                        $('#previous_registration_no').focus();
+                        return false;
+                    }
+                }
+
+                // Check if dropdowns are disabled (not loaded yet)
+                if ($('#course_id').prop('disabled') || $('#semester_id').prop('disabled')) {
+                    e.preventDefault();
+                    alert('Please wait for courses and semesters to load, then try again.');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Create Course Semester' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Create Course Semester Qualifications' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/registration_qualifications">Registration Qualifications</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Create Course Semester Qualifications' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Create Course Semester Qualifications' %></h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/registration_qualifications">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/registration_qualifications" method="POST">
+                                        <div class="row g-3">
+                                            <!-- Course -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="course_id" class="form-label">Course <span class="text-danger">*</span></label>
+                                                    <select name="course_id" id="course_id" class="form-control" required>
+                                                        <option value="">-- Select Course --</option>
+                                                        <% if (typeof courses !== 'undefined' && courses.length > 0) { %>
+                                                            <% courses.forEach(function(course) { %>
+                                                                <option value="<%= course.id %>" <%= typeof oldInput !== 'undefined' && oldInput.course_id == course.id ? 'selected' : '' %>>
+                                                                    <%= course.name %>
+                                                                </option>
+                                                            <% }); %>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Semester -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="semester_id" class="form-label">Semester <span class="text-danger">*</span></label>
+                                                    <select name="semester_id" id="semester_id" class="form-control" required>
+                                                        <option value="">-- Select Course First --</option>
+                                                    </select>
+                                                    <small class="form-text text-muted">Select a course first to see available semesters</small>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <!-- Qualifications Section -->
+                                        <div class="row g-3 mt-3">
+                                            <div class="col-md-12">
+                                                <h5 class="mb-3">Required Qualifications for Student Registration</h5>
+                                                <p class="text-muted small">Select which qualifications (classes) are required, optional, or hidden during student registration for this course-semester combination.</p>
+                                                <div id="qualifications-section" style="display: none;">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Qualification</th>
+                                                                    <th class="text-center">Required</th>
+                                                                    <th class="text-center">Optional</th>
+                                                                    <th class="text-center">Hidden</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="qualifications-tbody">
+                                                                <!-- Qualifications will be loaded here via JavaScript -->
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="card border-info mt-3">
+                                                        <div class="card-header bg-info text-white">
+                                                            <h6 class="mb-0">Subject Selection Settings (Semester <%= typeof semesterOrder !== 'undefined' ? semesterOrder : '' %>)</h6>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div class="d-flex gap-4">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox" name="is_skill_required" id="is_skill_required" value="1" <%= typeof oldInput !== 'undefined' && oldInput.is_skill_required == '1' ? 'checked' : '' %>>
+                                                                    <label class="form-check-label" for="is_skill_required">Skill Selection Required</label>
+                                                                </div>
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox" name="is_cocurricular_required" id="is_cocurricular_required" value="1" <%= typeof oldInput !== 'undefined' && oldInput.is_cocurricular_required == '1' ? 'checked' : '' %>>
+                                                                    <label class="form-check-label" for="is_cocurricular_required">Co-curricular Selection Required</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                </div>
+                                                <div id="no-qualifications-message" class="alert alert-info" style="display: none;">
+                                                    Please select a course and semester to configure qualifications.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary" id="submit-btn">
+                                                <i class="bi bi-save me-1"></i> Save Course Semester Qualifications
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    <script>
+                                        // Load semesters when course is selected
+                                        document.getElementById('course_id').addEventListener('change', function() {
+                                            const courseId = this.value;
+                                            const semesterSelect = document.getElementById('semester_id');
+
+                                            if (courseId) {
+                                                semesterSelect.disabled = true;
+                                                semesterSelect.innerHTML = '<option value="">Loading...</option>';
+
+                                                fetch(`/get-semester/${courseId}`)
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        semesterSelect.innerHTML = '<option value="">-- Select Semester --</option>';
+                                                        if (data && Array.isArray(data) && data.length > 0) {
+                                                            // Sort by order field (already sorted by API, but ensure it)
+                                                            const sortedSemesters = data.sort((a, b) => {
+                                                                const orderA = parseInt(a.order) || 0;
+                                                                const orderB = parseInt(b.order) || 0;
+                                                                return orderA - orderB;
+                                                            });
+
+                                                            sortedSemesters.forEach(semester => {
+                                                                const option = document.createElement('option');
+                                                                option.value = semester.id;
+                                                                option.textContent = semester.name;
+                                                                semesterSelect.appendChild(option);
+                                                            });
+                                                        }
+                                                        semesterSelect.disabled = false;
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error loading semesters:', error);
+                                                        semesterSelect.innerHTML = '<option value="">Error loading semesters</option>';
+                                                        semesterSelect.disabled = false;
+                                                    });
+                                            } else {
+                                                semesterSelect.innerHTML = '<option value="">-- Select Course First --</option>';
+                                                semesterSelect.disabled = true;
+                                            }
+
+                                            // Clear qualifications when course changes
+                                            document.getElementById('qualifications-section').style.display = 'none';
+                                            document.getElementById('no-qualifications-message').style.display = 'block';
+                                        });
+
+                                        // Load qualifications when semester is selected
+                                        document.getElementById('semester_id').addEventListener('change', function() {
+                                            const courseId = document.getElementById('course_id').value;
+                                            const semesterId = this.value;
+
+                                            if (courseId && semesterId) {
+                                                loadQualifications(courseId, semesterId);
+                                            } else {
+                                                document.getElementById('qualifications-section').style.display = 'none';
+                                                document.getElementById('no-qualifications-message').style.display = 'block';
+                                            }
+                                        });
+
+                                        function loadQualifications(courseId, semesterId) {
+                                            // Fetch qualifications/classes
+                                            fetch('/admin/registration_qualifications/get-qualifications')
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    const tbody = document.getElementById('qualifications-tbody');
+                                                    tbody.innerHTML = '';
+
+                                                    if (data.qualifications && data.qualifications.length > 0) {
+                                                        data.qualifications.forEach(qual => {
+                                                            const row = document.createElement('tr');
+                                                            row.innerHTML = `
+                                                                <td><strong>${qual.name}</strong></td>
+                                                                <td class="text-center">
+                                                                    <input type="radio" name="qualifications[${qual.id}][required_optional_hidden]" value="required" id="qual_${qual.id}_required" checked required>
+                                                                    <input type="hidden" name="qualifications[${qual.id}][qualification_id]" value="${qual.id}">
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="radio" name="qualifications[${qual.id}][required_optional_hidden]" value="optional" id="qual_${qual.id}_optional">
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <input type="radio" name="qualifications[${qual.id}][required_optional_hidden]" value="hidden" id="qual_${qual.id}_hidden">
+                                                                </td>
+                                                            `;
+                                                            tbody.appendChild(row);
+                                                        });
+                                                        document.getElementById('qualifications-section').style.display = 'block';
+                                                        document.getElementById('no-qualifications-message').style.display = 'none';
+                                                    } else {
+                                                        document.getElementById('qualifications-section').style.display = 'none';
+                                                        document.getElementById('no-qualifications-message').style.display = 'block';
+                                                        document.getElementById('no-qualifications-message').textContent = 'No qualifications found. Please add classes first.';
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error loading qualifications:', error);
+                                                    document.getElementById('qualifications-section').style.display = 'none';
+                                                    document.getElementById('no-qualifications-message').style.display = 'block';
+                                                    document.getElementById('no-qualifications-message').textContent = 'Error loading qualifications. Please try again.';
+                                                });
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>
+

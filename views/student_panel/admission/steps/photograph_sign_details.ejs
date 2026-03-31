@@ -1,0 +1,59 @@
+<% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong>
+        <ul class="mb-0">
+            <% error.forEach(function(err) { %>
+                <li><%= err %></li>
+            <% }); %>
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<% } %>
+
+<% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong>
+        <ul class="mb-0">
+            <% errors.forEach(function(err) { %>
+                <li><%= err %></li>
+            <% }); %>
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<% } %>
+
+<form action="/student/photograph_sign_details_post" method="POST" enctype="multipart/form-data">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="photograph" class="form-label">Photograph <span class="text-danger">*</span></label>
+                <input type="file" name="photograph" id="photograph" class="form-control" accept="image/jpeg,image/png,image/jfif,image/jpg" <%= typeof photoDetails !== 'undefined' && photoDetails.photograph ? '' : 'required' %>>
+                <small class="text-muted">Upload recent passport size photograph (Max 5MB)</small>
+                <% if (typeof photoDetails !== 'undefined' && photoDetails.photograph) { %>
+                    <div class="mt-2">
+                        <img src="<%= photoDetails.photograph %>?t=<%= Date.now() %>" alt="Photograph" class="img-thumbnail" style="max-width: 150px;">
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="signature" class="form-label">Signature <span class="text-danger">*</span></label>
+                <input type="file" name="signature" id="signature" class="form-control" accept="image/jpeg,image/png,image/jfif,image/jpg" <%= typeof photoDetails !== 'undefined' && photoDetails.signature ? '' : 'required' %>>
+                <small class="text-muted">Upload your signature (Max 5MB)</small>
+                <% if (typeof photoDetails !== 'undefined' && photoDetails.signature) { %>
+                    <div class="mt-2">
+                        <img src="<%= photoDetails.signature %>?t=<%= Date.now() %>" alt="Signature" class="img-thumbnail" style="max-width: 150px;">
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="/student/registration?tab=<%= isReRegistration ? 'other' : 'weightage' %>" class="btn btn-secondary">Previous</a>
+        <button type="submit" class="btn btn-primary">Save & Continue</button>
+    </div>
+</form>
+

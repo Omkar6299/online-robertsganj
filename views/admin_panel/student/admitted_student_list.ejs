@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Admitted Students' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Admitted Students Report' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Admitted Students' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+
+                            <!-- Extensive Filter Bar -->
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-body py-2">
+                                    <form action="/admin/admitted_student_list" method="GET" class="row g-2 align-items-end">
+
+                                        <!-- Row 1 -->
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">Academic Year</label>
+                                            <select name="academic_year_id" class="form-select form-select-sm">
+                                                <option value="">-- All --</option>
+                                                <% if (typeof academicYears !== 'undefined') { academicYears.forEach(function(year) { %>
+                                                    <option value="<%= year.id %>" <%= (typeof filters !== 'undefined' && filters.academic_year_id == year.id) ? 'selected' : (typeof activeYearId !== 'undefined' && activeYearId == year.id && !filters.academic_year_id) ? 'selected' : '' %>><%= year.session %></option>
+                                                <% }); } %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">Course</label>
+                                            <select name="course_id" id="filter_course_id" class="form-select form-select-sm">
+                                                <option value="">-- All Courses --</option>
+                                                <% if (typeof courses !== 'undefined') { courses.forEach(function(course) { %>
+                                                    <option value="<%= course.id %>" <%= (typeof filters !== 'undefined' && filters.course_id == course.id) ? 'selected' : '' %>><%= course.name %></option>
+                                                <% }); } %>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">Semester</label>
+                                            <select name="semester_id" id="filter_semester_id" class="form-select form-select-sm">
+                                                <option value="">-- All Semesters --</option>
+                                                <% if (typeof semesters !== 'undefined') { semesters.forEach(function(sem) { %>
+                                                    <option value="<%= sem.id %>" data-course="<%= sem.course_id %>" <%= (typeof filters !== 'undefined' && filters.semester_id == sem.id) ? 'selected' : '' %>><%= (sem.course && sem.course.name ? sem.course.name + ' - ' : '') %><%= sem.name %></option>
+                                                <% }); } %>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label mb-1 small fw-semibold">Registration No</label>
+                                            <input type="text" name="registration_no" class="form-control form-control-sm" placeholder="Search Reg No" value="<%= (typeof filters !== 'undefined' && filters.registration_no) ? filters.registration_no : '' %>">
+                                        </div>
+
+                                        <div class="col-md-1">
+                                            <label class="form-label mb-1 small fw-semibold">Gender</label>
+                                            <select name="gender" class="form-select form-select-sm">
+                                                <option value="">-- All --</option>
+                                                <option value="Male" <%= (typeof filters !== 'undefined' && filters.gender === 'Male') ? 'selected' : '' %>>Male</option>
+                                                <option value="Female" <%= (typeof filters !== 'undefined' && filters.gender === 'Female') ? 'selected' : '' %>>Female</option>
+                                                <option value="Transgender" <%= (typeof filters !== 'undefined' && filters.gender === 'Transgender') ? 'selected' : '' %>>Transgender</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">Category</label>
+                                            <select name="category" class="form-select form-select-sm">
+                                                <option value="">-- All --</option>
+                                                <option value="General" <%= (typeof filters !== 'undefined' && filters.category === 'General') ? 'selected' : '' %>>General</option>
+                                                <option value="OBC" <%= (typeof filters !== 'undefined' && filters.category === 'OBC') ? 'selected' : '' %>>OBC</option>
+                                                <option value="SC" <%= (typeof filters !== 'undefined' && filters.category === 'SC') ? 'selected' : '' %>>SC</option>
+                                                <option value="ST" <%= (typeof filters !== 'undefined' && filters.category === 'ST') ? 'selected' : '' %>>ST</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Row 2 -->
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">Start Date</label>
+                                            <input type="date" name="start_date" class="form-control form-control-sm" value="<%= (typeof filters !== 'undefined' && filters.start_date) ? filters.start_date : '' %>">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">End Date</label>
+                                            <input type="date" name="end_date" class="form-control form-control-sm" value="<%= (typeof filters !== 'undefined' && filters.end_date) ? filters.end_date : '' %>">
+                                        </div>
+
+                                        <div class="col-md-6 d-none d-md-block"></div> <!-- spacer to push buttons to right -->
+
+                                        <div class="col-md-2 d-flex gap-1 flex-wrap">
+                                            <button type="submit" class="btn btn-sm btn-primary flex-grow-1">
+                                                <i class="bi bi-funnel"></i> Filter
+                                            </button>
+                                            <a href="/admin/export_admitted_students?<%= new URLSearchParams(filters).toString() %>" class="btn btn-sm btn-success flex-grow-1 text-center">
+                                                <i class="bi bi-file-earmark-excel"></i> Export
+                                            </a>
+                                            <a href="/admin/admitted_student_list" class="btn btn-sm btn-secondary flex-grow-1 text-center">
+                                                <i class="bi bi-x-circle"></i> Reset
+                                            </a>
+                                        </div>
+                                    </form>
+                                    
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            const courseSelect = document.getElementById('filter_course_id');
+                                            const semesterSelect = document.getElementById('filter_semester_id');
+                                            if (!courseSelect || !semesterSelect) return;
+                                            
+                                            const originalOptions = Array.from(semesterSelect.options);
+                                            const preSelectedValue = "<%= (typeof filters !== 'undefined' && filters.semester_id) ? filters.semester_id : '' %>";
+                                            
+                                            courseSelect.addEventListener('change', function() {
+                                                const selectedCourse = this.value;
+                                                semesterSelect.innerHTML = '';
+                                                semesterSelect.appendChild(originalOptions[0].cloneNode(true)); // Add "-- All Semesters --"
+                                                
+                                                originalOptions.slice(1).forEach(opt => {
+                                                    if (!selectedCourse || opt.getAttribute('data-course') === selectedCourse) {
+                                                        const clone = opt.cloneNode(true);
+                                                        if (clone.value === preSelectedValue && courseSelect.value === "<%= (typeof filters !== 'undefined' && filters.course_id) ? filters.course_id : '' %>") {
+                                                            clone.selected = true;
+                                                        } else {
+                                                            clone.selected = false;
+                                                        }
+                                                        semesterSelect.appendChild(clone);
+                                                    }
+                                                });
+                                                
+                                                // If changed by user, default to all
+                                                if (courseSelect.value !== "<%= (typeof filters !== 'undefined' && filters.course_id) ? filters.course_id : '' %>") {
+                                                    semesterSelect.value = '';
+                                                }
+                                            });
+                                            
+                                            // Trigger on load to filter initial state
+                                            courseSelect.dispatchEvent(new Event('change'));
+                                            
+                                            if (preSelectedValue) {
+                                                semesterSelect.value = preSelectedValue;
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+
+                            <!-- Admitted Students Table -->
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Admitted Students Report' %></h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle" id="dataTable">
+                                            <thead class="table-bg-primary">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Registration No</th>
+                                                    <th>Student Name</th>
+                                                    <th>Gender</th>
+                                                    <th>Category</th>
+                                                    <th>Course</th>
+                                                    <th>Semester</th>
+                                                    <th>Phone</th>
+                                                    <th>Admission Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (typeof students !== 'undefined' && students.length > 0) { %>
+                                                    <% students.forEach(function(student, index) { %>
+                                                        <tr>
+                                                            <td><%= index + 1 %></td>
+                                                            <td><strong><%= student.registration_no || '-' %></strong></td>
+                                                            <td><%= student.user && student.user.name ? student.user.name : '-' %></td>
+                                                            <td><%= student.gender || '-' %></td>
+                                                            <td><%= student.category || '-' %></td>
+                                                            <td><%= student.courseName && student.courseName.name ? student.courseName.name : '-' %></td>
+                                                            <td><%= student.semester_name || (student.semsterName && student.semsterName.name ? student.semsterName.name : '-') %></td>
+                                                            <td><%= student.user && student.user.phone ? student.user.phone : '-' %></td>
+                                                            <td>
+                                                                <% 
+                                                                    let admissionDate = student.created_at;
+                                                                    if (student.admissionFeeDetails && student.admissionFeeDetails.length > 0) {
+                                                                        admissionDate = student.admissionFeeDetails[0].created_at;
+                                                                    }
+                                                                %>
+                                                                <%= admissionDate ? new Date(admissionDate).toLocaleDateString('en-IN') : '-' %>
+                                                                <br>
+                                                                <small class="text-success"><i class="bi bi-check-circle-fill"></i> Paid</small>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/admin/students/<%= student.id %>" class="btn btn-sm btn-info" title="View Application">
+                                                                    <i class="bi bi-eye"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    <% }); %>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <%- include('../layouts/datatable_init') %>
+</body>
+</html>

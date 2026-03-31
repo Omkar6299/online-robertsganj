@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Registration Form' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="mb-0 py-1">Admission Registration Form</h4>
+                                <% if (typeof activeAcademicYear !== 'undefined' && typeof student !== 'undefined') { %>
+                                    <div class="text-end">
+                                        <span class="badge bg-light text-primary mb-1 border border-primary">
+                                            <i class="bi bi-calendar-check"></i> Session: <%= activeAcademicYear.session %>
+                                        </span>
+                                        <div class="small mt-1" style="font-size: 0.85rem; opacity: 0.9;">
+                                            <span class="me-2"><i class="bi bi-book"></i> <%= student.courseName ? student.courseName.name : '' %></span>
+                                            <span><i class="bi bi-layers"></i> <%= student.semsterName ? student.semsterName.name : '' %></span>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="registrationTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link <%= activeTab === 'personal' ? 'active' : '' %>" href="/student/registration?tab=personal">Personal Details</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link <%= activeTab === 'address' ? 'active' : '' %> <%= student.personal_status !== '1' ? 'disabled' : '' %>" href="/student/registration?tab=address">Address Details</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link <%= activeTab === 'educational' ? 'active' : '' %> <%= student.address_status !== '1' ? 'disabled' : '' %>" href="/student/registration?tab=educational">Educational Details</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link <%= activeTab === 'subject' ? 'active' : '' %> <%= student.educational_status !== '1' ? 'disabled' : '' %>" href="/student/registration?tab=subject">Subject Details</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link <%= activeTab === 'other' ? 'active' : '' %> <%= student.subject_status !== '1' ? 'disabled' : '' %>" href="/student/registration?tab=other">Other Details</a>
+                                 </li>
+                                <% if (!isReRegistration) { %>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link <%= activeTab === 'weightage' ? 'active' : '' %> <%= student.additional_status !== '1' ? 'disabled' : '' %>" href="/student/registration?tab=weightage">Weightage Details</a>
+                                </li>
+                                <% } %>
+                                <li class="nav-item" role="presentation">
+                                    <% 
+                                        let photoDisabled = false;
+                                        if (isReRegistration) {
+                                            photoDisabled = student.additional_status !== '1';
+                                        } else {
+                                            photoDisabled = student.weightage_status !== '1';
+                                        }
+                                    %>
+                                    <a class="nav-link <%= activeTab === 'photo' ? 'active' : '' %> <%= photoDisabled ? 'disabled' : '' %>" href="/student/registration?tab=photo">Photo & Sign</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link <%= activeTab === 'declaration' ? 'active' : '' %> <%= student.photographsign_status !== '1' ? 'disabled' : '' %>" href="/student/registration?tab=declaration">Declaration</a>
+                                </li>
+                            </ul>
+
+                             <div class="tab-content mt-4">
+                                <div class="tab-pane fade <%= activeTab === 'personal' ? 'show active' : '' %>">
+                                    <%- include('steps/personal_details') %>
+                                </div>
+                                <div class="tab-pane fade <%= activeTab === 'address' ? 'show active' : '' %>">
+                                    <%- include('steps/address_details') %>
+                                </div>
+                                <div class="tab-pane fade <%= activeTab === 'educational' ? 'show active' : '' %>">
+                                    <%- include('steps/educational_details') %>
+                                </div>
+                                <div class="tab-pane fade <%= activeTab === 'subject' ? 'show active' : '' %>">
+                                    <%- include('steps/subject_details') %>
+                                </div>
+                                <div class="tab-pane fade <%= activeTab === 'other' ? 'show active' : '' %>">
+                                    <%- include('steps/other_details') %>
+                                </div>
+                                <% if (!isReRegistration) { %>
+                                <div class="tab-pane fade <%= activeTab === 'weightage' ? 'show active' : '' %>">
+                                    <%- include('steps/weightage_details') %>
+                                </div>
+                                <% } %>
+                                <div class="tab-pane fade <%= activeTab === 'photo' ? 'show active' : '' %>">
+                                    <%- include('steps/photograph_sign_details') %>
+                                </div>
+                                <div class="tab-pane fade <%= activeTab === 'declaration' ? 'show active' : '' %>">
+                                    <%- include('steps/declaration_details') %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+    <script>
+        // No hash logic needed anymore as navigation is handled by the backend
+    </script>
+</body>
+</html>
+

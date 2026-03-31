@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Registration Success' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow text-center">
+                        <div class="card-body py-5">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                            <h2 class="text-success mt-3 mb-3">Registration Successful!</h2>
+                            <p class="lead">Your registration has been completed successfully.</p>
+
+                            <% if (typeof registrationNo !== 'undefined' && registrationNo) { %>
+                                <div class="alert alert-info mt-3">
+                                    <h5>Your Registration Number:</h5>
+                                    <h3><strong><%= registrationNo %></strong></h3>
+                                    <p class="mb-0">Please note down this registration number for future reference.</p>
+                                </div>
+                            <% } %>
+
+                            <div class="mt-4">
+                                <a href="/admission_login" class="btn btn-primary me-2">Login to Continue</a>
+                                <a href="/" class="btn btn-secondary">Go to Home</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
+

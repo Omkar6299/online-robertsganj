@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Home' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-4">
+            <h4 class="text-center text-primary fw-bold mb-4">प्रवेश हेतु प्रेस विज्ञप्ति</h4>
+
+            <div class="row g-4">
+                <!-- Left Section -->
+                <div class="col-md-8">
+                    <div class="notice-card">
+                        <div class="notice-header">
+                            New Admission for Session <%= typeof activeAcademicYear !== 'undefined' && activeAcademicYear ? activeAcademicYear.session : '2025–26' %>
+                        </div>
+                        <div class="notice-list">
+                            <a href="#">Download Prospectus</a>
+                            <a href="/admission_login">Apply Online</a>
+                            <a href="/reprint_payment_receipt">Reprint Registration Payment Receipt</a>
+                            <a href="/print_application_form">Print Application Form</a>
+                            <a href="/know_your_registration">Know Your Registration No.</a>
+                        </div>
+                        <div class="contact-footer">
+                            <div class="mb-2">
+                                <i class="bi bi-telephone-fill"></i> Helpline Number : +91 7268079785 |
+                                <i class="bi bi-envelope-fill"></i> Email : onlinehelpdesk12@gmail.com |
+                                <i class="bi bi-clock-fill"></i> 10:30 AM to 05:00 PM (Mon - Sat)
+                            </div>
+                            <div>
+                                <i class="bi bi-telephone"></i> Admission Helpdesk (10 AM to 4 PM) :
+                                Professor Name: +91 9990099900
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section -->
+                <div class="col-md-4">
+                    <div class="important-dates">
+                        <h5 class="text-center">Important Dates</h5>
+                        <p>» Online Form Token Starts : <strong>25-04-2025</strong></p>
+                        <hr style="border-color: #c8e6c9;">
+                        <p>» Online Form Token Close : <strong>07-07-2025</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
+

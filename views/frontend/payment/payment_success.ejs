@@ -1,0 +1,182 @@
+<%- include('../layout/app', { title: 'Payment Successful' }) %>
+
+<style>
+    /* Success Animation */
+    #succes_bg {
+        background: var(--primary-color, #007bff);
+    }
+    .success-icon {
+        font-size: 90px;
+        color: #28a745;
+        animation: pop 0.6s ease forwards;
+    }
+    @keyframes pop {
+        0% { transform: scale(0); opacity: 0; }
+        70% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(1); }
+    }
+    /* Confetti */
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        top: -10px;
+        opacity: 0.7;
+        animation: fall linear forwards;
+    }
+    @keyframes fall {
+        to {
+            transform: translateY(110vh) rotate(360deg);
+            opacity: 0.9;
+        }
+    }
+</style>
+
+<div class="text-white text-center py-5 position-relative" id="succes_bg">
+    <i class="bi bi-check-circle-fill success-icon"></i>
+    <h1 class="fw-bold mt-3">Payment Successful!</h1>
+    <p class="lead mb-0">Thank you, your payment has been processed successfully 🎉</p>
+    <% if (typeof registrationData !== 'undefined' && registrationData && registrationData.registration_no) { %>
+        <p class="opacity-75">Registration Number: <%= registrationData.registration_no %></p>
+    <% } %>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- Left Column -->
+        <div class="col-lg-7">
+            <!-- Registration Details -->
+            <h4 class="fw-bold mb-3">Registration Details</h4>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <% if (typeof registrationData !== 'undefined' && registrationData) { %>
+                        <p class="mb-2"><strong>Name:</strong> <%= registrationData.name || 'N/A' %></p>
+                        <p class="mb-2"><strong>Email:</strong> <%= registrationData.email || 'N/A' %></p>
+                        <p class="mb-2"><strong>Phone:</strong> <%= registrationData.phone || 'N/A' %></p>
+                        <% if (registrationData.registration_no) { %>
+                            <p class="mb-2"><strong>Registration Number:</strong> <span class="badge bg-primary"><%= registrationData.registration_no %></span></p>
+                        <% } %>
+                        <% if (registrationData.course_name) { %>
+                            <p class="mb-2"><strong>Course:</strong> <%= registrationData.course_name %></p>
+                        <% } %>
+                        <% if (registrationData.semester_name) { %>
+                            <p class="mb-2"><strong>Semester:</strong> <%= registrationData.semester_name %></p>
+                        <% } %>
+                        <% if (registrationData.academic_year) { %>
+                            <p class="mb-0"><strong>Academic Year:</strong> <%= registrationData.academic_year %></p>
+                        <% } %>
+                    <% } else { %>
+                        <p class="text-muted">Registration details not available</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Payment Details -->
+            <% if (typeof payment !== 'undefined' && payment) { %>
+            <div class="p-4 border rounded-3 mb-4">
+                <h5 class="fw-bold"><i class="bi bi-credit-card me-2 text-primary"></i> Payment Details</h5>
+                <% if (payment.merchant_txn_id) { %>
+                    <p class="mb-1"><strong>Transaction ID:</strong> <code><%= payment.merchant_txn_id %></code></p>
+                <% } %>
+                <% if (payment.atom_txn_id) { %>
+                    <p class="mb-1"><strong>Atom Transaction ID:</strong> <%= payment.atom_txn_id %></p>
+                <% } %>
+                <% if (payment.bank_transaction_id) { %>
+                    <p class="mb-1"><strong>Bank Transaction ID:</strong> <%= payment.bank_transaction_id %></p>
+                <% } %>
+                <% if (payment.transaction_date) { %>
+                    <p class="mb-1"><strong>Payment Date:</strong> <%= new Date(payment.transaction_date).toLocaleString('en-IN') %></p>
+                <% } %>
+                <% if (payment.amount) { %>
+                    <p class="mb-0"><strong>Amount Paid:</strong> ₹<%= typeof payment.amount === 'number' ? payment.amount.toFixed(2) : payment.amount %></p>
+                <% } %>
+            </div>
+            <% } %>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-5">
+            <div class="p-4 border rounded-3 shadow-sm">
+                <h4 class="fw-bold mb-3">Payment Summary</h4>
+                <% if (typeof payment !== 'undefined' && payment && payment.amount) { %>
+                    <p class="mb-1"><strong>Registration Fee:</strong> ₹<%= typeof payment.amount === 'number' ? payment.amount.toFixed(2) : payment.amount %></p>
+                <% } else if (typeof registrationData !== 'undefined' && registrationData && registrationData.amount) { %>
+                    <p class="mb-1"><strong>Registration Fee:</strong> ₹<%= registrationData.amount %></p>
+                <% } %>
+                <hr>
+                <h3 class="fw-bold text-success mb-0">
+                    <% if (typeof payment !== 'undefined' && payment && payment.amount) { %>
+                        ₹<%= typeof payment.amount === 'number' ? payment.amount.toFixed(2) : payment.amount %>
+                    <% } else if (typeof registrationData !== 'undefined' && registrationData && registrationData.amount) { %>
+                        ₹<%= registrationData.amount %>
+                    <% } else { %>
+                        ₹0.00
+                    <% } %>
+                </h3>
+                <span class="badge bg-success mt-2 px-3 py-2 rounded-pill">
+                    <i class="bi bi-credit-card me-1"></i> Online Payment
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="text-center mt-5">
+        <% if (typeof transactionId !== 'undefined' && transactionId && typeof phoneNumber !== 'undefined' && phoneNumber) { %>
+            <a href="/admission_login?transaction_id=<%= encodeURIComponent(transactionId) %>&phone=<%= encodeURIComponent(phoneNumber) %>"
+               class="btn btn-primary btn-lg rounded-pill px-5 me-3" id="applyOnlineBtn">
+                <i class="bi bi-pencil-square me-2"></i> Apply Online Now
+            </a>
+            <p class="text-muted mt-3 small">
+                <i class="bi bi-info-circle me-1"></i>
+                You will be automatically redirected to Apply Online page in <span id="countdown">5</span> seconds...
+            </p>
+        <% } else { %>
+            <a href="/admission_login" class="btn btn-primary btn-lg rounded-pill px-5 me-3">
+                <i class="bi bi-pencil-square me-2"></i> Apply Online
+            </a>
+        <% } %>
+        <a href="/" class="btn btn-outline-dark btn-lg rounded-pill px-5">
+            <i class="bi bi-house me-2"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+<!-- Confetti Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Confetti animation
+        for (let i = 0; i < 80; i++) {
+            let confetti = document.createElement("div");
+            confetti.classList.add("confetti");
+            confetti.style.left = Math.random() * 100 + "vw";
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 5000);
+        }
+
+        // Auto-redirect to Apply Online page after 5 seconds
+         if (typeof transactionId !== 'undefined' && transactionId && typeof phoneNumber !== 'undefined' && phoneNumber) {
+        const applyOnlineBtn = document.getElementById('applyOnlineBtn');
+        const countdownElement = document.getElementById('countdown');
+        let countdown = 5;
+
+        if (applyOnlineBtn && countdownElement) {
+            const redirectUrl = applyOnlineBtn.href;
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = redirectUrl;
+                }
+            }, 1000);
+        }
+        }
+    });
+</script>
+

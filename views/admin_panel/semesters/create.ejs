@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Create Semester' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Create Semester' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/semesters">Semesters</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Create Semester' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Create Semester' %></h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/semesters">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/semesters" method="POST">
+                                        <div class="row g-3">
+                                            <!-- Course -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="course_id" class="form-label">Course <span class="text-danger">*</span></label>
+                                                    <select name="course_id" id="course_id" class="form-control" required>
+                                                        <option value="">-- Select Course --</option>
+                                                        <% if (typeof courses !== 'undefined' && courses.length > 0) { %>
+                                                            <% courses.forEach(function(course) { %>
+                                                                <option value="<%= course.id %>" <%= typeof oldInput !== 'undefined' && oldInput.course_id == course.id ? 'selected' : '' %>>
+                                                                    <%= course.name %>
+                                                                </option>
+                                                            <% }); %>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Semester Name -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="name" class="form-label">Semester Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="name" id="name" class="form-control"
+                                                        value="<%= typeof oldInput !== 'undefined' && oldInput.name ? oldInput.name : '' %>"
+                                                        placeholder="Enter Semester Name" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Order -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="order" class="form-label">Order <span class="text-danger">*</span></label>
+                                                    <input type="number" name="order" id="order" class="form-control"
+                                                        value="<%= typeof oldInput !== 'undefined' && oldInput.order ? oldInput.order : '' %>"
+                                                        placeholder="Enter Order (e.g., 1, 2, 3...)" min="1" required>
+                                                    <small class="form-text text-muted">Order number for sorting semesters (1, 2, 3, etc.)</small>
+                                                </div>
+                                            </div>
+
+                                            <!-- Status -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                                    <select name="status" id="status" class="form-control" required>
+                                                        <option value="">-- Select Status --</option>
+                                                        <option value="1" <%= typeof oldInput !== 'undefined' && oldInput.status == '1' ? 'selected' : '' %>>Active</option>
+                                                        <option value="0" <%= typeof oldInput !== 'undefined' && oldInput.status == '0' ? 'selected' : '' %>>Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Registration and Fee Payment Toggles -->
+                                        <div class="row g-3 mt-3">
+                                            <div class="col-md-6">
+                                                <div class="card border-primary">
+                                                    <div class="card-header bg-primary text-white">
+                                                        <h6 class="mb-0">Registration Settings</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <input type="hidden" name="registration_enabled" value="0">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="registration_enabled"
+                                                                id="registration_enabled"
+                                                                value="1"
+                                                                onchange="toggleMutuallyExclusive('registration_enabled', 'fee_payment_enabled')"
+                                                                <%= typeof oldInput !== 'undefined' && oldInput.registration_enabled == '1' ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="registration_enabled">
+                                                                Enable Registration for this Semester
+                                                            </label>
+                                                            <small class="form-text text-muted d-block mt-1">
+                                                                When enabled, this semester will appear in registration dropdowns for this course.
+                                                            </small>
+                                                        </div>
+
+                                                        <hr>
+
+                                                        <input type="hidden" name="approval_required" value="0">
+                                                        <div class="form-check form-switch mt-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="approval_required"
+                                                                id="approval_required"
+                                                                value="1"
+                                                                <%= typeof oldInput !== 'undefined' && oldInput.approval_required == '1' ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="approval_required">
+                                                                Admin Approval Required for Registration
+                                                            </label>
+                                                            <small class="form-text text-muted d-block mt-1">
+                                                                If disabled (default), students can proceed to fee payment immediately after registration without waiting for admin approval.
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="card border-success">
+                                                    <div class="card-header bg-success text-white">
+                                                        <h6 class="mb-0">Fee Payment Settings</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <input type="hidden" name="fee_payment_enabled" value="0">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="fee_payment_enabled"
+                                                                id="fee_payment_enabled"
+                                                                value="1"
+                                                                onchange="toggleMutuallyExclusive('fee_payment_enabled', 'registration_enabled')"
+                                                                <%= typeof oldInput !== 'undefined' && oldInput.fee_payment_enabled == '1' ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="fee_payment_enabled">
+                                                                Enable Fee Payment for this Semester
+                                                            </label>
+                                                            <small class="form-text text-muted d-block mt-1">
+                                                                When enabled, students can pay fees for this semester in the student portal. Multiple semesters per course can have fee payment enabled, but the same semester cannot have both registration and fee payment enabled.
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <script>
+                                            function toggleMutuallyExclusive(activeId, otherId) {
+                                                const activeCheckbox = document.getElementById(activeId);
+                                                const otherCheckbox = document.getElementById(otherId);
+
+                                                if (activeCheckbox.checked) {
+                                                    otherCheckbox.checked = false;
+                                                }
+                                            }
+                                        </script>
+
+                                        <!-- Submit -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Save Semester
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>
+

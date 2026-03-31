@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Edit Cocurricular' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit Cocurricular' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/cocurricular">Cocurricular</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Edit Cocurricular' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit Cocurricular' %></h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/cocurricular">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/cocurricular/<%= typeof cocurricular !== 'undefined' ? cocurricular.id : '' %>" method="POST">
+                                        <input type="hidden" name="_method" value="PUT">
+                                        <div class="row g-3">
+                                            <!-- Course Type -->
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="course_type_id" class="form-label">Course Type <span class="text-danger">*</span></label>
+                                                    <select name="course_type_id" id="course_type_id" class="form-control" required>
+                                                        <option value="">-- Select Course Type --</option>
+                                                        <% if(typeof courseTypes !== 'undefined' && courseTypes.length > 0) { %>
+                                                            <% courseTypes.forEach(function(type) { %>
+                                                                <option value="<%= type.id %>" <%= (typeof cocurricular !== 'undefined' && cocurricular.course_type_id == type.id) || (typeof oldInput !== 'undefined' && oldInput.course_type_id == type.id) ? 'selected' : '' %>><%= type.name %></option>
+                                                            <% }); %>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Course -->
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="course_id" class="form-label">Course <span class="text-danger">*</span></label>
+                                                    <select name="course_id" id="course_id" class="form-control" required>
+                                                        <option value="">-- Select Course --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Semester -->
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="semester_id" class="form-label">Semester <span class="text-danger">*</span></label>
+                                                    <select name="semester_id" id="semester_id" class="form-control" required>
+                                                        <option value="">-- Select Semester --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cocurricular Name -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="name" class="form-label">Cocurricular Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="name" id="name" class="form-control"
+                                                        value="<%= typeof oldInput !== 'undefined' && oldInput.name ? oldInput.name : (typeof cocurricular !== 'undefined' ? cocurricular.name : '') %>"
+                                                        placeholder="Enter Cocurricular Name" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Status -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                                    <select name="status" id="status" class="form-control" required>
+                                                        <option value="">-- Select Status --</option>
+                                                        <option value="1" <%= (typeof cocurricular !== 'undefined' && cocurricular.status == 1) || (typeof oldInput !== 'undefined' && oldInput.status == '1') ? 'selected' : '' %>>Active</option>
+                                                        <option value="0" <%= (typeof cocurricular !== 'undefined' && cocurricular.status == 0) || (typeof oldInput !== 'undefined' && oldInput.status == '0') ? 'selected' : '' %>>Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Update Cocurricular
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+<script>
+    $(document).ready(function() {
+        var selectedCourseId = "<%= typeof cocurricular !== 'undefined' ? cocurricular.course_id : (typeof oldInput !== 'undefined' ? oldInput.course_id : '') %>";
+        var selectedSemesterId = "<%= typeof cocurricular !== 'undefined' ? cocurricular.semester_id : (typeof oldInput !== 'undefined' ? oldInput.semester_id : '') %>";
+
+        // Fetch Courses based on Course Type
+        function fetchCourses(courseTypeId, selectedCourseId = null) {
+            if (courseTypeId) {
+                $.ajax({
+                    url: '/get-course/' + courseTypeId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        $('#course_id').empty();
+                        $('#course_id').append('<option value="">-- Select Course --</option>');
+                        $.each(data, function(key, value) {
+                            var selected = (selectedCourseId && selectedCourseId == value.id) ? 'selected' : '';
+                            $('#course_id').append('<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>');
+                        });
+
+                        // If we have a selected course, trigger semester fetch
+                        if(selectedCourseId) {
+                            fetchSemesters(selectedCourseId, selectedSemesterId);
+                        }
+                    }
+                });
+            } else {
+                $('#course_id').empty().append('<option value="">-- Select Course --</option>');
+                $('#semester_id').empty().append('<option value="">-- Select Semester --</option>');
+            }
+        }
+
+        // Fetch Semesters based on Course
+        function fetchSemesters(courseId, selectedSemesterId = null) {
+            if (courseId) {
+                $.ajax({
+                    url: '/get-semester/' + courseId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        $('#semester_id').empty();
+                        $('#semester_id').append('<option value="">-- Select Semester --</option>');
+                        $.each(data, function(key, value) {
+                            var selected = (selectedSemesterId && selectedSemesterId == value.id) ? 'selected' : '';
+                            $('#semester_id').append('<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#semester_id').empty().append('<option value="">-- Select Semester --</option>');
+            }
+        }
+
+        // Event Listeners
+        $('#course_type_id').change(function() {
+            var courseTypeId = $(this).val();
+            fetchCourses(courseTypeId);
+        });
+
+        $('#course_id').change(function() {
+            var courseId = $(this).val();
+            fetchSemesters(courseId);
+        });
+
+        // Initial Load
+        var initialCourseTypeId = $('#course_type_id').val();
+        if(initialCourseTypeId) {
+            fetchCourses(initialCourseTypeId, selectedCourseId);
+        }
+    });
+</script>
+</html>
+

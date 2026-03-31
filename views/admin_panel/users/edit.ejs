@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Edit User' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit User' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/users">Users</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Edit User' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit User' %></h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/users">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/users/<%= typeof targetUser !== 'undefined' ? targetUser.id : '' %>" method="POST">
+                                        <input type="hidden" name="_method" value="PUT">
+                                        <div class="row g-3">
+                                            <!-- Name -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="name" id="name" class="form-control"
+                                                        value="<%= typeof oldInput !== 'undefined' && oldInput.name ? oldInput.name : (typeof targetUser !== 'undefined' ? targetUser.name : '') %>"
+                                                        placeholder="Enter Name" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Email -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                                    <input type="email" name="email" id="email" class="form-control"
+                                                        value="<%= typeof oldInput !== 'undefined' && oldInput.email ? oldInput.email : (typeof targetUser !== 'undefined' ? targetUser.email : '') %>"
+                                                        placeholder="Enter Email" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Phone -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
+                                                    <input type="text" name="phone" id="phone" class="form-control" maxlength="10"
+                                                        value="<%= typeof oldInput !== 'undefined' && oldInput.phone ? oldInput.phone : (typeof targetUser !== 'undefined' ? targetUser.phone : '') %>"
+                                                        placeholder="Enter 10-digit phone number" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Password -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="password" class="form-label">Password <small>(Leave blank to keep current)</small></label>
+                                                    <input type="password" name="password" id="password" class="form-control"
+                                                        placeholder="Enter New Password">
+                                                </div>
+                                            </div>
+
+                                            <!-- Role -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="role" class="form-label">Role</label>
+                                                    <select name="role" id="role" class="form-control">
+                                                        <% if (typeof roles !== 'undefined' && roles.length > 0) { %>
+                                                            <% roles.forEach(function(role) { %>
+                                                                <% if (role.name === 'Super Admin') { %>
+                                                                    <% if (typeof currentUser !== 'undefined' && currentUser.role === 'Super Admin') { %>
+                                                                        <option value="<%= role.name %>" <%= (typeof targetUser !== 'undefined' && targetUser.role == role.name) || (typeof oldInput !== 'undefined' && oldInput.role == role.name) ? 'selected' : '' %>><%= role.name %></option>
+                                                                    <% } %>
+                                                                <% } else { %>
+                                                                    <option value="<%= role.name %>" <%= (typeof targetUser !== 'undefined' && targetUser.role == role.name) || (typeof oldInput !== 'undefined' && oldInput.role == role.name) ? 'selected' : '' %>><%= role.name %></option>
+                                                                <% } %>
+                                                            <% }); %>
+                                                        <% } else { %>
+                                                            <option value="Student" <%= (typeof targetUser !== 'undefined' && targetUser.role == 'Student') || (typeof oldInput !== 'undefined' && oldInput.role == 'Student') ? 'selected' : '' %>>Student</option>
+                                                            <option value="College" <%= (typeof targetUser !== 'undefined' && targetUser.role == 'College') || (typeof oldInput !== 'undefined' && oldInput.role == 'College') ? 'selected' : '' %>>College</option>
+                                                            <option value="Admin" <%= (typeof targetUser !== 'undefined' && targetUser.role == 'Admin') || (typeof oldInput !== 'undefined' && oldInput.role == 'Admin') ? 'selected' : '' %>>Admin</option>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Update User
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>
+

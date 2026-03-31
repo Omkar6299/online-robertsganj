@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Server Error' %> - सरदार बल्लभ भाई पटेल राजकीय महाविद्यालय</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Base Styles -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .error-container {
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            max-width: 600px;
+        }
+        .error-code {
+            font-size: 8rem;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .error-message {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+        .error-description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        .btn-home {
+            background: white;
+            color: #f5576c;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: #f093fb;
+        }
+        .icon-container {
+            margin-bottom: 2rem;
+        }
+        .icon-container i {
+            font-size: 6rem;
+            opacity: 0.8;
+        }
+    </style>
+
+    <!-- Extra styles only in development -->
+    <% if (typeof error !== 'undefined' && error.stack && process.env.NODE_ENV === 'development') { %>
+    <style>
+        .error-details {
+            background: rgba(255,255,255,0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            text-align: left;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error-details pre {
+            color: white;
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+    <% } %>
+
+</head>
+<body>
+
+    <div class="error-container">
+
+        <div class="icon-container">
+            <i class="fas fa-server"></i>
+        </div>
+
+        <div class="error-code">500</div>
+
+        <div class="error-message">Internal Server Error</div>
+
+        <div class="error-description">
+            We're sorry, but something went wrong on our end. Our team has been notified and is working to fix the issue.
+        </div>
+
+        <div>
+            <a href="/" class="btn-home">
+                <i class="fas fa-home me-2"></i>Go Back Home
+            </a>
+            <a href="javascript:history.back()" class="btn-home">
+                <i class="fas fa-arrow-left me-2"></i>Go Back
+            </a>
+        </div>
+
+        <!-- Show error details only in development -->
+        <% if (typeof error !== 'undefined' && error.stack && process.env.NODE_ENV === 'development') { %>
+        <div class="error-details">
+            <strong>Error Details (Development Mode):</strong>
+            <pre><%= error.stack %></pre>
+        </div>
+        <% } %>
+
+    </div>
+
+</body>
+</html>

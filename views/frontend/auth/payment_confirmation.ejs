@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Payment Confirmation' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h4 class="mb-0"><i class="bi bi-info-circle-fill"></i> Registration Initiated</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning text-center">
+                                <i class="bi bi-clock-history fa-2x"></i>
+                                <h5 class="mt-2">Registration data received. Payment Pending.</h5>
+                                <p class="mb-0">Please complete the payment process to finalize your registration.</p>
+                            </div>
+
+                            <div class="card border-primary mb-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Registration Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-borderless mb-0">
+                                        <tr>
+                                            <td><strong>Student Name:</strong></td>
+                                            <td><%= typeof registrationData !== 'undefined' && registrationData.name ? registrationData.name : 'N/A' %></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Email:</strong></td>
+                                            <td><%= typeof registrationData !== 'undefined' && registrationData.email ? registrationData.email : 'N/A' %></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Phone:</strong></td>
+                                            <td><%= typeof registrationData !== 'undefined' && registrationData.phone ? registrationData.phone : 'N/A' %></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Course:</strong></td>
+                                            <td><%= typeof registrationData !== 'undefined' && registrationData.course_name ? registrationData.course_name : 'N/A' %></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Semester:</strong></td>
+                                            <td><%= typeof registrationData !== 'undefined' && registrationData.semester_name ? registrationData.semester_name : 'N/A' %></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Academic Year:</strong></td>
+                                            <td><%= typeof registrationData !== 'undefined' && registrationData.academic_year ? registrationData.academic_year : 'N/A' %></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Transaction ID:</strong></td>
+                                            <td><code><%= typeof registrationData !== 'undefined' && registrationData.transaction_id ? registrationData.transaction_id : 'N/A' %></code></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0"><i class="bi bi-currency-rupee"></i> Payment Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="text-center mb-3">
+                                        <h3 class="text-primary">₹<%= typeof registrationData !== 'undefined' && registrationData.amount ? registrationData.amount : '0.00' %></h3>
+                                        <p class="text-muted mb-0">Registration Fee</p>
+                                    </div>
+
+                                    <form action="/payment/initiate" method="POST" id="paymentForm">
+                                        <input type="hidden" name="transaction_id" value="<%= typeof registrationData !== 'undefined' && registrationData.transaction_id ? registrationData.transaction_id : '' %>">
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary btn-lg" id="payNowBtn">
+                                                <i class="bi bi-credit-card"></i> Pay Now
+                                            </button>
+                                            <a href="/registration_fees_payment" class="btn btn-outline-secondary">
+                                                <i class="bi bi-arrow-left"></i> Back to Registration
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-3">
+                                <small>
+                                    <i class="bi bi-info-circle"></i>
+                                    <strong>Note:</strong> You will be redirected to the secure payment gateway to complete your payment.
+                                    Please keep your Transaction ID safe for future reference.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+    <script>
+        // Prevent double submission
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('payNowBtn');
+            if (btn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        });
+    </script>
+</body>
+</html>
+

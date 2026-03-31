@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Fees Payment' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Fees Payment</h4>
+                        </div>
+                        <div class="card-body">
+                            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        <% errors.forEach(function(error) { %>
+                                            <li><%= error %></li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof challan !== 'undefined' && challan) { %>
+                                <div class="alert alert-info">
+                                    <h5>Payment Details</h5>
+                                    <p><strong>Amount:</strong> ₹<%= challan.amount %></p>
+                                    <p><strong>Due Date:</strong> <%= challan.due_date %></p>
+                                </div>
+
+                                <form action="/student/payment_initiate" method="POST">
+                                    <input type="hidden" name="challan_id" value="<%= challan.id %>">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="bi bi-currency-rupee"></i> Proceed to Payment
+                                        </button>
+                                    </div>
+                                </form>
+                            <% } else { %>
+                                <div class="alert alert-warning">
+                                    <p>No pending fees found.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
+

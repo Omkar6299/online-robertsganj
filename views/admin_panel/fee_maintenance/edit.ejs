@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Edit Fee Maintenance' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit Fee Maintenance' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/fee_maintenance">Fee Maintenance</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Edit Fee</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0">Edit Fee Record</h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/fee_maintenance">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger shadow-sm">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/fee_maintenance/<%= fee.id %>" method="POST" id="feeForm">
+                                        <input type="hidden" name="_method" value="PUT">
+                                        <div class="row g-3">
+                                            <!-- Course -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="Course" class="form-label">Course <span class="text-danger">*</span></label>
+                                                    <select name="Course" id="Course" class="form-control" required>
+                                                        <option value="">-- Select Course --</option>
+                                                        <% courses.forEach(function(course) { %>
+                                                            <option value="<%= course.id %>" <%= (typeof oldInput !== 'undefined' ? oldInput.Course : fee.Course) == course.id ? 'selected' : '' %>>
+                                                                <%= course.name %>
+                                                            </option>
+                                                        <% }); %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Semester -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="semester" class="form-label">Semester <span class="text-danger">*</span></label>
+                                                    <select name="semester" id="semester" class="form-control" required>
+                                                        <option value="">-- Select Semester --</option>
+                                                        <% semesters.forEach(function(sem) { %>
+                                                            <option value="<%= sem.id %>" <%= (typeof oldInput !== 'undefined' ? oldInput.semester : fee.semester) == sem.id ? 'selected' : '' %>>
+                                                                <%= sem.name %>
+                                                            </option>
+                                                        <% }); %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Fee Name -->
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <label for="Fee_Name" class="form-label">Fee Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="Fee_Name" id="Fee_Name" class="form-control" placeholder="Enter Fee Name" value="<%= typeof oldInput !== 'undefined' ? oldInput.Fee_Name : fee.Fee_Name %>" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Status -->
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="fee_Active" class="form-label">Status <span class="text-danger">*</span></label>
+                                                    <select name="fee_Active" id="fee_Active" class="form-control" required>
+                                                        <option value="Active" <%= (typeof oldInput !== 'undefined' ? oldInput.fee_Active : fee.fee_Active) == 'Active' ? 'selected' : '' %>>Active</option>
+                                                        <option value="Inactive" <%= (typeof oldInput !== 'undefined' ? oldInput.fee_Active : fee.fee_Active) == 'Inactive' ? 'selected' : '' %>>Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Amounts -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="Total_Fee_Amount" class="form-label">Total Fee <span class="text-danger">*</span></label>
+                                                    <input type="number" step="1" min="0" name="Total_Fee_Amount" id="Total_Fee_Amount" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.Total_Fee_Amount : fee.Total_Fee_Amount %>" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="General_fee_Amount" class="form-label">General Fee</label>
+                                                    <input type="number" step="1" min="0" name="General_fee_Amount" id="General_fee_Amount" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.General_fee_Amount : fee.General_fee_Amount %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="Girls_fee_Amount" class="form-label">Girls Fee</label>
+                                                    <input type="number" step="1" min="0" name="Girls_fee_Amount" id="Girls_fee_Amount" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.Girls_fee_Amount : fee.Girls_fee_Amount %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="OBC_fee_Amount" class="form-label">OBC Fee</label>
+                                                    <input type="number" step="1" min="0" name="OBC_fee_Amount" id="OBC_fee_Amount" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.OBC_fee_Amount : fee.OBC_fee_Amount %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="SC_fee_Amount" class="form-label">SC Fee</label>
+                                                    <input type="number" step="1" min="0" name="SC_fee_Amount" id="SC_fee_Amount" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.SC_fee_Amount : fee.SC_fee_Amount %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="ST_fee_Amount" class="form-label">ST Fee</label>
+                                                    <input type="number" step="1" min="0" name="ST_fee_Amount" id="ST_fee_Amount" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.ST_fee_Amount : fee.ST_fee_Amount %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="Minority_Fee_Amount" class="form-label">Minority Fee</label>
+                                                    <input type="text" name="Minority_Fee_Amount" id="Minority_Fee_Amount" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.Minority_Fee_Amount : fee.Minority_Fee_Amount %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="Practical_Fee" class="form-label">Practical Fee</label>
+                                                    <input type="number" step="1" min="0" name="Practical_Fee" id="Practical_Fee" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.Practical_Fee : fee.Practical_Fee %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="late_fee" class="form-label">Late Fee</label>
+                                                    <input type="number" step="1" min="0" name="late_fee" id="late_fee" class="form-control" value="<%= typeof oldInput !== 'undefined' ? oldInput.late_fee : fee.late_fee %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 d-flex align-items-center mt-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="is_late_fee_applicable" id="is_late_fee_applicable" <%= (typeof oldInput !== 'undefined' ? oldInput.is_late_fee_applicable : fee.is_late_fee_applicable) ? 'checked' : '' %>>
+                                                    <label class="form-check-label fw-bold" for="is_late_fee_applicable">
+                                                        Enable Late Fee?
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Other types -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="fee_Type" class="form-label">Fee Type</label>
+                                                    <input type="text" name="fee_Type" id="fee_Type" class="form-control" placeholder="Enter Fee Type" value="<%= typeof oldInput !== 'undefined' ? oldInput.fee_Type : fee.fee_Type %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="Student_Type" class="form-label">Student Type</label>
+                                                    <input type="text" name="Student_Type" id="Student_Type" class="form-control" placeholder="Enter Student Type" value="<%= typeof oldInput !== 'undefined' ? oldInput.Student_Type : fee.Student_Type %>">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="Ex_Student" class="form-label">Ex-Student</label>
+                                                    <select name="Ex_Student" id="Ex_Student" class="form-control">
+                                                        <option value="No" <%= (typeof oldInput !== 'undefined' ? oldInput.Ex_Student : fee.Ex_Student) == 'No' ? 'selected' : '' %>>No</option>
+                                                        <option value="Yes" <%= (typeof oldInput !== 'undefined' ? oldInput.Ex_Student : fee.Ex_Student) == 'Yes' ? 'selected' : '' %>>Yes</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="Lab_Fee_Type" class="form-label">Lab Fee Type</label>
+                                                    <input type="text" name="Lab_Fee_Type" id="Lab_Fee_Type" class="form-control" placeholder="Enter Lab Fee Type" value="<%= typeof oldInput !== 'undefined' ? oldInput.Lab_Fee_Type : fee.Lab_Fee_Type %>">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Update Fee Record
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+
+    <script>
+        $(document).ready(function() {
+             // Fetch Semesters based on Course
+             $('#Course').change(function() {
+                var courseId = $(this).val();
+                if (courseId) {
+                    $.ajax({
+                        url: '/admin/fee_maintenance/get-semesters/' + courseId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            $('#semester').empty();
+                            $('#semester').append('<option value="">-- Select Semester --</option>');
+                            if (data.semesters) {
+                                $.each(data.semesters, function(key, value) {
+                                    $('#semester').append('<option value="' + value.id + '">' + value.name + '</option>');
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    $('#semester').empty().append('<option value="">-- Select Semester --</option>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+            <% }); %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/student/subject_details_post" method="POST">
+    <div class="row g-3">
+        <!-- Major Subject 1 -->
+        <% if (student.courseName && student.courseName.is_major1_required == '1') { %>
+        <div class="col-md-6">
+            <label class="form-label">Major Subject 1 <span class="text-danger">*</span></label>
+            <select class="form-select" name="major1_id" required>
+                <option value="">-- Select Major Subject 1 --</option>
+                <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
+                    <% subjects.forEach(function(subject) { %>
+                        <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major1_id == subject.id ? 'selected' : '' %>>
+                            <%= subject.subject_name %>
+                        </option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+        <% } %>
+
+        <!-- Major Subject 2 -->
+        <% if (student.courseName && student.courseName.is_major2_required == '1') { %>
+        <div class="col-md-6">
+            <label class="form-label">Major Subject 2 <span class="text-danger">*</span></label>
+            <select class="form-select" name="major2_id" required>
+                <option value="">-- Select Major Subject 2 --</option>
+                <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
+                    <% subjects.forEach(function(subject) { %>
+                        <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major2_id == subject.id ? 'selected' : '' %>>
+                            <%= subject.subject_name %>
+                        </option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+        <% } %>
+
+        <!-- Minor Subject -->
+        <% if (student.courseName && student.courseName.is_minor_required == '1') { %>
+        <div class="col-md-6">
+            <label class="form-label">Minor Subject <span class="text-danger">*</span></label>
+            <select class="form-select" name="minor_id" required>
+                <option value="">-- Select Minor Subject --</option>
+                <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
+                    <% subjects.forEach(function(subject) { %>
+                        <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.minor_id == subject.id ? 'selected' : '' %>>
+                            <%= subject.subject_name %>
+                        </option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+        <% } %>
+
+        <!-- Skill Development -->
+        <% if (student.semsterName && student.semsterName.is_skill_required == 1) { %>
+        <div class="col-md-6">
+            <label class="form-label">Skill Development Course <span class="text-danger">*</span></label>
+            <select class="form-select" name="skill_id" required>
+                <option value="">-- Select Skill Course --</option>
+                <% if (typeof skills !== 'undefined' && skills.length > 0) { %>
+                    <% skills.forEach(function(skill) { %>
+                        <option value="<%= skill.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.skill_id == skill.id ? 'selected' : '' %>>
+                            <%= skill.name %>
+                        </option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+        <% } %>
+
+        <!-- Co-Curricular -->
+        <% if (student.semsterName && student.semsterName.is_cocurricular_required == 1) { %>
+        <div class="col-md-6">
+            <label class="form-label">Co-Curricular Course <span class="text-danger">*</span></label>
+            <select class="form-select" name="cocurricular_id" required>
+                <option value="">-- Select Co-Curricular Course --</option>
+                <% if (typeof cocurriculars !== 'undefined' && cocurriculars.length > 0) { %>
+                    <% cocurriculars.forEach(function(cc) { %>
+                        <option value="<%= cc.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.cocurricular_id == cc.id ? 'selected' : '' %>>
+                            <%= cc.name %>
+                        </option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+        <% } %>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="/student/registration?tab=educational" class="btn btn-secondary">Previous</a>
+        <button type="submit" class="btn btn-primary">Save & Continue</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const major1Select = document.querySelector('select[name="major1_id"]');
+        const major2Select = document.querySelector('select[name="major2_id"]');
+        const minorSelect = document.querySelector('select[name="minor_id"]');
+
+        const selects = [major1Select, major2Select, minorSelect].filter(el => el !== null);
+
+        function updateOptions() {
+            const selectedValues = selects.map(s => s.value).filter(v => v !== "");
+
+            selects.forEach(select => {
+                const currentVal = select.value;
+                Array.from(select.options).forEach(option => {
+                    if (option.value === "") return; // Skip placeholder
+                    // Disable if it is selected in ANY OTHER select.
+
+                    const isSelectedInOther = selects.some(otherSelect => {
+                        return otherSelect !== select && otherSelect.value === option.value && otherSelect.value !== "";
+                    });
+
+                    if (isSelectedInOther) {
+                        option.disabled = true;
+                        // option.style.display = 'none'; // Optional: hide completely
+                    } else {
+                        option.disabled = false;
+                        // option.style.display = 'block';
+                    }
+                });
+            });
+        }
+
+        selects.forEach(select => {
+            select.addEventListener('change', updateOptions);
+        });
+
+        // Initial call
+        updateOptions();
+    });
+</script>
+

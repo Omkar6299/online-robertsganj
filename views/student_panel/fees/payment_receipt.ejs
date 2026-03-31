@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Payment Receipt' %></title>
+    <style>
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h4>Payment Receipt</h4>
+                            <p class="text-muted">सरदार बल्लभ भाई पटेल राजकीय महाविद्यालय</p>
+                        </div>
+
+                        <% if (typeof payment !== 'undefined' && payment) { %>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th><%= fieldLabels.receipt.fields.txn_id %>:</th>
+                                    <td><%= payment.transaction_id || '-' %></td>
+                                </tr>
+                                <tr>
+                                    <th><%= fieldLabels.receipt.fields.reg_no %>:</th>
+                                    <td><%= payment.registration_no || '-' %></td>
+                                </tr>
+                                <tr>
+                                    <th><%= fieldLabels.receipt.fields.name %>:</th>
+                                    <td><%= payment.student_name || '-' %></td>
+                                </tr>
+                                <tr>
+                                    <th><%= fieldLabels.receipt.fields.amount %>:</th>
+                                    <td>₹<%= payment.amount || '0' %></td>
+                                </tr>
+                                <tr>
+                                    <th><%= fieldLabels.receipt.fields.txn_date %>:</th>
+                                    <td><%= payment.payment_date || '-' %></td>
+                                </tr>
+                                <tr>
+                                    <th><%= fieldLabels.receipt.fields.status %>:</th>
+                                    <td>
+                                        <% if (payment.status == 'Success') { %>
+                                            <span class="badge bg-success">Success</span>
+                                        <% } else { %>
+                                            <span class="badge bg-danger"><%= payment.status %></span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </table>
+                        <% } else { %>
+                            <div class="alert alert-warning">Payment details not found.</div>
+                        <% } %>
+
+                        <div class="text-center mt-4 no-print">
+                            <button onclick="window.print()" class="btn btn-primary me-2">Print Receipt</button>
+                            <a href="/student/dashboard" class="btn btn-secondary">Go to Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

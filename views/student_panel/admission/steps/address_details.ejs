@@ -1,0 +1,304 @@
+
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        padding: 5px;
+    }
+</style>
+
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+            <% }); %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/student/address_details_post" method="POST">
+    <!-- Hidden fields to store pre-filled values for JS to pick up -->
+    <input type="hidden" id="saved_perm_state" value="<%= typeof oldInput !== 'undefined' && oldInput.permanent_state ? oldInput.permanent_state : (typeof addressDetails !== 'undefined' && addressDetails.permanent_state ? addressDetails.permanent_state : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.permanent_state ? previousStudent.permanent_state : '')) %>">
+    <input type="hidden" id="saved_perm_district" value="<%= typeof oldInput !== 'undefined' && oldInput.permanent_district ? oldInput.permanent_district : (typeof addressDetails !== 'undefined' && addressDetails.permanent_district ? addressDetails.permanent_district : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.permanent_district ? previousStudent.permanent_district : '')) %>">
+    <input type="hidden" id="saved_corr_state" value="<%= typeof oldInput !== 'undefined' && oldInput.correspondence_state ? oldInput.correspondence_state : (typeof addressDetails !== 'undefined' && addressDetails.mailing_state ? addressDetails.mailing_state : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.mailing_state ? previousStudent.mailing_state : '')) %>">
+    <input type="hidden" id="saved_corr_district" value="<%= typeof oldInput !== 'undefined' && oldInput.correspondence_district ? oldInput.correspondence_district : (typeof addressDetails !== 'undefined' && addressDetails.mailing_district ? addressDetails.mailing_district : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.mailing_district ? previousStudent.mailing_district : '')) %>">
+
+    <div class="row g-3">
+        <div class="col-md-12">
+            <h5>Permanent Address</h5>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="permanent_address" class="form-label">Address <span class="text-danger">*</span></label>
+                <textarea name="permanent_address" id="permanent_address" class="form-control" rows="3" required><%= typeof oldInput !== 'undefined' && oldInput.permanent_address ? oldInput.permanent_address : (typeof addressDetails !== 'undefined' && addressDetails.permanent_address ? addressDetails.permanent_address : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.permanent_address ? previousStudent.permanent_address : '')) %></textarea>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="permanent_state" class="form-label">State <span class="text-danger">*</span></label>
+                <select name="permanent_state" id="permanent_state" class="form-control select2" required>
+                    <option value="">-- Select State --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="permanent_district" class="form-label">District <span class="text-danger">*</span></label>
+                <select name="permanent_district" id="permanent_district" class="form-control select2" required disabled>
+                    <option value="">-- Select District --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="permanent_pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
+                <input type="text" name="permanent_pincode" id="permanent_pincode" class="form-control" maxlength="6"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.permanent_pincode ? oldInput.permanent_pincode : (typeof addressDetails !== 'undefined' && addressDetails.permanent_pincode ? addressDetails.permanent_pincode : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.permanent_pincode ? previousStudent.permanent_pincode : '')) %>"
+                    placeholder="Enter Pincode" required>
+            </div>
+        </div>
+
+        <div class="col-md-12 mt-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="same_as_permanent" name="same_as_permanent" value="1"
+                    <%= typeof oldInput !== 'undefined' && oldInput.same_as_permanent == '1' ? 'checked' : '' %>
+                <label class="form-check-label" for="same_as_permanent">
+                    Same as Permanent Address
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-12 mt-3">
+            <h5>Correspondence Address</h5>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="correspondence_address" class="form-label">Address <span class="text-danger">*</span></label>
+                <textarea name="correspondence_address" id="correspondence_address" class="form-control" rows="3" required><%= typeof oldInput !== 'undefined' && oldInput.correspondence_address ? oldInput.correspondence_address : (typeof addressDetails !== 'undefined' && addressDetails.mailing_address ? addressDetails.mailing_address : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.mailing_address ? previousStudent.mailing_address : '')) %></textarea>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="correspondence_state" class="form-label">State <span class="text-danger">*</span></label>
+                <select name="correspondence_state" id="correspondence_state" class="form-control select2" required>
+                    <option value="">-- Select State --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="correspondence_district" class="form-label">District <span class="text-danger">*</span></label>
+                <select name="correspondence_district" id="correspondence_district" class="form-control select2" required disabled>
+                    <option value="">-- Select District --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="correspondence_pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
+                <input type="text" name="correspondence_pincode" id="correspondence_pincode" class="form-control" maxlength="6"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.correspondence_pincode ? oldInput.correspondence_pincode : (typeof addressDetails !== 'undefined' && addressDetails.mailing_pincode ? addressDetails.mailing_pincode : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.mailing_pincode ? previousStudent.mailing_pincode : '')) %>"
+                    placeholder="Enter Pincode" required>
+            </div>
+        </div>
+
+        <div class="col-md-12 mt-3">
+            <h5>Local Guardian Details</h5>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="local_guadian" class="form-label">Local Guardian Name</label>
+                <input type="text" name="local_guadian" id="local_guadian" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.local_guadian ? oldInput.local_guadian : (typeof student !== 'undefined' && student.local_guadian ? student.local_guadian : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.local_guadian ? previousStudent.local_guadian : '')) %>"
+                    placeholder="Enter Local Guardian Name">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="guadian_contact" class="form-label">Guardian Contact Number</label>
+                <input type="text" name="guadian_contact" id="guadian_contact" class="form-control" maxlength="10"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.guadian_contact ? oldInput.guadian_contact : (typeof student !== 'undefined' && student.guadian_contact ? student.guadian_contact : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.guadian_contact ? previousStudent.guadian_contact : '')) %>"
+                    placeholder="Enter 10-digit contact number">
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="local_guadian_address" class="form-label">Local Guardian Address</label>
+                <textarea name="local_guadian_address" id="local_guadian_address" class="form-control" rows="2"
+                    placeholder="Enter Local Guardian Address"><%= typeof oldInput !== 'undefined' && oldInput.local_guadian_address ? oldInput.local_guadian_address : (typeof student !== 'undefined' && student.local_guadian_address ? student.local_guadian_address : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.local_guadian_address ? previousStudent.local_guadian_address : '')) %></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="/student/registration?tab=personal" class="btn btn-secondary">Previous</a>
+        <button type="submit" class="btn btn-primary">Save & Continue</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery is not loaded! Cannot initialize address dropdowns.');
+            return;
+        }
+        $(document).ready(function() {
+        // Initialize Select2
+        $('.select2').select2();
+
+        // Use local proxy routes
+        const BASE_URL = '';
+
+        // Load States
+        function loadStates(dropdownId, selectedValue) {
+            $.ajax({
+                url: `${BASE_URL}/locations/states`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const states = response.data.states;
+                        let options = '<option value="">-- Select State --</option>';
+                        states.forEach(state => {
+                            // Using name for value so it gets saved to the database directly
+                            options += `<option value="${state.name}" ${selectedValue == state.name ? 'selected' : ''}>${state.name}</option>`;
+                        });
+                        $(`#${dropdownId}`).html(options).trigger('change.select2');
+
+                        // If we have a selected value, we need to ensure the district is enabled and loaded
+                        if (selectedValue) {
+                             let districtId = dropdownId.replace('_state', '_district');
+                             let savedDistrict = $(`#saved_${districtId.replace('permanent', 'perm').replace('correspondence', 'corr')}`).val();
+
+                             // Enable district dropdown since state is selected
+                             $(`#${districtId}`).prop('disabled', false);
+
+                             loadDistricts(districtId, selectedValue, savedDistrict);
+                        }
+                    } else {
+                        console.error('Failed to load states:', response);
+                    }
+                },
+                error: function(err) {
+                    console.error('Error fetching states:', err);
+                    // Fallback or alert user
+                }
+            });
+        }
+
+        // Load Districts
+        function loadDistricts(dropdownId, stateId, selectedValue) {
+            const $districtSelect = $(`#${dropdownId}`);
+
+            if (!stateId) {
+                $districtSelect.html('<option value="">-- Select District --</option>').prop('disabled', true).trigger('change');
+                return;
+            }
+
+            // Enable the dropdown
+            $districtSelect.prop('disabled', false);
+
+            // Show loading state
+            $districtSelect.html('<option value="">Loading...</option>').trigger('change');
+
+            $.ajax({
+                url: `${BASE_URL}/locations/districts`,
+                method: 'GET',
+                data: { state_id: stateId },
+                success: function(response) {
+                    if (response.success) {
+                        let districts = response.data.districts;
+
+                        // Client-side filtering removed as backend handles it reliably
+                        // and response doesn't include state_id anymore.
+
+                        let options = '<option value="">-- Select District --</option>';
+                        districts.forEach(district => {
+                            // Using name for value as per DB expectation
+                            options += `<option value="${district.name}" ${selectedValue == district.name ? 'selected' : ''}>${district.name}</option>`;
+                        });
+                        $districtSelect.html(options).trigger('change');
+                    } else {
+                        $districtSelect.html('<option value="">-- Select District --</option>').trigger('change');
+                    }
+                },
+                error: function(err) {
+                    console.error('Error fetching districts:', err);
+                    $districtSelect.html('<option value="">-- Error Loading --</option>').trigger('change');
+                }
+            });
+        }
+
+        // Initial Load
+        loadStates('permanent_state', $('#saved_perm_state').val());
+        loadStates('correspondence_state', $('#saved_corr_state').val());
+
+        // Event Listeners
+        $('#permanent_state').on('change', function() {
+            const stateId = $(this).val();
+            // Clear current district value when state changes manually
+            loadDistricts('permanent_district', stateId, null);
+        });
+
+        $('#correspondence_state').on('change', function() {
+            const stateId = $(this).val();
+            // Clear current district value when state changes manually
+            loadDistricts('correspondence_district', stateId, null);
+        });
+
+        // Same as Permanent Logic
+        $('#same_as_permanent').on('change', function() {
+            if (this.checked) {
+                const permAddr = $('#permanent_address').val();
+                const permState = $('#permanent_state').val();
+                const permDistrict = $('#permanent_district').val();
+
+                $('#correspondence_address').val(permAddr);
+                $('#correspondence_pincode').val($('#permanent_pincode').val());
+
+                // Set State
+                $('#correspondence_state').val(permState).trigger('change.select2');
+
+                // Set District
+                if (permState) {
+                    $('#correspondence_district').prop('disabled', false);
+                    loadDistricts('correspondence_district', permState, permDistrict);
+                } else {
+                    $('#correspondence_district').prop('disabled', true).val('').trigger('change');
+                }
+
+            }
+        });
+
+        $('form').on('submit', function() {
+             // Ensure disabled fields are included?
+             // Disabled fields are NOT sent in form submit.
+             // IMPORTANT: We must enable them before submit if they have values, OR use hidden inputs.
+             // But valid data requires them to be selected, so they should be enabled.
+             // If user selects state then district, it is enabled.
+             // If user hasn't selected state, district is disabled and empty, which is fine (though required attribute might block submit if browser validation runs? No, disabled elements skip validation).
+             // But field is marked `required`. If disabled, browser ignores `required`.
+             // However, backend requires it.
+             // So user MUST select state, enabling district, then select district.
+
+            if ($('#same_as_permanent').is(':checked')) {
+                 $('#correspondence_address').val($('#permanent_address').val());
+                 $('#correspondence_state').val($('#permanent_state').val());
+                 // Explicitly set value for district hidden/visible input if needed,
+                 // but since we copy logic above, it should be set in the inputs.
+            }
+        });
+        });
+    });
+</script>

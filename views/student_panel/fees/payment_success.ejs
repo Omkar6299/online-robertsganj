@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Payment Success' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow text-center">
+                        <div class="card-body py-5">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                            <h2 class="text-success mt-3 mb-3">Payment Successful!</h2>
+                            <p class="lead">Your payment has been processed successfully.</p>
+
+                            <% if (typeof transactionId !== 'undefined' && transactionId) { %>
+                                <p><strong>Transaction ID:</strong> <%= transactionId %></p>
+                            <% } %>
+
+                            <div class="mt-4">
+                                <a href="/student/payment_receipt?transaction_id=<%= typeof transactionId !== 'undefined' ? transactionId : '' %>" class="btn btn-primary me-2">Download Receipt</a>
+                                <a href="/student/dashboard" class="btn btn-secondary">Go to Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
+

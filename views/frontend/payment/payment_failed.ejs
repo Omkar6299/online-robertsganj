@@ -1,0 +1,93 @@
+<%- include('../layout/app', { title: 'Payment Failed' }) %>
+
+<style>
+    .error-icon {
+        font-size: 90px;
+        color: #dc3545;
+        animation: pop 0.6s ease forwards;
+    }
+    @keyframes pop {
+        0% { transform: scale(0); opacity: 0; }
+        70% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(1); }
+    }
+    #error_bg {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+</style>
+
+<div class="text-white text-center py-5 position-relative" id="error_bg">
+    <i class="bi bi-x-circle-fill error-icon"></i>
+    <h1 class="fw-bold mt-3">Payment Failed</h1>
+    <p class="lead mb-0">We're sorry, but your payment could not be processed.</p>
+    <% if (typeof payment !== 'undefined' && payment && payment.merchant_txn_id) { %>
+        <p class="opacity-75">Transaction ID: <%= payment.merchant_txn_id %></p>
+    <% } %>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Payment Unsuccessful</h4>
+                <p>Your payment could not be processed. Please try again or choose a different payment method.</p>
+                <% if (typeof payment !== 'undefined' && payment && payment.remark) { %>
+                    <hr>
+                    <p class="mb-0"><strong>Reason:</strong> <%= payment.remark %></p>
+                <% } %>
+                <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                    <hr>
+                    <p class="mb-0"><strong>Error:</strong> <%= errorMessage %></p>
+                <% } %>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Payment Details</h5>
+                    <% if (typeof payment !== 'undefined' && payment) { %>
+                        <% if (payment.merchant_txn_id) { %>
+                            <p class="mb-1"><strong>Transaction ID:</strong> <code><%= payment.merchant_txn_id %></code></p>
+                        <% } %>
+                        <% if (payment.amount) { %>
+                            <p class="mb-1"><strong>Amount:</strong> ₹<%= typeof payment.amount === 'number' ? payment.amount.toFixed(2) : payment.amount %></p>
+                        <% } %>
+                        <% if (payment.atom_txn_id) { %>
+                            <p class="mb-1"><strong>Atom Transaction ID:</strong> <%= payment.atom_txn_id %></p>
+                        <% } %>
+                        <% if (payment.bank_transaction_id) { %>
+                            <p class="mb-1"><strong>Bank Transaction ID:</strong> <%= payment.bank_transaction_id %></p>
+                        <% } %>
+                    <% } %>
+                    <% if (typeof registrationData !== 'undefined' && registrationData && registrationData.registration_no) { %>
+                        <p class="mb-1"><strong>Registration Number:</strong> <%= registrationData.registration_no %></p>
+                    <% } %>
+                    <p class="mb-0"><strong>Status:</strong> <span class="badge bg-danger">Payment Failed</span></p>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <% if (typeof transactionId !== 'undefined' && transactionId) { %>
+                    <form action="/payment/initiate" method="POST" class="d-inline me-3">
+                        <input type="hidden" name="transaction_id" value="<%= transactionId %>">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">
+                            <i class="bi bi-arrow-clockwise me-2"></i> Try Payment Again
+                        </button>
+                    </form>
+                <% } else { %>
+                    <a href="/registration_fees_payment" class="btn btn-primary btn-lg rounded-pill px-5 me-3">
+                        <i class="bi bi-arrow-clockwise me-2"></i> Try Payment Again
+                    </a>
+                <% } %>
+                <a href="/registration_fees_payment" class="btn btn-outline-secondary btn-lg rounded-pill px-5">
+                    <i class="bi bi-arrow-left me-2"></i> Back to Registration
+                </a>
+            </div>
+
+            <div class="mt-4 p-3 bg-light rounded">
+                <h6 class="fw-bold mb-2">Need Help?</h6>
+                <p class="mb-0 small">If you continue to experience issues, please contact our support team for assistance.</p>
+            </div>
+        </div>
+    </div>
+</div>
+

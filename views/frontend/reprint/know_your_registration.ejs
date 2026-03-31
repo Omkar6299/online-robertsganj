@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Know Your Registration' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Know Your Registration Number</h4>
+                        </div>
+                        <div class="card-body">
+                            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        <% errors.forEach(function(error) { %>
+                                            <li><%= error %></li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof registrationNo !== 'undefined' && registrationNo) { %>
+                                <div class="alert alert-success">
+                                    <h5>Your Registration Number:</h5>
+                                    <h3 class="text-center"><strong><%= registrationNo %></strong></h3>
+                                </div>
+                            <% } %>
+
+                            <form action="/know_your_registration" method="GET">
+                                <div class="mb-3">
+                                    <label for="transaction_id" class="form-label">Transaction ID <span class="text-danger">*</span></label>
+                                    <input type="text" name="transaction_id" id="transaction_id" class="form-control"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.transaction_id ? oldInput.transaction_id : '' %>"
+                                        placeholder="Enter Transaction ID" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="phone" id="phone" class="form-control" maxlength="10"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.phone ? oldInput.phone : '' %>"
+                                        placeholder="Enter 10-digit mobile number" required>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Get Registration Number</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
+

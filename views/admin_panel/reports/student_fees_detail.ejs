@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Student Fees Report' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Student Fees Report' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Student Fees Report' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Student Fees Report' %></h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="/admin/reports/student_fees" method="GET" class="row g-3 mb-4">
+                                        <div class="col-md-4">
+                                            <label for="registration_no" class="form-label">Registration Number</label>
+                                            <input type="text" name="registration_no" id="registration_no" class="form-control"
+                                                value="<%= typeof oldInput !== 'undefined' && oldInput.registration_no ? oldInput.registration_no : '' %>"
+                                                placeholder="Enter Registration Number">
+                                        </div>
+                                        <div class="col-md-4 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-primary w-100">Search</button>
+                                        </div>
+                                    </form>
+
+                                    <% if (typeof payments !== 'undefined' && payments.length > 0) { %>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover align-middle">
+                                                <thead class="table-bg-primary">
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Transaction ID</th>
+                                                        <th>Registration No</th>
+                                                        <th>Student Name</th>
+                                                        <th>Amount</th>
+                                                        <th>Payment Date</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% payments.forEach(function(payment, index) { %>
+                                                        <tr>
+                                                            <td><%= index + 1 %></td>
+                                                            <td><%= payment.transaction_id || '-' %></td>
+                                                            <td><%= payment.registration_no || '-' %></td>
+                                                            <td><%= payment.student_name || '-' %></td>
+                                                            <td>₹<%= payment.amount || '0' %></td>
+                                                            <td><%= payment.payment_date || '-' %></td>
+                                                            <td>
+                                                                <% if (payment.status == 'Success') { %>
+                                                                    <span class="badge bg-success">Success</span>
+                                                                <% } else { %>
+                                                                    <span class="badge bg-danger"><%= payment.status %></span>
+                                                                <% } %>
+                                                            </td>
+                                                        </tr>
+                                                    <% }); %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="alert alert-info">No payment records found.</div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <%- include('../layouts/datatable_init') %>
+</body>
+</html>
+

@@ -1,0 +1,46 @@
+<div class="text-center mb-4">
+    <h4>Fee Challan</h4>
+    <p class="text-muted">सरदार बल्लभ भाई पटेल राजकीय महाविद्यालय</p>
+</div>
+
+<% if (typeof challan !== 'undefined' && challan) { %>
+    <table class="table table-bordered">
+        <tr>
+            <th>Challan Number:</th>
+            <td><%= challan.challan_no || '-' %></td>
+        </tr>
+        <tr>
+            <th>Registration Number:</th>
+            <td><%= challan.registration_no || '-' %></td>
+        </tr>
+        <tr>
+            <th>Student Name:</th>
+            <td><%= challan.student_name || '-' %></td>
+        </tr>
+        <tr>
+            <th>Course:</th>
+            <td><%= challan.course_name || '-' %></td>
+        </tr>
+        <tr>
+            <th>Amount:</th>
+            <td>₹<%= challan.amount || '0' %></td>
+        </tr>
+        <tr>
+            <th>Due Date:</th>
+            <td><%= challan.due_date || '-' %></td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td>
+                <% if (challan.status == 'Paid') { %>
+                    <span class="badge bg-success">Paid</span>
+                <% } else { %>
+                    <span class="badge bg-warning">Pending</span>
+                <% } %>
+            </td>
+        </tr>
+    </table>
+<% } else { %>
+    <div class="alert alert-warning">Challan details not found.</div>
+<% } %>
+

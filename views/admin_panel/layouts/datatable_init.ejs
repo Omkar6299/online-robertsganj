@@ -1,0 +1,66 @@
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+<script>
+    $(document).ready(function() {
+        if ($('#dataTable').length) {
+            // Get the number of columns to determine which column is Actions (usually the last one)
+            const columnCount = $('#dataTable thead tr th').length;
+            const actionsColumnIndex = columnCount - 1; // Last column is usually Actions
+
+            // Remove any empty rows with colspan before initializing DataTables
+            $('#dataTable tbody tr').each(function() {
+                const $row = $(this);
+                const colspanCells = $row.find('td[colspan]');
+                if (colspanCells.length > 0) {
+                    // Check if this is an empty row
+                    const cellText = $row.text().trim().toLowerCase();
+                    if (cellText.includes('no') && (cellText.includes('found') || cellText.includes('data'))) {
+                        $row.remove(); // Remove empty message rows
+                    }
+                }
+            });
+
+            $('#dataTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                lengthMenu: [10, 25, 50, 100],
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search...",
+                    emptyTable: "No semesters found."
+                },
+                columnDefs: [{
+                    orderable: false,
+                    targets: actionsColumnIndex // Disable ordering on Actions column (last column)
+                }],
+                dom: '<"d-flex justify-content-between align-items-center mb-2"<"d-flex"l><"d-flex"B>>rt<"d-flex justify-content-between align-items-center"ip>',
+                buttons: [{
+                    extend: 'colvis',
+                    text: '<i class="bi bi-list-columns"></i> Columns'
+                }, {
+                    extend: 'excelHtml5',
+                    text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+                    exportOptions: {
+                        columns: ':visible:not(.noExport)'
+                    }
+                }, {
+                    extend: 'pdfHtml5',
+                    text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+                    exportOptions: {
+                        columns: ':visible:not(.noExport)'
+                    }
+                }, {
+                    extend: 'print',
+                    text: '<i class="bi bi-printer"></i> Print',
+                    exportOptions: {
+                        columns: ':visible:not(.noExport)'
+                    }
+                }],
+                responsive: true,
+                order: [[0, 'asc']] // Sort by first column (usually #) ascending
+            });
+        }
+    });
+</script>
+

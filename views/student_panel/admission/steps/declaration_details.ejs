@@ -1,0 +1,74 @@
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+            <% }); %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/student/declaration_details_post" method="POST" id="submissionForm">
+    <div class="row g-3">
+        <div class="col-md-12">
+            <div class="alert alert-warning border-warning shadow-sm mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-3 me-3 text-warning"></i>
+                    <div>
+                        <h6 class="alert-heading fw-bold mb-2">Final Submission Warning / अंतिम जमा करने की चेतावनी</h6>
+                        <p class="mb-2 small">Please review your application carefully using the <strong>"Preview Application"</strong> button below. Once you click on <strong>"Submit Application,"</strong> your details will be locked, and no further changes will be allowed.</p>
+                        <hr class="my-2 opacity-25">
+                        <p class="mb-0 small">कृपया नीचे दिए गए <strong>"Preview Application"</strong> बटन का उपयोग करके अपने आवेदन की सावधानीपूर्वक समीक्षा करें। एक बार जब आप <strong>"Submit Application"</strong> पर क्लिक कर देते हैं, तो आपका विवरण लॉक हो जाएगा और आप उसमें कोई भी बदलाव नहीं कर पाएंगे।</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small">Need to check your information?</span>
+                    </div>
+                    <a href="/student/print_application_form" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-eye me-1"></i> Preview Application
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="fw-bold"><i class="bi bi-check2-circle me-2 text-primary"></i>Declaration</h5>
+                    <p class="text-muted" style="line-height: 1.6;">I hereby declare that all the information provided by me in this application form is true and correct to the best of my knowledge and belief. I understand that if any information is found to be false or incorrect, my admission will be cancelled.</p>
+
+                    <div class="form-check mt-3 p-3 bg-white border rounded shadow-sm">
+                        <input class="form-check-input ms-0 me-3" type="checkbox" name="declaration" id="declaration" value="1" required
+                            <%= typeof oldInput !== 'undefined' && oldInput.declaration == '1' ? 'checked' : '' %>>
+                        <label class="form-check-label fw-bold" for="declaration">
+                            I agree to the above declaration <span class="text-danger">*</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between align-items-center">
+        <a href="/student/registration?tab=photo" class="btn btn-secondary px-4">
+            <i class="bi bi-arrow-left me-1"></i> Previous
+        </a>
+        <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm" id="submitBtn">
+            <i class="bi bi-cloud-upload me-1"></i> Submit Application
+        </button>
+    </div>
+</form>
+
+<script>
+document.getElementById('submissionForm').onsubmit = function(e) {
+    if (!confirm('ARE YOU SURE?\n\nOnce submitted, you will NOT be able to update any details anymore.\n\nPlease ensure you have previewed your application.\n\nClick OK to finalize submission.')) {
+        e.preventDefault();
+        return false;
+    }
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+};
+</script>
+

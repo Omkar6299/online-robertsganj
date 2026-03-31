@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<!--begin::Head-->
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title><%= typeof title !== 'undefined' ? title : 'Dashboard' %> || सरदार बल्लभ भाई पटेल राजकीय महाविद्यालय</title>
+    <!--begin::Accessibility Meta Tags-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    <!--end::Accessibility Meta Tags-->
+    <!--begin::Primary Meta Tags-->
+    <meta name="title" content="AdminLTE v4 | Dashboard" />
+    <meta name="author" content="ColorlibHQ" />
+    <meta name="description"
+        content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS. Fully accessible with WCAG 2.1 AA compliance." />
+    <meta name="keywords"
+        content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard, accessible admin panel, WCAG compliant" />
+
+    <meta name="supported-color-schemes" content="light dark" />
+    <%- include('css_link') %>
+    <style>
+        button.dt-button {
+            background: #031633 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+
+<body
+    class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+
+    <div class="app-wrapper">
+        <%- include('header') %>
+        <%- include('sidebar') %>
+
+        <main class="app-main">
+            <%- typeof body !== 'undefined' ? body : '' %>
+        <%- include('footer') %>
+
+    </div>
+
+    <%- include('script_link') %>
+    <script>
+        new Sortable(document.querySelector('.connectedSortable'), {
+            group: 'shared',
+            handle: '.card-header',
+        });
+
+        const cardHeaders = document.querySelectorAll('.connectedSortable .card-header');
+        cardHeaders.forEach((cardHeader) => {
+            cardHeader.style.cursor = 'move';
+        });
+    </script>
+    <!-- apexcharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
+        integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8=" crossorigin="anonymous"></script>
+    <!-- ChartJS -->
+    <script>
+        // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
+        // IT'S ALL JUST JUNK FOR DEMO
+        // ++++++++++++++++++++++++++++++++++++++++++
+
+        const sales_chart_options = {
+            series: [{
+                    name: 'Digital Goods',
+                    data: [28, 48, 40, 19, 86, 27, 90],
+                },
+                {
+                    name: 'Electronics',
+                    data: [65, 59, 80, 81, 56, 55, 40],
+                },
+            ],
+            chart: {
+                height: 300,
+                type: 'area',
+                toolbar: {
+                    show: false,
+                },
+            },
+            legend: {
+                show: false,
+            },
+            colors: ['#0d6efd', '#20c997'],
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                curve: 'smooth',
+            },
+            xaxis: {
+                type: 'datetime',
+                categories: [
+                    '2023-01-01',
+                    '2023-02-01',
+                    '2023-03-01',
+                    '2023-04-01',
+                    '2023-05-01',
+                    '2023-06-01',
+                    '2023-07-01',
+                ],
+            },
+            tooltip: {
+                x: {
+                    format: 'MMMM yyyy',
+                },
+            },
+        };
+
+        const sales_chart = new ApexCharts(
+            document.querySelector('#revenue-chart'),
+            sales_chart_options,
+        );
+        if (document.querySelector('#revenue-chart')) {
+            sales_chart.render();
+        }
+    </script>
+    <!-- jsvectormap -->
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"
+        integrity="sha256-/t1nN2956BT869E6H4V1dnt0X5pAQHPytli+1nTZm2Y=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"
+        integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY=" crossorigin="anonymous"></script>
+    <!-- jsvectormap -->
+    <script>
+        // World map by jsVectorMap
+        if (document.querySelector('#world-map')) {
+            new jsVectorMap({
+                selector: '#world-map',
+                map: 'world',
+            });
+        }
+
+        // Sparkline charts
+        const option_sparkline1 = {
+            series: [{
+                data: [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021],
+            }, ],
+            chart: {
+                type: 'area',
+                height: 50,
+                sparkline: {
+                    enabled: true,
+                },
+            },
+            stroke: {
+                curve: 'straight',
+            },
+            fill: {
+                opacity: 0.3,
+            },
+            yaxis: {
+                min: 0,
+            },
+            colors: ['#DCE6EC'],
+        };
+
+        if (document.querySelector('#sparkline-1')) {
+            const sparkline1 = new ApexCharts(document.querySelector('#sparkline-1'), option_sparkline1);
+            sparkline1.render();
+        }
+
+        const option_sparkline2 = {
+            series: [{
+                data: [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921],
+            }, ],
+            chart: {
+                type: 'area',
+                height: 50,
+                sparkline: {
+                    enabled: true,
+                },
+            },
+            stroke: {
+                curve: 'straight',
+            },
+            fill: {
+                opacity: 0.3,
+            },
+            yaxis: {
+                min: 0,
+            },
+            colors: ['#DCE6EC'],
+        };
+
+        if (document.querySelector('#sparkline-2')) {
+            const sparkline2 = new ApexCharts(document.querySelector('#sparkline-2'), option_sparkline2);
+            sparkline2.render();
+        }
+
+        const option_sparkline3 = {
+            series: [{
+                data: [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21],
+            }, ],
+            chart: {
+                type: 'area',
+                height: 50,
+                sparkline: {
+                    enabled: true,
+                },
+            },
+            stroke: {
+                curve: 'straight',
+            },
+            fill: {
+                opacity: 0.3,
+            },
+            yaxis: {
+                min: 0,
+            },
+            colors: ['#DCE6EC'],
+        };
+
+        if (document.querySelector('#sparkline-3')) {
+            const sparkline3 = new ApexCharts(document.querySelector('#sparkline-3'), option_sparkline3);
+            sparkline3.render();
+        }
+    </script>
+    <% if (typeof scripts !== 'undefined') { %>
+        <%- scripts %>
+    <% } %>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    <script>
+        if ($('#dataTable').length) {
+            $('#dataTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                lengthMenu: [10, 25, 50, 100],
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search students..."
+                },
+                columnDefs: [{
+                        orderable: false,
+                        targets: 3
+                    } // Disable ordering on Actions column
+                ],
+                dom: '<"d-flex justify-content-between align-items-center mb-2"<"d-flex"l><"d-flex"B>>rt<"d-flex justify-content-between align-items-center"ip>',
+
+                buttons: [{
+                        extend: 'colvis',
+
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        exportOptions: {
+                            columns: ':visible:not(.noExport)'
+                        }
+
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        exportOptions: {
+                            columns: ':visible:not(.noExport)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':visible:not(.noExport)'
+                        }
+                    }
+                ]
+            });
+        }
+
+        $(document).ready(function() {
+             if (typeof success !== 'undefined' && success.length > 0) {
+                toastr.success('<%= success[0] %>');
+             }
+
+             if (typeof error !== 'undefined' && error.length > 0) {
+                toastr.error('<%= error[0] %>');
+             }
+
+             if (typeof errors !== 'undefined' && errors.length > 0) {
+                 errors.forEach(function(error) {
+                    toastr.error('<%= error %>');
+                 });
+             }
+
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+</body>
+</html>
+

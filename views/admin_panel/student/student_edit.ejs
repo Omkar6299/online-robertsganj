@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title>Edit Student Details</title>
+    <style>
+        .section-header {
+            background: linear-gradient(135deg, #1a3a5c, #2d6da3);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 6px 6px 0 0;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-card { border: 1px solid #d0dce8; border-radius: 6px; margin-bottom: 22px; }
+        .section-card .card-body { padding: 18px; }
+        .form-label { font-weight: 500; font-size: 13.5px; color: #374151; }
+        .status-section { background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 20px; margin-top: 10px; }
+        .status-section h6 { color: #b45309; font-weight: 700; font-size: 15px; }
+    </style>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">Edit Student Details</h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/register_student_list">Registered Students</a></li>
+                                <li class="breadcrumb-item active">Edit</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+
+                    <!-- Flash Messages -->
+                    <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i><%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+                    <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i><%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+
+                    <!-- Student Info Banner -->
+                    <div class="card mb-3" style="border-left: 4px solid #2d6da3;">
+                        <div class="card-body py-2 d-flex align-items-center gap-4 flex-wrap">
+                            <div><span class="text-muted small">Registration No:</span> <strong class="text-primary"><%= student.registration_no || 'N/A' %></strong></div>
+                            <div><span class="text-muted small">Course:</span> <strong><%= student.courseName && student.courseName.name ? student.courseName.name : '-' %></strong></div>
+                            <div><span class="text-muted small">Semester/Year:</span> <strong><%= student.semsterName && student.semsterName.name ? student.semsterName.name : '-' %></strong></div>
+                            <div>
+                                <span class="text-muted small">Status:</span>
+                                <% if (student.admission_status == 'Approved') { %>
+                                    <span class="badge bg-success ms-1">Approved</span>
+                                <% } else if (student.admission_status == 'Disapproved') { %>
+                                    <span class="badge bg-danger ms-1">Disapproved</span>
+                                <% } else { %>
+                                    <span class="badge bg-warning ms-1">Pending</span>
+                                <% } %>
+                            </div>
+                            <div class="ms-auto">
+                                <a href="/admin/register_student_list" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i>Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Edit Form -->
+                    <form action="/admin/students/<%= student.id %>/update" method="POST" id="editStudentForm">
+
+                        <!-- 1. Personal Details -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-person-fill"></i> Personal Details</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="name" class="form-control" value="<%= student.user && student.user.name ? student.user.name : '' %>" required readonly style="background-color: #e9ecef;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" name="dob" class="form-control" value="<%= student.dob || '' %>" readonly style="background-color: #e9ecef;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Gender</label>
+                                        <select name="gender" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                                            <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                                            <option value="Other" <%= student.gender === 'Other' ? 'selected' : '' %>>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Father's Name</label>
+                                        <input type="text" name="father_name" class="form-control" value="<%= student.father_name || '' %>" readonly style="background-color: #e9ecef;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Mother's Name</label>
+                                        <input type="text" name="mother_name" class="form-control" value="<%= student.mother_name || '' %>" readonly style="background-color: #e9ecef;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Category</label>
+                                        <select name="category" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="General" <%= student.category === 'General' ? 'selected' : '' %>>General</option>
+                                            <option value="OBC" <%= student.category === 'OBC' ? 'selected' : '' %>>OBC</option>
+                                            <option value="SC" <%= student.category === 'SC' ? 'selected' : '' %>>SC</option>
+                                            <option value="ST" <%= student.category === 'ST' ? 'selected' : '' %>>ST</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Sub Category</label>
+                                        <input type="text" name="sub_category" class="form-control" value="<%= student.sub_category || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Religion</label>
+                                        <select name="religion" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <option value="HINDU" <%= student.religion === 'HINDU' ? 'selected' : '' %>>HINDU</option>
+                                            <option value="MUSLIM" <%= student.religion === 'MUSLIM' ? 'selected' : '' %>>MUSLIM</option>
+                                            <option value="SIKH" <%= student.religion === 'SIKH' ? 'selected' : '' %>>SIKH</option>
+                                            <option value="CHRISTIAN" <%= student.religion === 'CHRISTIAN' ? 'selected' : '' %>>CHRISTIAN</option>
+                                            <option value="JAIN" <%= student.religion === 'JAIN' ? 'selected' : '' %>>JAIN</option>
+                                            <option value="BUDDHIST" <%= student.religion === 'BUDDHIST' ? 'selected' : '' %>>BUDDHIST</option>
+                                            <option value="Other" <%= student.religion === 'Other' ? 'selected' : '' %>>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Caste</label>
+                                        <input type="text" name="caste" class="form-control" value="<%= student.caste || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Caste Certificate No</label>
+                                        <input type="text" name="cast_certificate_no" class="form-control" value="<%= student.cast_certificate_no || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Blood Group</label>
+                                        <select name="blood_group" class="form-select">
+                                            <option value="">-- Select --</option>
+                                            <% ['A+','A-','B+','B-','AB+','AB-','O+','O-'].forEach(bg => { %>
+                                                <option value="<%= bg %>" <%= student.blood_group === bg ? 'selected' : '' %>><%= bg %></option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Aadhaar No</label>
+                                        <input type="text" name="adhar_no" class="form-control" value="<%= student.adhar_no || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">EPIC No (Voter ID)</label>
+                                        <input type="text" name="epic_no" class="form-control" value="<%= student.epic_no || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Samarth No</label>
+                                        <input type="text" name="samarth_no" class="form-control" value="<%= student.samarth_no || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">WhatsApp Number</label>
+                                        <input type="text" name="whatsapp_number" class="form-control" value="<%= student.whatsapp_number || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Is 18+?</label>
+                                        <select name="is_18_plus" class="form-select">
+                                            <option value="Yes" <%= student.is_18_plus === 'Yes' ? 'selected' : '' %>>Yes</option>
+                                            <option value="No" <%= student.is_18_plus !== 'Yes' ? 'selected' : '' %>>No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Contact Details -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-telephone-fill"></i> Contact Details</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" name="email" class="form-control" value="<%= student.user && student.user.email ? student.user.email : '' %>" required readonly style="background-color: #e9ecef;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                        <input type="text" name="phone" class="form-control" value="<%= student.user && student.user.phone ? student.user.phone : '' %>" required readonly style="background-color: #e9ecef;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Mailing Address -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-geo-alt-fill"></i> Address Details</div>
+                            <div class="card-body">
+                                <!-- Hidden fields to store pre-filled values for JS to pick up -->
+                                <input type="hidden" id="saved_corr_state" value="<%= student.mailing_state || '' %>">
+                                <input type="hidden" id="saved_corr_district" value="<%= student.mailing_district || '' %>">
+                                <input type="hidden" id="saved_perm_state" value="<%= student.permanent_state || '' %>">
+                                <input type="hidden" id="saved_perm_district" value="<%= student.permanent_district || '' %>">
+
+                                <p class="fw-semibold text-secondary mb-2">Mailing / Correspondence Address</p>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Address</label>
+                                        <textarea name="mailing_address" class="form-control" rows="2"><%= student.mailing_address || '' %></textarea>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">State</label>
+                                        <select name="mailing_state" id="correspondence_state" class="form-select select2">
+                                            <option value="">-- Select State --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">District</label>
+                                        <select name="mailing_district" id="correspondence_district" class="form-select select2" disabled>
+                                            <option value="">-- Select District --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Tehsil</label>
+                                        <input type="text" name="mailing_tehsil" class="form-control" value="<%= student.mailing_tehsil || '' %>">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Pincode</label>
+                                        <input type="text" name="mailing_pincode" class="form-control" value="<%= student.mailing_pincode || '' %>">
+                                    </div>
+                                </div>
+                                <hr>
+                                <p class="fw-semibold text-secondary mb-2">Permanent Address</p>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Address</label>
+                                        <textarea name="permanent_address" class="form-control" rows="2"><%= student.permanent_address || '' %></textarea>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">State</label>
+                                        <select name="permanent_state" id="permanent_state" class="form-select select2">
+                                            <option value="">-- Select State --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">District</label>
+                                        <select name="permanent_district" id="permanent_district" class="form-select select2" disabled>
+                                            <option value="">-- Select District --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Tehsil</label>
+                                        <input type="text" name="permanent_tehsil" class="form-control" value="<%= student.permanent_tehsil || '' %>">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Pincode</label>
+                                        <input type="text" name="permanent_pincode" class="form-control" value="<%= student.permanent_pincode || '' %>">
+                                    </div>
+                                </div>
+                                <hr>
+                                <p class="fw-semibold text-secondary mb-2">Local Guardian</p>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Guardian Name</label>
+                                        <input type="text" name="local_guadian" class="form-control" value="<%= student.local_guadian || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Guardian Contact</label>
+                                        <input type="text" name="guadian_contact" class="form-control" value="<%= student.guadian_contact || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Guardian Address</label>
+                                        <input type="text" name="local_guadian_address" class="form-control" value="<%= student.local_guadian_address || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Other / Family Details -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-people-fill"></i> Family & Other Details</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Father's Occupation</label>
+                                        <input type="text" name="father_occupation" class="form-control" value="<%= student.father_occupation || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Mother's Occupation</label>
+                                        <input type="text" name="mother_occupation" class="form-control" value="<%= student.mother_occupation || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Family Annual Income</label>
+                                        <input type="text" name="family_annual_income" class="form-control" value="<%= student.family_annual_income || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Income Certificate No</label>
+                                        <input type="text" name="income_certificate_no" class="form-control" value="<%= student.income_certificate_no || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Computer Literate</label>
+                                        <select name="computer_literate" class="form-select">
+                                            <option value="Yes" <%= student.computer_literate === 'Yes' ? 'selected' : '' %>>Yes</option>
+                                            <option value="No" <%= student.computer_literate !== 'Yes' ? 'selected' : '' %>>No</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Extracurricular Activity</label>
+                                        <input type="text" name="extracurricular_activity" class="form-control" value="<%= student.extracurricular_activity || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Is Previous Student?</label>
+                                        <select name="is_previous_student" class="form-select">
+                                            <option value="Yes" <%= student.is_previous_student === 'Yes' ? 'selected' : '' %>>Yes</option>
+                                            <option value="No" <%= student.is_previous_student !== 'Yes' ? 'selected' : '' %>>No</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Disability %</label>
+                                        <input type="text" name="disability_percentage" class="form-control" value="<%= student.disability_percentage || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Year Gap?</label>
+                                        <select name="year_gap" class="form-select">
+                                            <option value="Yes" <%= student.year_gap === 'Yes' ? 'selected' : '' %>>Yes</option>
+                                            <option value="No" <%= student.year_gap !== 'Yes' ? 'selected' : '' %>>No</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Year Gap After Inter</label>
+                                        <input type="text" name="year_gap_after_inter" class="form-control" value="<%= student.year_gap_after_inter || '' %>">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Gap Reason</label>
+                                        <textarea name="gap_reason" class="form-control" rows="2"><%= student.gap_reason || '' %></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Bank Details -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-bank2"></i> Bank Details</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Bank Name</label>
+                                        <input type="text" name="bank_name" class="form-control" value="<%= student.bank_name || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Account Number</label>
+                                        <input type="text" name="bank_account_no" class="form-control" value="<%= student.bank_account_no || '' %>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">IFSC Code</label>
+                                        <input type="text" name="ifsc_code" class="form-control" value="<%= student.ifsc_code || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. Subject Details -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-book-half"></i> Subject Details</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <!-- Major Subject 1 -->
+                                    <% if (student.courseName && student.courseName.is_major1_required == '1') { %>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Major Subject 1 <span class="text-danger">*</span></label>
+                                        <select class="form-select subject-select" name="major1_id" required>
+                                            <option value="">-- Select Major Subject 1 --</option>
+                                            <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
+                                                <% subjects.forEach(function(subject) { %>
+                                                    <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major1_id == subject.id ? 'selected' : '' %>>
+                                                        <%= subject.subject_name %>
+                                                    </option>
+                                                <% }); %>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <% } %>
+
+                                    <!-- Major Subject 2 -->
+                                    <% if (student.courseName && student.courseName.is_major2_required == '1') { %>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Major Subject 2 <span class="text-danger">*</span></label>
+                                        <select class="form-select subject-select" name="major2_id" required>
+                                            <option value="">-- Select Major Subject 2 --</option>
+                                            <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
+                                                <% subjects.forEach(function(subject) { %>
+                                                    <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major2_id == subject.id ? 'selected' : '' %>>
+                                                        <%= subject.subject_name %>
+                                                    </option>
+                                                <% }); %>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <% } %>
+
+                                    <!-- Minor Subject -->
+                                    <% if (student.courseName && student.courseName.is_minor_required == '1') { %>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Minor Subject <span class="text-danger">*</span></label>
+                                        <select class="form-select subject-select" name="minor_id" required>
+                                            <option value="">-- Select Minor Subject --</option>
+                                            <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
+                                                <% subjects.forEach(function(subject) { %>
+                                                    <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.minor_id == subject.id ? 'selected' : '' %>>
+                                                        <%= subject.subject_name %>
+                                                    </option>
+                                                <% }); %>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <% } %>
+
+                                    <!-- Skill Development -->
+                                    <% if (student.semsterName && student.semsterName.is_skill_required == 1) { %>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Skill Development Course <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="skill_id" required>
+                                            <option value="">-- Select Skill Course --</option>
+                                            <% if (typeof skills !== 'undefined' && skills.length > 0) { %>
+                                                <% skills.forEach(function(skill) { %>
+                                                    <option value="<%= skill.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.skill_id == skill.id ? 'selected' : '' %>>
+                                                        <%= skill.name %>
+                                                    </option>
+                                                <% }); %>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <% } %>
+
+                                    <!-- Co-Curricular -->
+                                    <% if (student.semsterName && student.semsterName.is_cocurricular_required == 1) { %>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Co-Curricular Course <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="cocurricular_id" required>
+                                            <option value="">-- Select Co-Curricular Course --</option>
+                                            <% if (typeof cocurriculars !== 'undefined' && cocurriculars.length > 0) { %>
+                                                <% cocurriculars.forEach(function(cc) { %>
+                                                    <option value="<%= cc.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.cocurricular_id == cc.id ? 'selected' : '' %>>
+                                                        <%= cc.name %>
+                                                    </option>
+                                                <% }); %>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 7. Weightage Details -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-award-fill"></i> Weightage Details</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <% if (typeof weightages !== 'undefined' && weightages.length > 0) { %>
+                                        <% weightages.forEach(function(weightage) { %>
+                                            <div class="col-md-6">
+                                                <div class="card h-100 border-0 shadow-sm" style="border: 1px solid #e0e0e0 !important;">
+                                                    <div class="card-body py-2 px-3">
+                                                        <div class="form-check d-flex align-items-center mb-0">
+                                                            <input class="form-check-input me-3" type="checkbox"
+                                                                name="weightage_ids[]"
+                                                                id="weightage_<%= weightage.id %>"
+                                                                value="<%= weightage.id %>"
+                                                                <%= (typeof selectedWeightageIds !== 'undefined' && selectedWeightageIds.includes(weightage.id.toString())) ? 'checked' : '' %>>
+                                                            <label class="form-check-label flex-grow-1" for="weightage_<%= weightage.id %>" style="cursor: pointer; font-weight: 500;">
+                                                                <%= weightage.name %>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <div class="col-md-12">
+                                            <div class="alert alert-info mb-0">No weightages available for selection.</div>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 8. Educational Details -->
+                        <div class="section-card">
+                            <div class="section-header"><i class="bi bi-mortarboard-fill"></i> Educational Details</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <% if (typeof qualifications !== 'undefined' && qualifications.length > 0) { %>
+                                        <% qualifications.forEach(function(qualification, index) { %>
+                                            <% if (qualification.status !== 'hidden') { %>
+                                            <div class="col-md-12 mt-4">
+                                                <h6 class="fw-bold text-primary border-bottom pb-2"><%= qualification.name %> <%= qualification.status === 'optional' ? '(Optional)' : '' %></h6>
+                                                <input type="hidden" name="qual_name[<%= qualification.id %>]" value="<%= qualification.name %>">
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="board_<%= qualification.id %>" class="form-label">Board/University <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
+                                                    <input type="text" name="board[<%= qualification.id %>]" id="board_<%= qualification.id %>" class="form-control"
+                                                        value="<%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].board_name ? educationalDetails[qualification.name].board_name : '' %>"
+                                                        placeholder="Enter Board/University" <%= qualification.status === 'required' ? 'required' : '' %>>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="year_<%= qualification.id %>" class="form-label">Passing Year <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
+                                                    <select name="year[<%= qualification.id %>]" id="year_<%= qualification.id %>" class="form-select" <%= qualification.status === 'required' ? 'required' : '' %>>
+                                                        <option value="">-- Select Year --</option>
+                                                        <%
+                                                            const years = [];
+                                                            const currentYr = new Date().getFullYear();
+                                                            const limit = qualification.max_year_gap !== null && qualification.max_year_gap !== undefined ? qualification.max_year_gap : 50;
+                                                            for(let i = 0; i <= limit; i++) {
+                                                                years.push(currentYr - i);
+                                                            }
+                                                        %>
+                                                        <% years.forEach(year => { %>
+                                                            <option value="<%= year %>"
+                                                                <%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].year_of_passing == year ? 'selected' : '' %>>
+                                                                <%= year %>
+                                                            </option>
+                                                        <% }); %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="total_marks_<%= qualification.id %>" class="form-label">Total Marks</label>
+                                                    <input type="number" name="total_marks[<%= qualification.id %>]" id="total_marks_<%= qualification.id %>" class="form-control" min="0" step="0.01"
+                                                        value="<%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].total_marks ? educationalDetails[qualification.name].total_marks : '' %>"
+                                                        placeholder="Total Marks">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="obtained_marks_<%= qualification.id %>" class="form-label">Obtained Marks</label>
+                                                    <input type="number" name="obtained_marks[<%= qualification.id %>]" id="obtained_marks_<%= qualification.id %>" class="form-control" min="0" step="0.01"
+                                                        value="<%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].obtained_marks ? educationalDetails[qualification.name].obtained_marks : '' %>"
+                                                        placeholder="Obtained Marks">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="roll_no_<%= qualification.id %>" class="form-label">Roll Number</label>
+                                                    <input type="text" name="roll_no[<%= qualification.id %>]" id="roll_no_<%= qualification.id %>" class="form-control"
+                                                        value="<%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].roll_no ? educationalDetails[qualification.name].roll_no : '' %>"
+                                                        placeholder="Enter Roll Number">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="mark_type_<%= qualification.id %>" class="form-label">Mark Type <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
+                                                    <select name="mark_type[<%= qualification.id %>]" id="mark_type_<%= qualification.id %>" class="form-select mark-type-selector" data-qual-id="<%= qualification.id %>" data-status="<%= qualification.status %>" <%= qualification.status === 'required' ? 'required' : '' %>>
+                                                        <option value="Percentage" <%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].mark_type === 'Percentage' ? 'selected' : '' %>>Percentage</option>
+                                                        <option value="CGPA" <%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].mark_type === 'CGPA' ? 'selected' : '' %>>CGPA</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <%
+                                                const isCGPASelected = typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].mark_type === 'CGPA';
+                                            %>
+
+                                            <div class="col-md-6 percentage-container-<%= qualification.id %>" <% if (isCGPASelected) { %>style="display: none;"<% } %>>
+                                                <div class="form-group">
+                                                    <label for="percentage_<%= qualification.id %>" class="form-label">Percentage <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
+                                                    <input type="number" name="percentage[<%= qualification.id %>]" id="percentage_<%= qualification.id %>" class="form-control" step="0.01" min="1" max="100"
+                                                        value="<%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].percentage ? educationalDetails[qualification.name].percentage : '' %>"
+                                                        placeholder="Enter Percentage" <%= qualification.status === 'required' && !isCGPASelected ? 'required' : '' %>>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 cgpa-container-<%= qualification.id %>" <% if (!isCGPASelected) { %>style="display: none;"<% } %>>
+                                                <div class="form-group">
+                                                    <label for="cgpa_<%= qualification.id %>" class="form-label">CGPA <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
+                                                    <input type="number" name="cgpa[<%= qualification.id %>]" id="cgpa_<%= qualification.id %>" class="form-control" step="0.01" min="1" max="10"
+                                                        value="<%= typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].cgpa ? educationalDetails[qualification.name].cgpa : '' %>"
+                                                        placeholder="Enter CGPA" <%= qualification.status === 'required' && isCGPASelected ? 'required' : '' %>>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                                        <% }); %>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div class="d-flex gap-2 mb-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-floppy-fill me-1"></i> Update Student Details
+                            </button>
+                            <a href="/admin/register_student_list" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Status Update Section -->
+                    <div class="status-section">
+                        <h6><i class="bi bi-shield-check me-2"></i>Update Application Status</h6>
+                        <p class="text-muted small mb-3">Change the admission status for this application. This action will take effect immediately.</p>
+                        <form action="/admin/students/<%= student.id %>/update-status" method="POST" class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Application Status <span class="text-danger">*</span></label>
+                                <select name="admission_status" class="form-select" required>
+                                    <option value="Pending" <%= student.admission_status === 'Pending' ? 'selected' : '' %>>⏳ Pending</option>
+                                    <option value="Approved" <%= student.admission_status === 'Approved' ? 'selected' : '' %>>✅ Approved</option>
+                                    <option value="Disapproved" <%= student.admission_status === 'Disapproved' ? 'selected' : '' %>>❌ Disapproved</option>
+                                </select>
+                            </div>
+                            <div class="col-md-auto">
+                                <button type="submit" class="btn btn-warning px-4">
+                                    <i class="bi bi-arrow-repeat me-1"></i> Update Status
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ === 'undefined') {
+                console.error('jQuery is not loaded! Cannot initialize address dropdowns.');
+                return;
+            }
+            $(document).ready(function() {
+                // Initialize Select2 if available
+                if ($.fn.select2) {
+                    $('.select2').select2({ theme: 'bootstrap-5' });
+                }
+
+                const BASE_URL = '';
+
+                // Load States
+                function loadStates(dropdownId, selectedValue) {
+                    $.ajax({
+                        url: `${BASE_URL}/locations/states`,
+                        method: 'GET',
+                        success: function(response) {
+                            if (response.success) {
+                                const states = response.data.states;
+                                let options = '<option value="">-- Select State --</option>';
+                                states.forEach(state => {
+                                    options += `<option value="${state.name}" ${selectedValue == state.name ? 'selected' : ''}>${state.name}</option>`;
+                                });
+                                
+                                const $dropdown = $(`#${dropdownId}`);
+                                $dropdown.html(options);
+                                if ($.fn.select2) $dropdown.trigger('change.select2');
+
+                                if (selectedValue) {
+                                    let districtId = dropdownId.replace('_state', '_district');
+                                    let savedDistrictTag = dropdownId.includes('permanent') ? 'saved_perm_district' : 'saved_corr_district';
+                                    let savedDistrict = $(`#${savedDistrictTag}`).val();
+
+                                    $(`#${districtId}`).prop('disabled', false);
+                                    loadDistricts(districtId, selectedValue, savedDistrict);
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Load Districts
+                function loadDistricts(dropdownId, stateId, selectedValue) {
+                    const $districtSelect = $(`#${dropdownId}`);
+
+                    if (!stateId) {
+                        $districtSelect.html('<option value="">-- Select District --</option>').prop('disabled', true);
+                        if ($.fn.select2) $districtSelect.trigger('change.select2');
+                        return;
+                    }
+
+                    $districtSelect.prop('disabled', false).html('<option value="">Loading...</option>');
+                    if ($.fn.select2) $districtSelect.trigger('change.select2');
+
+                    $.ajax({
+                        url: `${BASE_URL}/locations/districts`,
+                        method: 'GET',
+                        data: { state_id: stateId },
+                        success: function(response) {
+                            if (response.success) {
+                                let districts = response.data.districts;
+                                let options = '<option value="">-- Select District --</option>';
+                                districts.forEach(district => {
+                                    options += `<option value="${district.name}" ${selectedValue == district.name ? 'selected' : ''}>${district.name}</option>`;
+                                });
+                                $districtSelect.html(options);
+                                if ($.fn.select2) $districtSelect.trigger('change.select2');
+                            }
+                        }
+                    });
+                }
+
+                // Initial Load
+                loadStates('permanent_state', $('#saved_perm_state').val());
+                loadStates('correspondence_state', $('#saved_corr_state').val());
+
+                // Event Listeners
+                $('#permanent_state').on('change', function() {
+                    loadDistricts('permanent_district', $(this).val(), null);
+                });
+
+                $('#correspondence_state').on('change', function() {
+                    loadDistricts('correspondence_district', $(this).val(), null);
+                });
+
+                // Subject dropdown uniqueness logic
+                const major1Select = document.querySelector('select[name="major1_id"]');
+                const major2Select = document.querySelector('select[name="major2_id"]');
+                const minorSelect = document.querySelector('select[name="minor_id"]');
+
+                const selects = [major1Select, major2Select, minorSelect].filter(el => el !== null);
+
+                function updateOptions() {
+                    selects.forEach(select => {
+                        Array.from(select.options).forEach(option => {
+                            if (option.value === "") return;
+                            const isSelectedInOther = selects.some(otherSelect => {
+                                return otherSelect !== select && otherSelect.value === option.value && otherSelect.value !== "";
+                            });
+                            if (isSelectedInOther) {
+                                option.disabled = true;
+                            } else {
+                                option.disabled = false;
+                            }
+                        });
+                    });
+                }
+
+                selects.forEach(select => select.addEventListener('change', updateOptions));
+                updateOptions();
+
+                // Educational auto-calculation logic
+                const selectors = document.querySelectorAll('.mark-type-selector');
+
+                function calculateMarks(qualId) {
+                    const totalInput = document.getElementById(`total_marks_${qualId}`);
+                    const obtainedInput = document.getElementById(`obtained_marks_${qualId}`);
+                    const percentageInput = document.getElementById(`percentage_${qualId}`);
+                    const cgpaInput = document.getElementById(`cgpa_${qualId}`);
+
+                    if (!totalInput || !obtainedInput) return;
+
+                    const total = parseFloat(totalInput.value);
+                    const obtained = parseFloat(obtainedInput.value);
+
+                    if (!isNaN(total) && !isNaN(obtained) && total > 0) {
+                        const percentage = (obtained / total) * 100;
+                        if (percentageInput) percentageInput.value = percentage.toFixed(2);
+
+                        const cgpa = percentage / 9.5;
+                        const cappedCGPA = Math.min(cgpa, 10);
+                        if (cgpaInput) cgpaInput.value = cappedCGPA.toFixed(2);
+                    }
+                }
+
+                selectors.forEach(selector => {
+                    const qualId = selector.getAttribute('data-qual-id');
+                    const totalInput = document.getElementById(`total_marks_${qualId}`);
+                    const obtainedInput = document.getElementById(`obtained_marks_${qualId}`);
+
+                    if (totalInput) totalInput.addEventListener('input', () => calculateMarks(qualId));
+                    if (obtainedInput) obtainedInput.addEventListener('input', () => calculateMarks(qualId));
+
+                    selector.addEventListener('change', function() {
+                        const status = this.getAttribute('data-status');
+                        const isRequired = status === 'required';
+
+                        const percentageContainer = document.querySelector(`.percentage-container-${qualId}`);
+                        const cgpaContainer = document.querySelector(`.cgpa-container-${qualId}`);
+                        const percentageInput = document.getElementById(`percentage_${qualId}`);
+                        const cgpaInput = document.getElementById(`cgpa_${qualId}`);
+
+                        if (this.value === 'CGPA') {
+                            if (percentageContainer) percentageContainer.style.display = 'none';
+                            if (cgpaContainer) cgpaContainer.style.display = 'block';
+                            if (percentageInput) percentageInput.removeAttribute('required');
+                            if (isRequired && cgpaInput) cgpaInput.setAttribute('required', 'required');
+                        } else {
+                            if (percentageContainer) percentageContainer.style.display = 'block';
+                            if (cgpaContainer) cgpaContainer.style.display = 'none';
+                            if (cgpaInput) cgpaInput.removeAttribute('required');
+                            if (isRequired && percentageInput) percentageInput.setAttribute('required', 'required');
+                        }
+
+                        calculateMarks(qualId);
+                    });
+
+                    // Initial calculate on load
+                    calculateMarks(qualId);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

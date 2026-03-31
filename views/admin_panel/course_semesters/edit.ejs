@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Edit Course Semester' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit Course Semester Qualifications' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/registration_qualifications">Registration Qualifications</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%= typeof title !== 'undefined' ? title : 'Edit Course Semester Qualifications' %></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Edit Course Semester Qualifications' %></h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/registration_qualifications">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/registration_qualifications/<%= typeof courseSemester !== 'undefined' ? courseSemester.id : '' %>" method="POST">
+                                        <input type="hidden" name="_method" value="PUT">
+                                        <div class="row g-3">
+                                            <!-- Course -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="course_id" class="form-label">Course <span class="text-danger">*</span></label>
+                                                    <select name="course_id" id="course_id" class="form-control" required>
+                                                        <option value="">-- Select Course --</option>
+                                                        <% if (typeof courses !== 'undefined' && courses.length > 0) { %>
+                                                            <% courses.forEach(function(course) { %>
+                                                                <option value="<%= course.id %>" <%= (typeof courseSemester !== 'undefined' && courseSemester.course_id == course.id) || (typeof oldInput !== 'undefined' && oldInput.course_id == course.id) ? 'selected' : '' %>>
+                                                                    <%= course.name %>
+                                                                </option>
+                                                            <% }); %>
+                                                        <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Semester -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="semester_id" class="form-label">Semester <span class="text-danger">*</span></label>
+                                                    <select name="semester_id" id="semester_id" class="form-control" required>
+                                                        <option value="">-- Select Course First --</option>
+                                                        <% if (typeof courseSemester !== 'undefined') { %>
+                                                            <option value="<%= courseSemester.id %>" selected><%= courseSemester.name %></option>
+                                                        <% } %>
+                                                    </select>
+                                                    <small class="form-text text-muted">Select a course first to see available semesters</small>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <!-- Registration and Fee Payment Settings -->
+                                        <% if (typeof isOddSemester !== 'undefined' && isOddSemester) { %>
+                                            <div class="row g-3 mt-3">
+                                                <div class="col-md-12">
+                                                    <div class="card border-primary">
+                                                        <div class="card-header bg-primary text-white">
+                                                            <h6 class="mb-0">Registration Settings (Semester <%= typeof semesterOrder !== 'undefined' ? semesterOrder : '' %>)</h6>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <input type="hidden" name="registration_enabled" value="0">
+                                                            <div class="form-check form-switch">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    name="registration_enabled"
+                                                                    id="registration_enabled"
+                                                                    value="1"
+                                                                    <%= (typeof courseSemester !== 'undefined' && (courseSemester.registration_enabled == '1' || courseSemester.registration_enabled == 1)) || (typeof oldInput !== 'undefined' && oldInput.registration_enabled == '1') ? 'checked' : '' %>>
+                                                                <label class="form-check-label" for="registration_enabled">
+                                                                    Enable Registration for this Semester (Academic Year Wise)
+                                                                </label>
+                                                                <small class="form-text text-muted d-block mt-1">
+                                                                    When enabled, students can register for this semester during the academic year registration period.
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% } else { %>
+                                            <input type="hidden" name="registration_enabled" value="0">
+                                        <% } %>
+
+                                        <% if (typeof isEvenSemester !== 'undefined' && isEvenSemester) { %>
+                                            <div class="row g-3 mt-3">
+                                                <div class="col-md-12">
+                                                    <div class="card border-success">
+                                                        <div class="card-header bg-success text-white">
+                                                            <h6 class="mb-0">Fee Payment Settings (Semester <%= typeof semesterOrder !== 'undefined' ? semesterOrder : '' %>)</h6>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <input type="hidden" name="fee_payment_enabled" value="0">
+                                                            <div class="form-check form-switch">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    name="fee_payment_enabled"
+                                                                    id="fee_payment_enabled"
+                                                                    value="1"
+                                                                    <%= (typeof courseSemester !== 'undefined' && (courseSemester.fee_payment_enabled == '1' || courseSemester.fee_payment_enabled == 1)) || (typeof oldInput !== 'undefined' && oldInput.fee_payment_enabled == '1') ? 'checked' : '' %>>
+                                                                <label class="form-check-label" for="fee_payment_enabled">
+                                                                    Enable Fee Payment for this Semester
+                                                                </label>
+                                                                <small class="form-text text-muted d-block mt-1">
+                                                                    When enabled, students can pay fees for this semester after login. This applies to semesters 2, 4, and 6 for the corresponding academic year.
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% } else { %>
+                                            <input type="hidden" name="fee_payment_enabled" value="0">
+                                        <% } %>
+
+                                        <!-- Subject Selection Settings (Skills & Co-curricular) -->
+                                        <div class="row g-3 mt-3">
+                                            <div class="col-md-12">
+                                                <div class="card border-info">
+                                                    <div class="card-header bg-info text-white">
+                                                        <h6 class="mb-0">Subject Selection Settings (Semester <%= typeof semesterOrder !== 'undefined' ? semesterOrder : '' %>)</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="d-flex gap-4">
+                                                            <div class="form-check form-switch">
+                                                                <input class="form-check-input" type="checkbox" name="is_skill_required" id="is_skill_required" value="1" <%= (typeof courseSemester !== 'undefined' && (courseSemester.is_skill_required == '1' || courseSemester.is_skill_required == 1)) || (typeof oldInput !== 'undefined' && oldInput.is_skill_required == '1') ? 'checked' : '' %>>
+                                                                <label class="form-check-label" for="is_skill_required">Skill Selection Required</label>
+                                                            </div>
+                                                            <div class="form-check form-switch">
+                                                                <input class="form-check-input" type="checkbox" name="is_cocurricular_required" id="is_cocurricular_required" value="1" <%= (typeof courseSemester !== 'undefined' && (courseSemester.is_cocurricular_required == '1' || courseSemester.is_cocurricular_required == 1)) || (typeof oldInput !== 'undefined' && oldInput.is_cocurricular_required == '1') ? 'checked' : '' %>>
+                                                                <label class="form-check-label" for="is_cocurricular_required">Co-curricular Selection Required</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Qualifications Section -->
+                                        <div class="row g-3 mt-3">
+                                            <div class="col-md-12">
+                                                <h5 class="mb-3">Required Qualifications</h5>
+                                                <p class="text-muted small">Select which qualifications are required, optional, or hidden for this course-semester combination.</p>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Qualification</th>
+                                                                <th>Required</th>
+                                                                <th>Optional</th>
+                                                                <th>Hidden</th>
+                                                                <th>Max Year Gap</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% if (typeof qualifications !== 'undefined' && qualifications.length > 0) { %>
+                                                                <% qualifications.forEach(function(qualification) { %>
+                                                                    <tr>
+                                                                        <td><%= qualification.name %></td>
+                                                                        <td class="text-center">
+                                                                            <input type="radio"
+                                                                                name="qualifications[<%= qualification.id %>][required_optional_hidden]"
+                                                                                value="required"
+                                                                                <%= (typeof existingQualifications !== 'undefined' && existingQualifications[qualification.id] == 'required') ? 'checked' : (!existingQualifications || !existingQualifications[qualification.id] ? 'checked' : '') %>>
+                                                                            <input type="hidden" name="qualifications[<%= qualification.id %>][qualification_id]" value="<%= qualification.id %>">
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <input type="radio"
+                                                                                name="qualifications[<%= qualification.id %>][required_optional_hidden]"
+                                                                                value="optional"
+                                                                                <%= (typeof existingQualifications !== 'undefined' && existingQualifications[qualification.id] == 'optional') ? 'checked' : '' %>>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <input type="radio"
+                                                                                name="qualifications[<%= qualification.id %>][required_optional_hidden]"
+                                                                                value="hidden"
+                                                                                <%= (typeof existingQualifications !== 'undefined' && existingQualifications[qualification.id] == 'hidden') ? 'checked' : '' %>>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="number"
+                                                                                class="form-control form-control-sm"
+                                                                                name="qualifications[<%= qualification.id %>][max_year_gap]"
+                                                                                min="0"
+                                                                                value="<%= (typeof existingMaxYearGaps !== 'undefined' && existingMaxYearGaps[qualification.id] != null) ? existingMaxYearGaps[qualification.id] : '' %>"
+                                                                                placeholder="No Limit">
+                                                                        </td>
+                                                                    </tr>
+                                                                <% }); %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="4" class="text-center">No qualifications found. Please add class names first.</td>
+                                                                </tr>
+                                                            <% } %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Update Course Semester Qualifications
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <script>
+        // Load semesters when course is selected
+        document.getElementById('course_id').addEventListener('change', function() {
+            const courseId = this.value;
+            const semesterSelect = document.getElementById('semester_id');
+            const currentSemesterId = '<%= typeof courseSemester !== "undefined" && courseSemester.id ? courseSemester.id : "" %>';
+
+            if (courseId) {
+                semesterSelect.disabled = true;
+                semesterSelect.innerHTML = '<option value="">Loading...</option>';
+
+                fetch(`/get-semester/${courseId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        semesterSelect.innerHTML = '<option value="">-- Select Semester --</option>';
+                        if (data && Array.isArray(data) && data.length > 0) {
+                            // Sort by order field (already sorted by API, but ensure it)
+                            const sortedSemesters = data.sort((a, b) => {
+                                const orderA = parseInt(a.order) || 0;
+                                const orderB = parseInt(b.order) || 0;
+                                return orderA - orderB;
+                            });
+
+                            sortedSemesters.forEach(semester => {
+                                const option = document.createElement('option');
+                                option.value = semester.id;
+                                option.textContent = semester.name;
+                                if (currentSemesterId && semester.id == currentSemesterId) {
+                                    option.selected = true;
+                                }
+                                semesterSelect.appendChild(option);
+                            });
+                        }
+                        semesterSelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error loading semesters:', error);
+                        semesterSelect.innerHTML = '<option value="">Error loading semesters</option>';
+                        semesterSelect.disabled = false;
+                    });
+            } else {
+                semesterSelect.innerHTML = '<option value="">-- Select Course First --</option>';
+                semesterSelect.disabled = true;
+            }
+        });
+
+        // Load semesters on page load if course is already selected
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseId = document.getElementById('course_id').value;
+            if (courseId) {
+                document.getElementById('course_id').dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+</body>
+</html>
+

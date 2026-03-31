@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Redirecting to Payment Gateway...</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .loading-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="text-center px-4">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h4 class="mb-3">Redirecting to Payment Gateway...</h4>
+            <p class="text-muted">Please wait while we redirect you to the secure payment page.</p>
+            <p class="text-muted small mb-4">Do not close or refresh this page.</p>
+
+            <div id="cancel-container" class="mt-4" style="display: none;">
+                <p class="text-muted small">Taking too long? Or want to cancel?</p>
+                <a href="/" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i> Cancel and Go Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <% if (typeof atomTokenId !== 'undefined' && atomTokenId) { %>
+        <!-- Atom Paynetz AIPAY JavaScript SDK -->
+        <script>
+            // Prepare payment options
+            const paymentOptions = {
+                atomTokenId: "<%= atomTokenId %>",
+                merchId: "<%= typeof data !== 'undefined' && data.login ? data.login : '445842' %>",
+                custEmail: "<%= typeof data !== 'undefined' && data.email ? data.email : '' %>",
+                custMobile: "<%= typeof data !== 'undefined' && data.mobile ? data.mobile : '' %>",
+                returnUrl: "<%= typeof data !== 'undefined' && data.return_url ? data.return_url : '' %>",
+                // SDK Event Listeners (if supported by the version being used)
+                onSuccess: function(data) {
+                    console.log('Payment Successful Event:', data);
+                    // The SDK usually handles redirection to returnUrl, but fallback if needed
+                    if (paymentOptions.returnUrl) window.location.href = paymentOptions.returnUrl;
+                },
+                onFail: function(data) {
+                    console.log('Payment Failed Event:', data);
+                    if (paymentOptions.returnUrl) window.location.href = paymentOptions.returnUrl;
+                },
+                onCancel: function(data) {
+                    console.log('Payment Canceled Event:', data);
+                    window.location.href = '/';
+                }
+            };
+
+            console.log('=== ATOM PAYNETZ PAYMENT INITIATION ===');
+            console.log('Payment Options:', JSON.stringify(paymentOptions, null, 2));
+
+            // Show cancel button after 10 seconds if still on this page
+            setTimeout(() => {
+                const cancelContainer = document.getElementById('cancel-container');
+                if (cancelContainer) cancelContainer.style.display = 'block';
+            }, 10000);
+
+            function openPay() {
+                if (typeof AtomPaynetz === 'undefined') {
+                    console.error('AtomPaynetz SDK not found');
+                    alert('Payment gateway SDK failed to load properly. Please try again.');
+                    window.location.href = '/';
+                    return;
+                }
+
+                try {
+                    const env = '<%= typeof atomEnvironment !== "undefined" ? atomEnvironment : "demo" %>';
+                    const mode = (env === "live") ? "live" : "uat";
+                    console.log('Initializing AtomPaynetz in mode:', mode);
+
+                    let atom = new AtomPaynetz(paymentOptions, mode);
+                    console.log('AtomPaynetz initialized successfully');
+                } catch (error) {
+                    console.error('AtomPaynetz initialization error:', error);
+                    alert('Payment gateway initialization failed: ' + error.message);
+                    window.location.href = '/';
+                }
+            }
+
+            // Load SDK and then initialize
+            function loadAtomSDK() {
+                const script = document.createElement('script');
+                // Use live or uat SDK based on environment
+                const env = '<%= typeof atomEnvironment !== "undefined" ? atomEnvironment : "demo" %>';
+                const isLive = env === "live";
+
+                script.src = isLive ? "https://psm7.atomtech.in/staticdata/ots/js/atomcheckout.js" : "https://pgtest.atomtech.in/staticdata/ots/js/atomcheckout.js";
+
+                script.onload = function () {
+                    console.log('AtomPaynetz SDK loaded successfully from:', script.src);
+                    setTimeout(openPay, 100);
+                };
+                script.onerror = function () {
+                    console.error('Failed to load SDK from:', script.src);
+                    alert('Failed to load payment gateway. Please try again.');
+                    window.location.href = '/';
+                };
+                document.head.appendChild(script);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadAtomSDK);
+            } else {
+                loadAtomSDK();
+            }
+        </script>
+    <% } else { %>
+        <script>
+            alert('Payment token generation failed. Please try again.');
+            window.location.href = '/registration_fees_payment';
+        </script>
+    <% } %>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
