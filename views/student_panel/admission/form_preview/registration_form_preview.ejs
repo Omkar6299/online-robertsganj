@@ -236,10 +236,19 @@
                     <span><%= fieldLabels.header.college_name_en %></span>
                 </div>
 
-                <div class="college-header text-center">
-                    <h2><%= fieldLabels.header.college_name_hi %></h2>
-                    <h2><%= fieldLabels.header.college_address_hi %></h2>
-                    <h4><%= fieldLabels.header.application_title %> - सत्र - <%= activeAcademicYear ? activeAcademicYear.session : '' %></h4>
+                <div class="college-header">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                        <img src="/uploads/static/logo_header.png" alt="Logo Left" style="max-height: 70px;">
+                        <div style="flex-grow: 1; text-align: center; overflow: hidden;">
+                            <h2 style="color: #b71c1c; margin-bottom: 2px; font-size: 18px; white-space: nowrap;">Government Women Degree College Robertsganj Sonebhadra</h2>
+                            <h2 style="color: #1565c0; font-size: 16px; margin-bottom: 2px; white-space: nowrap;">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</h2>
+                            <div style="color: #1976d2; font-size: 11px; font-weight: 600; white-space: nowrap;">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
+                        </div>
+                        <img src="/uploads/static/logo_header_right.png" alt="Logo Right" style="max-height: 70px;">
+                    </div>
+                    <div class="text-center mt-3">
+                        <h4 style="border: 1px solid #000; padding: 4px 15px; background: #f0f0f0;"><%= fieldLabels.header.application_title %> - सत्र - <%= activeAcademicYear ? activeAcademicYear.session : '' %></h4>
+                    </div>
                 </div>
 
                 <div class="fieldset-box">

@@ -2,54 +2,113 @@
 <html lang="en">
 <head>
     <%- include('../layout/css_link') %>
-    <title><%= typeof title !== 'undefined' ? title : 'Home' %></title>
+    <title><%= typeof title !== 'undefined' ? title : 'Home' %> || Government Women Degree College Robertsganj Sonebhadra</title>
 </head>
 <body>
     <%- include('../layout/header') %>
-    <section>
-        <div class="container my-4">
-            <h4 class="text-center text-primary fw-bold mb-4">प्रवेश हेतु प्रेस विज्ञप्ति</h4>
-
-            <div class="row g-4">
-                <!-- Left Section -->
-                <div class="col-md-8">
-                    <div class="notice-card">
-                        <div class="notice-header">
-                            New Admission for Session <%= typeof activeAcademicYear !== 'undefined' && activeAcademicYear ? activeAcademicYear.session : '2025–26' %>
-                        </div>
-                        <div class="notice-list">
-                            <a href="#">Download Prospectus</a>
-                            <a href="/admission_login">Apply Online</a>
-                            <a href="/reprint_payment_receipt">Reprint Registration Payment Receipt</a>
-                            <a href="/print_application_form">Print Application Form</a>
-                            <a href="/know_your_registration">Know Your Registration No.</a>
-                        </div>
-                        <div class="contact-footer">
-                            <div class="mb-2">
-                                <i class="bi bi-telephone-fill"></i> Helpline Number : +91 7268079785 |
-                                <i class="bi bi-envelope-fill"></i> Email : onlinehelpdesk12@gmail.com |
-                                <i class="bi bi-clock-fill"></i> 10:30 AM to 05:00 PM (Mon - Sat)
-                            </div>
+    
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Admission Brochure and Registration Boxes -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="#" class="home-link-box brochure">
+                            <i class="bi bi-file-earmark-pdf"></i>
                             <div>
-                                <i class="bi bi-telephone"></i> Admission Helpdesk (10 AM to 4 PM) :
-                                Professor Name: +91 9990099900
+                                Admission Brochure (2025-26)
+                                <div class="small fw-normal">विवरणिका (2025-26)</div>
                             </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/registration_fees_payment" class="home-link-box brochure" style="color: #1e40af; border-color: #dbeafe; background: #f0f9ff;">
+                            <i class="bi bi-currency-rupee"></i>
+                            <div>
+                                Pay Registration Fee
+                                <div class="small fw-normal">पंजीकरण शुल्क जमा करें</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Important Notice Box -->
+                <div class="notice-red-box shadow-sm">
+                    महाविद्यालय में प्रवेश हेतु माँ विंध्यवासिनी विश्वविद्यालय, मिर्ज़ापुर की समर्थ वेबसाइट 
+                    <br>
+                    <a href="https://mvvuadm.samarth.edu.in/index.php" target="_blank">https://mvvuadm.samarth.edu.in/index.php</a> 
+                    पर पंजीकरण होना अनिवार्य है। <br>
+                    <span class="text-dark small">इससे अभ्यर्थी को पंजीकरण संख्या (SRN Number) मिलेगा जिसको फॉर्म में भरना अनिवार्य होगा।</span>
+                </div>
+
+                <!-- Important Dates Section -->
+                <div class="section-box">
+                    <div class="section-header">
+                        <i class="bi bi-calendar-check me-2"></i> Important Dates / महत्वपूर्ण तिथियां
+                    </div>
+                    <div class="section-body">
+                        <div class="d-flex align-items-center text-crimson fw-bold">
+                            <i class="bi bi-pin-angle-fill me-2"></i>
+                            स्नातक प्रथम वर्ष ऑनलाइन आवेदन की प्रारंभ तिथि : 16, मई 2025
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Section -->
-                <div class="col-md-4">
-                    <div class="important-dates">
-                        <h5 class="text-center">Important Dates</h5>
-                        <p>» Online Form Token Starts : <strong>25-04-2025</strong></p>
-                        <hr style="border-color: #c8e6c9;">
-                        <p>» Online Form Token Close : <strong>07-07-2025</strong></p>
+                <!-- Instruction Section -->
+                <div class="section-box">
+                    <div class="section-header">
+                        <i class="bi bi-info-circle me-2"></i> Instruction / निर्देश
                     </div>
+                    <div class="section-body">
+                        <ol class="instruction-list">
+                            <li>ऑनलाइन आवेदन करने की प्रक्रिया (Online Application Process) -
+                                <ul>
+                                    <li>महाविद्यालय के ऑनलाइन वेबसाइट पर <a href="/registration_fees_payment">Registration Fee Payment</a> पर क्लिक करें और अपना फॉर्म फीस जमा करें।</li>
+                                    <li>फॉर्म फीस जमा करने के पश्चात ही ऑनलाइन एडमिशन फॉर्म भरा जा सकता है।</li>
+                                    <li>ट्रांजेक्शन नम्बर को सुरक्षित रखे। इसके बिना ऑनलाइन एडमिशन फॉर्म नहीं भरा जा सकेगा।</li>
+                                    <li>ट्रांजेक्शन नम्बर मिलने के पश्चात <a href="/admission_login">Apply Online</a> पर क्लिक करें।</li>
+                                    <li>Transaction ID और Mobile Number भरकर लॉगिन करें।</li>
+                                    <li>अधिकतम 100KB का फोटो और हस्ताक्षर JPEG फॉर्मेट में अपलोड करें।</li>
+                                    <li>पूर्णतः भरे हुए फॉर्म का प्रिंट आउट लें (कॉलेज कॉपी और कैंडिडेट कॉपी)।</li>
+                                </ul>
+                            </li>
+                            <li>दस्तावेज (Documents required at College office) -
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <ul class="small mb-0">
+                                            <li>हाईस्कूल अंक पत्र एवं प्रमाण-पत्र</li>
+                                            <li>इंटरमीडिएट अंक पत्र एवं प्रमाण-पत्र</li>
+                                            <li>चरित्र प्रमाण-पत्र की छाया प्रति</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="small mb-0">
+                                            <li>टी०सी० की छाया प्रति</li>
+                                            <li>जाति एवं आय प्रमाण पत्र</li>
+                                            <li>आधार कार्ड एवं अन्य अधिभार प्रमाण पत्र</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Bottom Action Buttons -->
+                <div class="action-btn-container mb-5">
+                    <a href="/admission_login" class="action-btn-large">
+                        <span class="btn-title">Apply Online</span>
+                        <span class="btn-subtitle">ऑनलाइन आवेदन करें</span>
+                    </a>
+                    <a href="/print_application_form" class="action-btn-large">
+                        <span class="btn-title">Re-Print Form</span>
+                        <span class="btn-subtitle">अपना फॉर्म पुनः प्रिन्ट करें</span>
+                    </a>
                 </div>
             </div>
         </div>
-    </section>
+    </main>
+
     <%- include('../layout/footer') %>
     <%- include('../layout/script_link') %>
 </body>

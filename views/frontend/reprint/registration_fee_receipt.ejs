@@ -130,24 +130,47 @@
             border-bottom: 3px solid #000;
         }
 
+        .header-section .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .header-section img {
+            max-height: 80px;
+        }
+
         .header-section h2 {
-            margin: 0 0 8px 0;
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
-        .header-section p {
-            margin: 4px 0;
-            font-size: 16px;
-            color: #333;
-            line-height: 1.5;
-        }
-
-        .header-section .college-name {
+            margin: 0;
             font-size: 18px;
+            font-weight: 800;
+            color: #b71c1c; /* Dark Red */
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .header-section .hindi-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1565c0; /* Blue */
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+
+        .header-section .affiliation {
+            font-size: 14px;
+            color: #1976d2;
             font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .header-section .receipt-type {
+            font-size: 18px;
+            font-weight: 700;
             color: #000;
+            margin-top: 10px;
+            text-decoration: underline;
         }
 
         .section-title {
@@ -322,9 +345,16 @@
     <div class="receipt-box">
 
         <div class="header-section">
-            <h2><%= fieldLabels.header.registration_receipt_title %></h2>
-            <p class="college-name"><%= fieldLabels.header.college_name_hi %></p>
-            <p><%= fieldLabels.header.college_name_en %></p>
+            <div class="header-top">
+                <img src="/uploads/static/logo_header.png" alt="Logo Left">
+                <div class="flex-grow-1">
+                    <h2>Government Women Degree College Robertsganj Sonebhadra</h2>
+                    <div class="hindi-title">(राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र)</div>
+                    <div class="affiliation">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
+                    <div class="receipt-type"><%= fieldLabels.header.registration_receipt_title %></div>
+                </div>
+                <img src="/uploads/static/logo_header_right.png" alt="Logo Right">
+            </div>
         </div>
 
         <% if (payment && user) { %>

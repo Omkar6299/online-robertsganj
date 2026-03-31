@@ -1,9 +1,9 @@
 const fieldLabels = {
   header: {
-    college_name_hi: "राजकीय स्नातकोत्तर महाविद्यालय",
-    college_address_hi: "ओबरा सोनभद्र (उ.प्र.) - 231219",
-    college_name_en: "Government PG College, Obra",
-    college_address_en: "Sonbhadra, Uttar Pradesh - 231219",
+    college_name_hi: "राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र",
+    college_address_hi: "सोनभद्र (महात्मा गांधी काशी विद्यापीठ, वाराणसी से संबद्ध)",
+    college_name_en: "Government Women Degree College Robertsganj Sonebhadra",
+    college_address_en: "Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi",
     logo_path: "/assets/images/logo.png",
     application_title: "प्रवेश आवेदन पत्र (Online Admission Form)",
     receipt_title: "प्रवेश शुल्क रसीद (Admission Fee Receipt)",
