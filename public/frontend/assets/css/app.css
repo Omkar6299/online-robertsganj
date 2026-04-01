@@ -95,19 +95,19 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 992px) {
     .main-header h1 {
-        font-size: 1.7rem;
+        font-size: 1.55rem;
         white-space: nowrap;
     }
     .main-header .hindi-title {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
         white-space: nowrap;
     }
     .main-header .affiliation {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         white-space: nowrap;
     }
     .main-header .logo-img {
-        max-height: 85px;
+        max-height: 80px;
     }
 }
 

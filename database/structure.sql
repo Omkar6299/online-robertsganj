@@ -8,10 +8,11 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ---------------------------------------------------------
 -- Table structure for AcademicYears
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `academic_years`;
 CREATE TABLE IF NOT EXISTS `academic_years` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `session` VARCHAR(255) NOT NULL,
-  `is_active` TINYINT(1) DEFAULT 0,
+  `status` ENUM('Active', 'Inactive') DEFAULT 'Inactive',
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -19,13 +20,14 @@ CREATE TABLE IF NOT EXISTS `academic_years` (
 -- ---------------------------------------------------------
 -- Table structure for Admins
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `admins`;
 CREATE TABLE IF NOT EXISTS `admins` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `phone` VARCHAR(255),
-  `role` VARCHAR(255),
+  `role` VARCHAR(255) NOT NULL DEFAULT 'Admin',
   `remember_token` VARCHAR(255),
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL
@@ -41,19 +43,20 @@ INSERT INTO `admins` (`id`, `name`, `email`, `password`, `phone`, `role`, `creat
 -- ---------------------------------------------------------
 -- Table structure for Users
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
-  `email_verified_at` DATETIME,
+  `email_verified_at` DATETIME DEFAULT NULL,
   `password` VARCHAR(255) NOT NULL,
   `phone` VARCHAR(255) NOT NULL,
-  `transaction_id` VARCHAR(255),
+  `transaction_id` VARCHAR(255) DEFAULT NULL,
   `role` VARCHAR(255) DEFAULT 'Student',
-  `academic_year` VARCHAR(255),
-  `remember_token` VARCHAR(255),
+  `remember_token` VARCHAR(255) DEFAULT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
+  `academic_year` VARCHAR(255) DEFAULT NULL,
   INDEX (`phone`),
   INDEX (`transaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -61,31 +64,66 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- ---------------------------------------------------------
 -- Table structure for Students
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `students`;
 CREATE TABLE IF NOT EXISTS `students` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT UNSIGNED NOT NULL,
-  `registration_no` VARCHAR(255) NOT NULL UNIQUE,
-  `course_type_id` BIGINT UNSIGNED,
-  `course_id` BIGINT UNSIGNED,
-  `year` VARCHAR(255),
+  `student_id` VARCHAR(255) DEFAULT NULL COMMENT 'Common unique identifier across years',
+  `registration_no` VARCHAR(255) UNIQUE,
+  `course_type_id` BIGINT UNSIGNED NOT NULL,
+  `course_id` BIGINT UNSIGNED NOT NULL,
+  `year` VARCHAR(255) NOT NULL,
   `academic_year` VARCHAR(255),
+  `father_name` VARCHAR(255) NOT NULL,
+  `mother_name` VARCHAR(255) NOT NULL,
+  `gender` VARCHAR(255),
+  `dob` VARCHAR(255) NOT NULL,
+  `category` VARCHAR(255),
+  `sub_category` VARCHAR(255),
+  `caste_certificate_number` VARCHAR(255),
+  `religion` VARCHAR(255),
+  `weightage` JSON,
+  `whatsapp_number` VARCHAR(255),
+  `aadhar_card_no` VARCHAR(255),
+  `samarth_registration_no` VARCHAR(255),
+  `photo` VARCHAR(255),
+  `sign` VARCHAR(255),
+  `personal_status` VARCHAR(255) DEFAULT '0',
+  `weightage_status` VARCHAR(255) DEFAULT '0',
+  `educational_status` VARCHAR(255) DEFAULT '0',
+  `address_status` VARCHAR(255) DEFAULT '0',
+  `additional_status` VARCHAR(255) DEFAULT '0',
+  `subject_status` VARCHAR(255),
+  `photographsign_status` VARCHAR(255) DEFAULT '0',
+  `declaration_status` VARCHAR(255) DEFAULT '0',
+  `admission_status` ENUM('Pending', 'Approved', 'Disapproved') DEFAULT 'Pending',
   `major1_id` BIGINT UNSIGNED,
   `major2_id` BIGINT UNSIGNED,
   `minor_id` BIGINT UNSIGNED,
   `skill_id` BIGINT UNSIGNED,
   `cocurricular_id` BIGINT UNSIGNED,
-  `gender` VARCHAR(255),
-  `category` VARCHAR(255),
-  `sub_category` VARCHAR(255),
-  `father_name` VARCHAR(255),
-  `mother_name` VARCHAR(255),
-  `dob` DATE,
-  `religion` VARCHAR(255),
   `caste` VARCHAR(255),
-  `adhar_no` VARCHAR(255),
-  `samarth_no` VARCHAR(255),
-  `whatsapp_number` VARCHAR(255),
+  `cast_certificate_no` VARCHAR(255),
   `blood_group` VARCHAR(255),
+  `computer_literate` VARCHAR(255) DEFAULT 'No',
+  `extracurricular_activity` VARCHAR(255),
+  `is_previous_student` VARCHAR(255) DEFAULT 'No',
+  `is_18_plus` VARCHAR(255) DEFAULT 'No',
+  `epic_no` VARCHAR(255),
+  `disability_percentage` VARCHAR(255),
+  `samarth_no` VARCHAR(255),
+  `year_gap` VARCHAR(255) DEFAULT 'No',
+  `year_gap_after_inter` VARCHAR(255),
+  `gap_reason` TEXT,
+  `adhar_no` VARCHAR(255),
+  `local_guadian` VARCHAR(255),
+  `local_guadian_address` TEXT,
+  `guadian_contact` VARCHAR(255),
+  `father_occupation` VARCHAR(255),
+  `father_annual_income` VARCHAR(255),
+  `mother_occupation` VARCHAR(255),
+  `family_annual_income` VARCHAR(255),
+  `income_certificate_no` VARCHAR(255),
   `mailing_address` TEXT,
   `mailing_state` VARCHAR(255),
   `mailing_district` VARCHAR(255),
@@ -99,24 +137,17 @@ CREATE TABLE IF NOT EXISTS `students` (
   `bank_name` VARCHAR(255),
   `bank_account_no` VARCHAR(255),
   `ifsc_code` VARCHAR(255),
-  `admission_status` VARCHAR(255) DEFAULT 'Draft',
-  `weightage` JSON,
-  `status` TINYINT(1) DEFAULT 1,
-  `personal_status` VARCHAR(255) DEFAULT '0',
-  `educational_status` VARCHAR(255) DEFAULT '0',
-  `additional_status` VARCHAR(255) DEFAULT '0',
-  `weightage_status` VARCHAR(255) DEFAULT '0',
-  `photo_sign_status` VARCHAR(255) DEFAULT '0',
-  `is_locked` TINYINT(1) DEFAULT 0,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   INDEX (`user_id`),
-  INDEX (`registration_no`)
+  INDEX (`registration_no`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for Weightages
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `weightages`;
 CREATE TABLE IF NOT EXISTS `weightages` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
@@ -129,10 +160,11 @@ CREATE TABLE IF NOT EXISTS `weightages` (
 -- ---------------------------------------------------------
 -- Table structure for StudentWeightages
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `student_weightages`;
 CREATE TABLE IF NOT EXISTS `student_weightages` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT UNSIGNED NOT NULL,
-  `registration_no` VARCHAR(255) NOT NULL,
+  `registration_no` VARCHAR(255),
   `weightage_id` BIGINT UNSIGNED NOT NULL,
   `status` TINYINT(1) DEFAULT 1,
   `created_at` DATETIME NOT NULL,
@@ -142,22 +174,31 @@ CREATE TABLE IF NOT EXISTS `student_weightages` (
 -- ---------------------------------------------------------
 -- Table structure for Courses
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `courses`;
 CREATE TABLE IF NOT EXISTS `courses` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(255) NOT NULL,
   `course_type_id` BIGINT UNSIGNED,
-  `status` TINYINT(1) DEFAULT 1,
+  `name` VARCHAR(255) NOT NULL,
+  `slug` VARCHAR(255) NOT NULL UNIQUE,
+  `status` VARCHAR(255) DEFAULT '1',
+  `is_major1_required` VARCHAR(255) DEFAULT '1',
+  `is_major2_required` VARCHAR(255) DEFAULT '0',
+  `is_minor_required` VARCHAR(255) DEFAULT '0',
   `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL
+  `updated_at` DATETIME NOT NULL,
+  INDEX (`course_type_id`),
+  FOREIGN KEY (`course_type_id`) REFERENCES `course_types`(`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for CourseTypes
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `course_types`;
 CREATE TABLE IF NOT EXISTS `course_types` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
-  `status` TINYINT(1) DEFAULT 1,
+  `slug` VARCHAR(255) NOT NULL UNIQUE,
+  `status` VARCHAR(255) DEFAULT '1',
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -165,54 +206,76 @@ CREATE TABLE IF NOT EXISTS `course_types` (
 -- ---------------------------------------------------------
 -- Table structure for Semesters
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `semesters`;
 CREATE TABLE IF NOT EXISTS `semesters` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(255) NOT NULL,
   `course_id` BIGINT UNSIGNED NOT NULL,
-  `slug` VARCHAR(255) UNIQUE,
-  `status` TINYINT(1) DEFAULT 1,
+  `name` VARCHAR(255) NOT NULL,
+  `slug` VARCHAR(255) NOT NULL,
+  `order` VARCHAR(255) NOT NULL,
+  `status` INT DEFAULT 1,
+  `registration_enabled` INT DEFAULT 0 COMMENT 'Enable registration flag',
+  `fee_payment_enabled` INT DEFAULT 0 COMMENT 'Enable fee payment flag',
+  `is_skill_required` INT DEFAULT 0,
+  `is_cocurricular_required` INT DEFAULT 0,
+  `approval_required` TINYINT DEFAULT 0,
   `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL
+  `updated_at` DATETIME NOT NULL,
+  UNIQUE INDEX (`course_id`, `slug`),
+  UNIQUE INDEX (`course_id`, `order`),
+  FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for Subjects
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `subjects`;
 CREATE TABLE IF NOT EXISTS `subjects` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `subject_name` VARCHAR(255) NOT NULL,
   `course_id` BIGINT UNSIGNED NOT NULL,
+  `subject_name` VARCHAR(255) NOT NULL,
   `is_practical` TINYINT(1) DEFAULT 0,
-  `status` TINYINT(1) DEFAULT 1,
+  `status` VARCHAR(255) DEFAULT '1',
   `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL
+  `updated_at` DATETIME NOT NULL,
+  UNIQUE INDEX (`course_id`, `subject_name`),
+  FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for Educationals
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `educationals`;
 CREATE TABLE IF NOT EXISTS `educationals` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT UNSIGNED NOT NULL,
-  `registration_no` VARCHAR(255) NOT NULL,
-  `class_name` BIGINT UNSIGNED NOT NULL,
-  `board_name` VARCHAR(255),
-  `passing_year` INT,
-  `roll_no` VARCHAR(255),
-  `total_marks` INT,
-  `obtained_marks` INT,
-  `percentage` DECIMAL(10, 2),
-  `result` VARCHAR(255),
+  `registration_no` VARCHAR(255),
+  `class_name` VARCHAR(255) NOT NULL,
+  `board_name` VARCHAR(255) NOT NULL,
+  `school_name` VARCHAR(255),
+  `year_of_passing` VARCHAR(255) NOT NULL,
+  `division` VARCHAR(255),
+  `roll_no` VARCHAR(255) NOT NULL,
+  `percentage` VARCHAR(255),
+  `total_marks` VARCHAR(255),
+  `obtained_marks` VARCHAR(255),
+  `mark_type` ENUM('Percentage', 'CGPA'),
+  `cgpa` VARCHAR(255),
+  `max_cgpa` VARCHAR(255) DEFAULT '10',
+  `subject_details` VARCHAR(255),
   `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL
+  `updated_at` DATETIME NOT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for Qualifications
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `qualifications`;
 CREATE TABLE IF NOT EXISTS `qualifications` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
+  `status` VARCHAR(255) DEFAULT '1',
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -220,91 +283,117 @@ CREATE TABLE IF NOT EXISTS `qualifications` (
 -- ---------------------------------------------------------
 -- Table structure for SemesterQualifications
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `semester_qualifications`;
 CREATE TABLE IF NOT EXISTS `semester_qualifications` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `semester_id` BIGINT UNSIGNED,
   `qualification_id` BIGINT UNSIGNED,
-  `required_optional_hidden` ENUM('required', 'optional', 'hidden') NOT NULL DEFAULT 'required',
+  `required_optional_hidden` ENUM('required', 'optional', 'hidden') DEFAULT 'required',
   `max_year_gap` INT DEFAULT NULL,
   `is_skill_required` VARCHAR(255) DEFAULT '0',
   `is_cocurricular_required` VARCHAR(255) DEFAULT '0',
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
+  UNIQUE INDEX (`semester_id`, `qualification_id`),
   INDEX (`semester_id`),
-  INDEX (`qualification_id`)
+  INDEX (`qualification_id`),
+  FOREIGN KEY (`semester_id`) REFERENCES `semesters`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`qualification_id`) REFERENCES `qualifications`(`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for FeeMaintenance
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `fee_maintenance`;
 CREATE TABLE IF NOT EXISTS `fee_maintenance` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
   `Course` INT NOT NULL,
   `semester` INT NOT NULL,
-  `Total_Fee_Amount` INT,
-  `General_fee_Amount` INT,
-  `Girls_fee_Amount` INT,
-  `Minority_Fee_Amount` INT,
-  `OBC_fee_Amount` INT,
-  `SC_fee_Amount` INT,
-  `ST_fee_Amount` INT,
-  `Practical_Fee` INT,
-  `late_fee` INT,
+  `User` VARCHAR(45),
+  `Total_Fee_Amount` INT DEFAULT 0,
+  `Fee_Name` VARCHAR(100),
+  `General_fee_Amount` INT DEFAULT 0,
+  `Girls_fee_Amount` INT DEFAULT 0,
+  `Minority_Fee_Amount` VARCHAR(45),
+  `OBC_fee_Amount` INT DEFAULT 0,
+  `SC_fee_Amount` INT DEFAULT 0,
+  `ST_fee_Amount` INT DEFAULT 0,
+  `Practical_Fee` INT DEFAULT 0,
+  `late_fee` INT DEFAULT 0,
   `is_late_fee_applicable` TINYINT(1) DEFAULT 0,
-  `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL
+  `fee_Type` VARCHAR(45),
+  `fee_Active` VARCHAR(45),
+  `Student_Type` VARCHAR(45),
+  `Ex_Student` VARCHAR(45),
+  `Lab_Fee_Type` VARCHAR(45),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for StudentAdmissionFeeDetails
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `student_admission_fee_details`;
 CREATE TABLE IF NOT EXISTS `student_admission_fee_details` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT UNSIGNED NOT NULL,
-  `student_id` BIGINT UNSIGNED NOT NULL,
-  `registration_no` VARCHAR(255),
-  `semester_id` BIGINT UNSIGNED,
+  `student_id` INT NOT NULL,
+  `registration_no` VARCHAR(255) NOT NULL,
+  `transaction_id` VARCHAR(255) COMMENT 'Initial registration transaction ID',
   `merchant_txn_id` VARCHAR(255) UNIQUE,
-  `txn_id` VARCHAR(255),
+  `bank_transaction_id` VARCHAR(255),
+  `atom_txn_id` VARCHAR(255),
   `amount` DECIMAL(10, 2) NOT NULL,
-  `status` VARCHAR(255) DEFAULT 'Pending',
-  `raw_response` TEXT,
-  `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL
+  `academic_year` VARCHAR(255) NOT NULL,
+  `semester_id` VARCHAR(255),
+  `semester_type` ENUM('Even', 'Odd'),
+  `payment_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `status` ENUM('Pending', 'Success', 'Failed') DEFAULT 'Pending',
+  `response_data` JSON,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for Payments
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `payments`;
 CREATE TABLE IF NOT EXISTS `payments` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT UNSIGNED NOT NULL,
-  `registration_no` VARCHAR(255) NOT NULL,
-  `txn_id` VARCHAR(255) UNIQUE,
   `merchant_txn_id` VARCHAR(255) UNIQUE,
-  `amount` DECIMAL(10, 2) NOT NULL,
-  `status` VARCHAR(255) DEFAULT 'Pending',
-  `raw_response` TEXT,
+  `payment_payload` TEXT,
+  `bank_transaction_id` VARCHAR(255),
+  `atom_txn_id` VARCHAR(255),
+  `txnInitDate` VARCHAR(255),
+  `txnCompleteDate` VARCHAR(255),
+  `transaction_date` VARCHAR(255),
+  `amount` DECIMAL(10, 2),
+  `payment_method` VARCHAR(255),
+  `status` VARCHAR(255),
+  `fee_type` VARCHAR(255) DEFAULT 'form_fee' COMMENT 'Type of fee: form_fee, admission_fee, etc.',
   `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME NOT NULL
+  `updated_at` DATETIME NOT NULL,
+  `academic_year` VARCHAR(255)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for StudentFeesDetails
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `student_fees_details`;
 CREATE TABLE IF NOT EXISTS `student_fees_details` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT UNSIGNED,
-  `course_id` VARCHAR(255),
+  `course_id` VARCHAR(255) NOT NULL,
   `semester_id` VARCHAR(255) NOT NULL,
   `semester_type` ENUM('Even', 'Odd'),
-  `challan_id` VARCHAR(255),
-  `academic_year` VARCHAR(255),
+  `challan_id` VARCHAR(255) NOT NULL,
+  `academic_year` VARCHAR(255) NOT NULL,
   `amount` DECIMAL(10, 2),
   `payment_mode` VARCHAR(255),
   `payment_method` VARCHAR(255),
   `status` VARCHAR(255) NOT NULL,
-  `transaction_date` VARCHAR(255),
+  `transaction_date` VARCHAR(255) NOT NULL,
   `txnInitDate` VARCHAR(255),
   `txnCompleteDate` VARCHAR(255),
   `payment_transaction_id` VARCHAR(255),
@@ -312,13 +401,14 @@ CREATE TABLE IF NOT EXISTS `student_fees_details` (
   `merchant_txn_id` VARCHAR(255),
   `atom_txn_id` VARCHAR(255),
   `remark` VARCHAR(255),
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for Roles
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL UNIQUE,
@@ -335,6 +425,7 @@ INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VAL
 -- ---------------------------------------------------------
 -- Table structure for States
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `states`;
 CREATE TABLE IF NOT EXISTS `states` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(255) NOT NULL,
@@ -383,6 +474,15 @@ INSERT INTO `states` (`id`, `name`, `code`, `created_at`, `updated_at`) VALUES
 -- ---------------------------------------------------------
 -- Table structure for Districts
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `districts`;
+CREATE TABLE IF NOT EXISTS `districts` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `state_id` BIGINT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
+  INDEX (`state_id`),
+  FOREIGN KEY (`state_id`) REFERENCES `states` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `districts` (`id`, `state_id`, `name`, `created_at`, `updated_at`) VALUES
@@ -426,13 +526,14 @@ INSERT INTO `districts` (`id`, `state_id`, `name`, `created_at`, `updated_at`) V
 -- ---------------------------------------------------------
 -- Table structure for Skills
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `skills`;
 CREATE TABLE IF NOT EXISTS `skills` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(255) NOT NULL,
   `course_type_id` BIGINT UNSIGNED,
-  `course_id` BIGINT UNSIGNED,
-  `semester_id` BIGINT UNSIGNED,
-  `status` TINYINT(1) DEFAULT 1,
+  `course_id` BIGINT UNSIGNED NOT NULL,
+  `semester_id` BIGINT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `status` VARCHAR(255) DEFAULT '1',
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -440,13 +541,14 @@ CREATE TABLE IF NOT EXISTS `skills` (
 -- ---------------------------------------------------------
 -- Table structure for Cocurriculars
 -- ---------------------------------------------------------
+DROP TABLE IF EXISTS `cocurriculars`;
 CREATE TABLE IF NOT EXISTS `cocurriculars` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(255) NOT NULL,
   `course_type_id` BIGINT UNSIGNED,
-  `course_id` BIGINT UNSIGNED,
-  `semester_id` BIGINT UNSIGNED,
-  `status` TINYINT(1) DEFAULT 1,
+  `course_id` BIGINT UNSIGNED NOT NULL,
+  `semester_id` BIGINT UNSIGNED NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `status` VARCHAR(255) DEFAULT '1',
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -470,7 +572,7 @@ CREATE PROCEDURE GetAdmittedStudentsReport(
     IN p_end_date DATETIME
 )
 BEGIN
-    SELECT 
+    SELECT
         ANY_VALUE(s.id) as id, ANY_VALUE(s.user_id) as user_id, s.registration_no, ANY_VALUE(s.gender) as gender, ANY_VALUE(s.category) as category, ANY_VALUE(s.sub_category) as sub_category,
         ANY_VALUE(s.father_name) as father_name, ANY_VALUE(s.mother_name) as mother_name, ANY_VALUE(s.dob) as dob, ANY_VALUE(s.religion) as religion, ANY_VALUE(s.caste) as caste, ANY_VALUE(s.adhar_no) as adhar_no,
         ANY_VALUE(s.samarth_no) as samarth_no, ANY_VALUE(s.whatsapp_number) as whatsapp_number, ANY_VALUE(s.blood_group) as blood_group, ANY_VALUE(s.mailing_address) as mailing_address,
@@ -532,13 +634,13 @@ BEGIN
     DECLARE v_minority_fee_str VARCHAR(45);
     DECLARE v_minority_fee INT DEFAULT 0;
 
-    SELECT 
+    SELECT
         Total_Fee_Amount, General_fee_Amount, Girls_fee_Amount, Minority_Fee_Amount,
-        OBC_fee_Amount, SC_fee_Amount, ST_fee_Amount, Practical_Fee, 
+        OBC_fee_Amount, SC_fee_Amount, ST_fee_Amount, Practical_Fee,
         late_fee, is_late_fee_applicable
-    INTO 
+    INTO
         v_total_fee_amount, v_general_fee, v_girls_fee, v_minority_fee_str,
-        v_obc_fee, v_sc_fee, v_st_fee, v_practical_fee, 
+        v_obc_fee, v_sc_fee, v_st_fee, v_practical_fee,
         v_late_fee_amount, v_is_late_fee_applicable
     FROM fee_maintenance
     WHERE Course = p_course_id AND semester = p_semester_id
@@ -563,7 +665,7 @@ BEGIN
     END IF;
 
     IF p_subject_ids IS NOT NULL AND p_subject_ids != '' THEN
-        SELECT COUNT(*) INTO v_practical_count FROM subjects 
+        SELECT COUNT(*) INTO v_practical_count FROM subjects
         WHERE FIND_IN_SET(id, p_subject_ids) AND is_practical = 1;
     ELSE
         SET v_practical_count = 0;

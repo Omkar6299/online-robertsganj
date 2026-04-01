@@ -144,45 +144,92 @@
         .notes-section h6 { font-weight: bold; margin: 5px 0 2px 0; font-size: 10px; }
         .notes-list { margin: 0; padding-left: 15px; list-style-type: decimal; }
 
-        .declaration-box {
+        .undertaking-section {
             margin-top: 15px;
-            font-size: 10px;
-            line-height: 1.5;
-            text-align: justify;
+            font-size: 11px;
+            line-height: 1.6;
         }
-        
-        .signature-row {
+        .section-header-label {
+            text-align: center;
+            margin-bottom: 0px;
+            position: relative;
+            z-index: 1;
+            height: 15px;
+        }
+        .section-header-label span {
+            background: #7d8e62;
+            color: #fff;
+            padding: 2px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+            display: inline-block;
+            position: relative;
+            top: 5px;
+        }
+        .boxed-sub-section {
+            border: 1px solid #7d8e62;
+            padding: 15px 10px 10px 10px;
+            margin-top: 15px;
+            position: relative;
+            background: #fdfdfd;
+        }
+        .boxed-label {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #7d8e62;
+            color: #fff;
+            padding: 0 10px;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 2px;
+        }
+        .document-checklist {
+            border: 1px solid #7d8e62;
+            padding: 15px 10px 10px 10px;
+            margin-top: 0;
+            position: relative;
+            background: #fdfdfd;
+        }
+        .checklist-title {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            font-size: 10.5px;
+        }
+        .receipt-section {
+            border: 1px solid #7d8e62;
+            padding: 15px 10px 10px 10px;
+            margin-top: 0;
+            position: relative;
+            background: #fdfdfd;
+        }
+        .receipt-dashed-line {
+            border-top: 2px dashed #000;
+            margin: 25px 0 15px 0;
+        }
+        .signature-row-flex {
             display: flex;
             justify-content: space-between;
             margin-top: 40px;
-            margin-bottom: 20px;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
         }
-
-        .office-use {
-            border: 1px dashed #ccc;
-            border-top: 1px dashed #000;
-            border-bottom: 1px dashed #000;
-            border-left: none;
-            border-right: none;
-            padding: 10px 0;
+        .mini-college-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             margin-top: 15px;
-        }
-        .office-use-title { font-weight: bold; font-size: 11px; margin-bottom: 15px; }
-        .blank-line {
-            display: inline-block;
-            border-bottom: 1px solid #000;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .btn-print {
-            padding: 2px 10px;
-            font-size: 10px;
-            border: 1px solid #000;
-            background: #fff;
-            cursor: pointer;
-            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
         }
     </style>
 </head>
@@ -201,14 +248,14 @@
             </div>
 
             <div class="college-header">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
-                    <img src="/uploads/static/logo_header.png" alt="Logo Left" style="max-height: 70px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <img src="/uploads/static/logo_header.png" alt="Logo Left" style="max-height: 55px;">
                     <div style="flex-grow: 1; text-align: center; overflow: hidden;">
-                        <h2 style="color: #b71c1c; margin-bottom: 2px; font-size: 18px; white-space: nowrap;">Government Women Degree College Robertsganj Sonebhadra</h2>
-                        <h2 style="color: #1565c0; font-size: 16px; margin-bottom: 2px; white-space: nowrap;">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</h2>
-                        <div style="color: #1976d2; font-size: 11px; font-weight: 600; white-space: nowrap;">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
+                        <h2 style="color: #b71c1c; margin-bottom: 1px; font-size: 15px; white-space: nowrap;">Government Women Degree College Robertsganj Sonebhadra</h2>
+                        <h2 style="color: #1565c0; font-size: 13px; margin-bottom: 1px; white-space: nowrap;">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</h2>
+                        <div style="color: #1976d2; font-size: 10px; font-weight: 600; white-space: nowrap;">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
                     </div>
-                    <img src="/uploads/static/logo_header_right.png" alt="Logo Right" style="max-height: 70px;">
+                    <img src="/uploads/static/logo_header_right.png" alt="Logo Right" style="max-height: 55px;">
                 </div>
                 <div class="text-center mt-3">
                     <h4 style="border: 1px solid #000; padding: 4px 15px; background: #f0f0f0;"><%= fieldLabels.header.application_title %> - सत्र - <%= activeAcademicYear ? activeAcademicYear.session : '' %></h4>
@@ -326,29 +373,25 @@
                 </div>
             </div>
 
-
-            <div style="text-align: right; font-size: 8px; color: #666; margin-top: 5px;">1/3</div>
-
-            <% 
-                let claimedWeightageIds = [];
-                let studentWeightageObj = student.weightage;
-                if (typeof studentWeightageObj === 'string') {
-                    try { studentWeightageObj = JSON.parse(studentWeightageObj); } catch(e) {}
-                }
-                if (studentWeightageObj) {
-                    Object.keys(studentWeightageObj).forEach(key => {
-                        if(studentWeightageObj[key] === "1" || studentWeightageObj[key] === true) {
-                            claimedWeightageIds.push(key.toString());
-                        }
-                    });
-                }
-            %>
-
             <div class="fieldset-box" style="page-break-before: always; margin-top: 30px;">
                 <div class="legend-box">Weightage Information</div>
                 <div class="row">
                     <div class="col-8">
                         <table class="kv-table" style="font-size: 10px;">
+                            <% 
+                                let claimedWeightageIds = [];
+                                let studentWeightageObj = student.weightage;
+                                if (typeof studentWeightageObj === 'string') {
+                                    try { studentWeightageObj = JSON.parse(studentWeightageObj); } catch(e) {}
+                                }
+                                if (studentWeightageObj) {
+                                    Object.keys(studentWeightageObj).forEach(key => {
+                                        if(studentWeightageObj[key] === "1" || studentWeightageObj[key] === true) {
+                                            claimedWeightageIds.push(key.toString());
+                                        }
+                                    });
+                                }
+                            %>
                             <% if (typeof weightages !== 'undefined' && weightages.length > 0) { %>
                                 <% weightages.forEach((w, index) => { %>
                                     <tr>
@@ -435,8 +478,9 @@
                     </thead>
                     <tbody>
                         <% if (typeof educationals !== 'undefined' && educationals.length > 0) { %>
-                            <% educationals.forEach(edu => {
-                                let qualName = edu.qualification ? edu.qualification.name : edu.school_name;
+                            <% educationals.forEach(edu => { %>
+                                <%
+                                    let qualName = edu.qualification ? edu.qualification.name : edu.school_name;
                                 if (!qualName || qualName == '0' || !isNaN(qualName)) {
                                     qualName = edu.class_name;
                                 }
@@ -460,53 +504,93 @@
                 </table>
             </div>
 
-            <div class="fieldset-box">
-                <div class="notes-section">
-                    <h6>नोट :-</h6>
-                    <ul class="notes-list">
-                        <li>प्रवेश लिए हुए सभी छात्र/छात्राओं को परीक्षा फार्म स्वयं भरकर महाविद्यालय में जमा करना होगा।</li>
-                        <li>विषयों का आवंटन नई शिक्षा नीति 2020 के सन्दर्भ में महात्मा गांधी काशी विद्यापीठ वाराणसी के निर्देशानुसार किया जाएगा।</li>
-                        <li>महाविद्यालय के संस्थागत छात्र/छात्राओं के लिए ड्रेस कोड निर्धारित है जिसे महाविद्यालय में पहनकर आना अनिवार्य है।
-                            <div style="padding-left: 20px; display: flex; margin-top: 5px;">
-                                <div style="width: 50%;">
-                                    <strong>छात्र के लिए :-</strong>
-                                    <ul style="margin: 0; padding-left: 15px; list-style-type: disc;">
-                                        <li>शर्ट - ह्वाइट आसमानी</li>
-                                        <li>पैंट - काला</li>
-                                        <li>स्वेटर/ब्लेजर - नेवी ब्लू</li>
-                                    </ul>
-                                </div>
-                                <div style="width: 50%;">
-                                    <strong>छात्रा के लिए :-</strong>
-                                    <ul style="margin: 0; padding-left: 15px; list-style-type: disc;">
-                                        <li>कुर्ता/कमीज - ह्वाइट आसमानी</li>
-                                        <li>सलवार एवं दुपट्टा - सफेद</li>
-                                        <li>स्वेटर/ब्लेजर - नेवी ब्लू</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+            <div class="undertaking-section" style="border: 1px solid #7d8e62; padding: 15px 10px; margin-top: 20px;">
+                <p style="text-align: justify; margin-top: 5px;">
+                    मैं <strong><%= student.user ? student.user.name : '-' %></strong> पुत्री/पत्नी <strong><%= student.father_name || '-' %></strong> इस महाविद्यालय में कक्षा <strong><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></strong> में प्रवेश की अभ्यर्थी हूँ, शपथ पूर्वक घोषित करती हूँ कि:-
+                </p>
+                <ol style="padding-left: 20px; font-size: 10.5px;">
+                    <li>मैंने वर्तमान सत्र में इस महाविद्यालय के अतिरिक्त अन्य किसी विश्वविद्यालय / महाविद्यालय / प्रशिक्षण संस्थान में प्रवेश नहीं लिया है, और न ही मैं कही सेवारत हूँ|</li>
+                    <li>मैं कक्षा में 75 प्रतिशत उपस्थिति पूर्ण करने का वचन देती हूँ |</li>
+                    <li>मैं घोषणा करती हूँ कि मैं कोई दुर्व्यवहार/अनुचित साधन प्रयोग नहीं करुँगी|</li>
+                    <li>मेरे द्वारा आवेदन-पत्र/ घोषणा-पत्र में दिए गए सभी विवरण एवं तथ्य सही हैं| कोई भी सूचना असत्य पाए जाने पर मेरा प्रवेश निरस्त कर दिया जाय,उसका सम्पूर्ण उत्तरदायित्व मेरा होगा |</li>
+                    <li>मैं महाविद्यालय परिसर को रैगिंग मुक्त एवं तम्बाकू-गुटका मुक्त बनाये रखने में सहयोग करुँगी|</li>
+                </ol>
+
+                <div class="boxed-sub-section">
+                    <div class="boxed-label">अभ्यर्थी द्वारा अंडरटेकिंग</div>
+                    <p style="margin-top: 5px; text-align: justify; font-size: 10.5px; line-height: 1.4;">
+                        महात्मा गाँधी काशी विद्यापीठ के कार्यालय आदेश दि० 05/09/2020 में प्रोन्नति के सम्बन्ध में दी गयी शर्तो के अधीन अगली कक्षा में प्रोन्नति के पश्चात् प्रवेश हेतु मेरा आवेदन किया जा रहा है| यदि इन शर्तो/प्रतिबंधो के आधार पर यदि मैं भविष्य में पिछली कक्षा में वि० वि० द्वारा अनुत्तीर्ण घोषित की जाती हूँ तो प्रवेश निरस्त किये जाने पर मुझे कोई आपत्ति नहीं होगी |
+                    </p>
                 </div>
 
-                <div class="declaration-box text-center">
-                    <h6 style="font-weight: bold; font-size: 11px; text-decoration: underline; margin-bottom: 5px;">घोषणा</h6>
-                    <p style="margin-bottom: 5px; text-align: justify;">मैंने महाविद्यालय प्रवेश विवरणिका और ऑनलाइन एडमिशन के होम पेज पर लिखे गये नियमों एवं शर्तों को भली भांति पढ़ लिया है। मैं घोषणा करता/करती हूँ कि उपरोक्त समस्त विवरण मेरी जानकारी के अनुसार सत्य हैं। तथ्य असत्य पाये जाने पर अथवा जानबूझ कर छिपाए जाने पर मेरा प्रवेश निरस्त कर दिए जाने पर मुझे कोई आपत्ति नहीं होगी। मैं यह भी घोषणा करता/करती हूँ कि मेरे ऊपर संस्था द्वारा कोई अनुशासनात्मक कार्यवाही नहीं की गयी है और मैंने इस संस्था के अतिरिक्त अन्य किसी भी संस्था में प्रवेश नहीं लिया है।</p>
-                    <p style="margin-bottom: 20px; text-align: justify;">मैं कक्षा में नियमित रूप से उपस्थित रहूँगा/रहूँगी तथा विश्वविद्यालय द्वारा निर्धारित 75% उपस्थिति से सम्बंधित नियमों का पालन करूँगा/करूँगी।</p>
-                </div>
-
-                <div class="signature-row text-center">
-                    <div style="width: 40%;">पिता / माता / अभिभावक के हस्ताक्षर</div>
-                    <div style="width: 40%; text-align: right;">प्रवेशार्थी के हस्ताक्षर</div>
+                <div class="signature-row-flex">
+                    <div>पिता / अभिभावक के हस्ताक्षर</div>
+                    <div style="text-align: right; min-width: 150px;">
+                        <div style="border: 1px solid #ccc; height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; overflow: hidden;">
+                            <% if (student.sign) { %>
+                                <img src="<%= student.sign %>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                            <% } else { %>
+                                <span style="color: #ccc; font-size: 10px; opacity: 0.5;"><%= student.user ? student.user.name : '' %></span>
+                            <% } %>
+                        </div>
+                        प्रवेशार्थी के हस्ताक्षर
+                    </div>
                 </div>
             </div>
 
-            <div class="office-use">
-                
-                <div style="font-weight: bold; font-size: 11px;">प्राचार्य</div>
-                <div class="text-center no-print mt-3">
-                    <button onclick="window.print()" class="btn-print">Print this page</button>
+            <div class="section-header-label" style="margin-top: 30px;">
+                <span>आवश्यक निर्देश</span>
+            </div>
+
+            <div class="document-checklist">
+                <div class="checklist-title">संलग्नकों का विवरण</div>
+                <div class="checklist-grid">
+                    <div>1. हाईस्कूल अंक पत्र एवं प्रमाण-पत्र की छाया प्रति</div>
+                    <div>2. इंटरमीडिएट अंक पत्र एवं प्रमाण-पत्र की छाया प्रति|</div>
+                    <div>3. चरित्र प्रमाण-पत्र की छाया प्रति|</div>
+                    <div>4. स्थानान्तरण प्रमाण-पत्र (टी०सी०) की छाया प्रति|</div>
+                    <div>5. जाति प्रमाण-पत्र (केवल SC/ST/OBC प्रमाण-पत्र) छाया प्रति</div>
+                    <div>6. आधार कार्ड की छाया प्रति</div>
+                    <div>7. अन्य प्रमाण पत्र (भारांक सम्बन्धी) की छाया प्रति</div>
+                    <div>8. गैप होने कि दशा में शपथ पत्र की छाया प्रति</div>
                 </div>
+            </div>
+
+            <div class="receipt-dashed-line"></div>
+
+            <div class="section-header-label">
+                <span>फार्म प्राप्ति रसीद</span>
+            </div>
+
+            <div class="receipt-section">
+                <div class="receipt-content" style="font-size: 11px;">
+                    <div style="margin-bottom: 8px;"><strong>आवेदन पत्र संख्या</strong> <%= student.registration_no || '-' %></div>
+                    छात्रा का नाम <strong><%= student.user ? student.user.name : '-' %></strong> पिता का नाम <strong><%= student.father_name || '-' %></strong> कक्षा <strong><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></strong> में प्रवेश के लिए आवेदन पत्र प्राप्त किया |
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px;">
+                    <div><strong>दिनांक:-</strong><%= (typeof payment !== 'undefined' && payment && (payment.txnCompleteDate || payment.transaction_date)) ? new Date(payment.txnCompleteDate || payment.transaction_date).toLocaleString('en-IN') : new Date().toLocaleString('en-IN') %></div>
+                    <div style="text-align: right; min-width: 250px;">
+                        <div style="border-bottom: 1px dashed #000; height: 30px; margin-bottom: 2px;"></div>
+                        हस्ताक्षर प्रवेश आवेदन-पत्र प्राप्तकर्ता
+                        <div style="margin-top: 5px;">दिनांक :</div>
+                    </div>
+                </div>
+                
+                <p style="font-size: 10px; margin-top: 15px; border-top: 1px solid #eee; padding-top: 5px; font-style: italic;">
+                    नोट : एक कागज पर हस्ताक्षर और फोटो भी फार्म के साथ संलग्न करें |
+                </p>
+
+                <div class="mini-college-header">
+                    <img src="/uploads/static/logo_header.png" alt="Logo" style="max-height: 40px;">
+                    <div style="text-align: center;">
+                        <div style="font-weight: bold; font-size: 12px;">Government Women Degree College Robertsganj Sonebhadra</div>
+                        <div style="font-size: 11px;">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center no-print mt-4">
+                <button onclick="window.print()" class="btn btn-dark btn-sm">Final Print Application</button>
             </div>
             
         <% } else { %>
