@@ -21,6 +21,9 @@ import StudentWeightage from './StudentWeightage.js';
 import StudentAdmissionFeeDetail from './StudentAdmissionFeeDetail.js';
 import StudentFeeDetail from './StudentFeeDetail.js';
 import FeeMaintenance from './FeeMaintenance.js';
+import DocumentType from './DocumentType.js';
+import CourseSemesterDocument from './CourseSemesterDocument.js';
+import StudentDocument from './StudentDocument.js';
 
 // Define associations after all models are loaded
 // Student associations
@@ -81,6 +84,17 @@ Educational.belongsTo(Qualification, { foreignKey: 'class_name', targetKey: 'id'
 FeeMaintenance.belongsTo(Course, { foreignKey: 'Course', as: 'course' });
 FeeMaintenance.belongsTo(Semester, { foreignKey: 'semester', as: 'semesterInfo' });
 
+// Document associations
+CourseSemesterDocument.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });
+CourseSemesterDocument.belongsTo(Semester, { foreignKey: 'semester_id', as: 'semester' });
+CourseSemesterDocument.belongsTo(DocumentType, { foreignKey: 'document_type_id', as: 'documentType' });
+
+StudentDocument.belongsTo(Student, { foreignKey: 'student_id', as: 'student' });
+StudentDocument.belongsTo(DocumentType, { foreignKey: 'document_type_id', as: 'documentType' });
+StudentDocument.belongsTo(Semester, { foreignKey: 'semester_id', as: 'semester' });
+
+Student.hasMany(StudentDocument, { foreignKey: 'student_id', as: 'documents' });
+
 // Export all models
 export {
   User,
@@ -103,5 +117,8 @@ export {
   StudentAdmissionFeeDetail,
   StudentFeeDetail,
   FeeMaintenance,
+  DocumentType,
+  CourseSemesterDocument,
+  StudentDocument,
   Role
 };

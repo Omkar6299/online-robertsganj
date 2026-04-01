@@ -404,6 +404,32 @@
                     </div>
                 </div>
 
+                <!-- Dynamic Documents Table - Two Column Design -->
+                <div class="fieldset-box">
+                    <div class="legend-box">Uploaded Documents Summary</div>
+                    <% 
+                        let filteredDocs = [];
+                        if (typeof student.documents !== 'undefined' && student.documents.length > 0) {
+                            filteredDocs = student.documents.filter(doc => {
+                                const code = doc.documentType ? doc.documentType.code : '';
+                                return !['photo', 'signature', 'sign'].includes(code);
+                            });
+                        }
+                    %>
+                    <div class="row" style="margin-top: 5px;">
+                        <% if (filteredDocs.length > 0) { %>
+                            <% filteredDocs.forEach((doc, idx) => { %>
+                                <div class="col-6" style="border-bottom: 0.5px solid #bcc9a8; padding: 3px 5px;">
+                                    <span style="color: #555; font-size: 10px; min-width: 15px; display: inline-block;"><%= idx + 1 %>.</span>
+                                    <span style="font-size: 10.5px; font-weight: bold;"><%= doc.documentType ? doc.documentType.name : 'Unknown' %></span>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="col-12 text-center" style="padding: 10px; color: #666;">No additional documents uploaded</div>
+                        <% } %>
+                    </div>
+                </div>
+
 
                 <div style="text-align: right; font-size: 8px; color: #666; margin-top: 5px;">1/3</div>
 

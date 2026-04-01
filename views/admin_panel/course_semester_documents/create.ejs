@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Course Semester Documents' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">Create Mapping</h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/course_semester_documents">Mapping</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Create</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0">Select Course & Semester</h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/course_semester_documents">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/course_semester_documents" method="POST">
+                                        <div class="row g-3 mb-4">
+                                            <!-- Course -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="course_id" class="form-label">Course <span class="text-danger">*</span></label>
+                                                    <select name="course_id" id="course_id" class="form-control" required>
+                                                        <option value="">-- Select Course --</option>
+                                                        <% courses.forEach(function(course) { %>
+                                                            <option value="<%= course.id %>"><%= course.name %></option>
+                                                        <% }); %>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Semester -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="semester_id" class="form-label">Semester <span class="text-danger">*</span></label>
+                                                    <select name="semester_id" id="semester_id" class="form-control" required disabled>
+                                                        <option value="">-- Select Semester --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <h5 class="mb-3 border-bottom pb-2">Select Documents & Requirements</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-hover align-middle">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 80px;" class="text-center">Select</th>
+                                                            <th>Document Name</th>
+                                                            <th>Code</th>
+                                                            <th>Requirement Level</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% documentTypes.forEach(function(doc) { %>
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <div class="form-check d-flex justify-content-center">
+                                                                        <input type="checkbox" class="form-check-input" name="document_type_ids[]" value="<%= doc.id %>" id="doc_<%= doc.id %>">
+                                                                    </div>
+                                                                </td>
+                                                                <td><label class="form-check-label w-100" for="doc_<%= doc.id %>" style="cursor: pointer;"><%= doc.name %></label></td>
+                                                                <td><code><%= doc.code %></code></td>
+                                                                 <td>
+                                                                    <select name="is_required_<%= doc.id %>" class="form-control form-control-sm">
+                                                                        <option value="Required">Required</option>
+                                                                        <option value="Optional">Optional</option>
+                                                                        <option value="Hidden">Hidden</option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        <% }); %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Save Mapping
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <script>
+        const courseSelect = document.getElementById('course_id');
+        const semSelect = document.getElementById('semester_id');
+
+        courseSelect.addEventListener('change', async function() {
+            const courseId = this.value;
+            semSelect.innerHTML = '<option value="">-- Select Semester --</option>';
+            semSelect.disabled = true;
+            resetForm();
+
+            if (courseId) {
+                try {
+                    const response = await fetch(`/admin/course_semester_documents/get-semesters/${courseId}`);
+                    const semesters = await response.json();
+                    
+                    semesters.forEach(sem => {
+                        const option = document.createElement('option');
+                        option.value = sem.id;
+                        option.textContent = sem.name;
+                        semSelect.appendChild(option);
+                    });
+                    semSelect.disabled = false;
+                } catch (error) {
+                    console.error('Error fetching semesters:', error);
+                }
+            }
+        });
+
+        semSelect.addEventListener('change', async function() {
+            const courseId = courseSelect.value;
+            const semesterId = this.value;
+            resetForm();
+
+            if (courseId && semesterId) {
+                try {
+                    const response = await fetch(`/admin/course_semester_documents/get-mappings/${courseId}/${semesterId}`);
+                    const mappings = await response.json();
+                    
+                    mappings.forEach(mapping => {
+                        const cb = document.getElementById(`doc_${mapping.document_type_id}`);
+                        const reqSelect = document.querySelector(`select[name="is_required_${mapping.document_type_id}"]`);
+                        
+                        if (cb) cb.checked = true;
+                        if (reqSelect) reqSelect.value = mapping.is_required;
+                    });
+                } catch (error) {
+                    console.error('Error fetching mappings:', error);
+                }
+            }
+        });
+
+        function resetForm() {
+            document.querySelectorAll('input[name="document_type_ids[]"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('select[name^="is_required_"]').forEach(select => select.value = 'Required');
+        }
+    </script>
+</body>
+</html>

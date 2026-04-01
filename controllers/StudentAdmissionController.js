@@ -138,6 +138,31 @@ export const registrationForm = async (req, res) => {
             }
         });
 
+        // Get dynamic document mappings for this course and semester
+        const { CourseSemesterDocument, DocumentType, StudentDocument } = await import('../models/index.js');
+        const documentMappings = await CourseSemesterDocument.findAll({
+            where: {
+                course_id: student.course_id,
+                semester_id: student.year,
+                status: true
+            },
+            include: [{ model: DocumentType, as: 'documentType' }]
+        });
+
+        // Get already uploaded documents for this student/semester
+        const uploadedDocuments = await StudentDocument.findAll({
+            where: {
+                student_id: student.id,
+                semester_id: student.year
+            },
+            include: [{ model: DocumentType, as: 'documentType' }]
+        });
+
+        const uploadedDocsMap = {};
+        uploadedDocuments.forEach(doc => {
+            uploadedDocsMap[doc.documentType.code] = doc;
+        });
+
         // Determine active tab
         let stepsOrder = ['personal', 'address', 'educational', 'subject', 'other', 'weightage', 'photo', 'declaration'];
 
@@ -184,6 +209,8 @@ export const registrationForm = async (req, res) => {
             subjects,
             skills,
             cocurriculars,
+            documentMappings,
+            uploadedDocsMap,
             isReRegistration,
             previousStudent,
             stepsOrder,
@@ -664,14 +691,61 @@ export const photoSignPost = async (req, res) => {
         }
 
         const updateData = { photographsign_status: '1' };
+        const { StudentDocument, DocumentType, CourseSemesterDocument } = await import('../models/index.js');
 
-        if (req.files) {
-            if (req.files.photograph) {
-                // If using S3, location is in .location, else use filename
-                updateData.photo = req.files.photograph[0].location || req.files.photograph[0].filename;
-            }
-            if (req.files.signature) {
-                updateData.sign = req.files.signature[0].location || req.files.signature[0].filename;
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const docTypeCode = file.fieldname;
+                const docType = await DocumentType.findOne({ where: { code: docTypeCode } });
+                
+                if (docType) {
+                    const filePath = file.location || file.path || file.filename;
+                    const storageType = file.location ? 'S3' : 'Local';
+
+                    // Find if document already exists to delete old one (as requested)
+                    const oldDoc = await StudentDocument.findOne({
+                        where: {
+                            student_id: student.id,
+                            document_type_id: docType.id,
+                            semester_id: student.year
+                        }
+                    });
+
+                    if (oldDoc) {
+                        try {
+                            // Deletion logic (Simplified: Actual deletion from S3/FS depends on storageType)
+                            if (oldDoc.storage_type === 'S3') {
+                                // Add S3 deletion logic here if needed
+                            } else {
+                                const fullPath = path.join(process.cwd(), 'public', oldDoc.file_path);
+                                if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+                            }
+                        } catch (e) { console.error('Old file deletion failed:', e); }
+                        
+                        await oldDoc.update({
+                            file_path: filePath,
+                            storage_type: storageType,
+                            academic_year: student.academic_year
+                        });
+                    } else {
+                        await StudentDocument.create({
+                            student_id: student.id,
+                            registration_no: student.registration_no,
+                            document_type_id: docType.id,
+                            file_path: filePath,
+                            storage_type: storageType,
+                            academic_year: student.academic_year,
+                            semester_id: student.year
+                        });
+                    }
+
+                    // Backward compatibility for photo/sign columns
+                    if (docTypeCode === 'photo') {
+                        updateData.photo = filePath;
+                    } else if (docTypeCode === 'signature' || docTypeCode === 'sign') {
+                        updateData.sign = filePath;
+                    }
+                }
             }
         }
 
@@ -687,9 +761,16 @@ export const photoSignPost = async (req, res) => {
             }
         );
 
-        flashSuccessAndRedirect(req, res, 'Photo and signature uploaded successfully.', '/student/registration?tab=declaration');
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.json({ success: true, message: 'Documents uploaded successfully.' });
+        }
+
+        flashSuccessAndRedirect(req, res, 'Documents uploaded successfully.', '/student/registration?tab=declaration');
     } catch (error) {
-        handleError(req, res, error, 'An error occurred while saving photo and signature.', '/student/registration');
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        handleError(req, res, error, 'An error occurred while saving documents.', '/student/registration');
     }
 };
 
@@ -773,7 +854,12 @@ export const printApplicationForm = async (req, res) => {
                 { model: Subject, as: 'major2' },
                 { model: Subject, as: 'minor' },
                 { model: Skills, as: 'skill' },
-                { model: Cocurricular, as: 'cocurricular' }
+                { model: Cocurricular, as: 'cocurricular' },
+                { 
+                    model: await (async () => { const m = await import('../models/index.js'); return m.StudentDocument; })(), 
+                    as: 'documents',
+                    include: [{ model: await (async () => { const m = await import('../models/index.js'); return m.DocumentType; })(), as: 'documentType' }]
+                }
             ]
         });
 

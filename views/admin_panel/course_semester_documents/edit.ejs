@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Edit Mapping' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">Edit Mapping</h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/course_semester_documents">Mapping</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0">Mapping Details</h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end align-items-center">
+                                            <a class="btn btn-bg-primary" href="/admin/course_semester_documents">Return</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                <% errors.forEach(function(error) { %>
+                                                    <li><%= error %></li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/course_semester_documents/<%= mapping.id %>" method="POST">
+                                        <input type="hidden" name="_method" value="PUT">
+                                        <div class="row g-3">
+                                            <!-- Course / Semester (Readonly) -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">Course / Semester</label>
+                                                    <input type="text" class="form-control" value="<%= mapping.course ? mapping.course.name : '' %> / <%= mapping.semester ? mapping.semester.name : '' %>" readonly>
+                                                </div>
+                                            </div>
+
+                                            <!-- Document (Readonly) -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">Document</label>
+                                                    <input type="text" class="form-control" value="<%= mapping.documentType ? mapping.documentType.name : '' %>" readonly>
+                                                </div>
+                                            </div>
+
+                                            <!-- Requirement Level -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="is_required" class="form-label">Requirement Level <span class="text-danger">*</span></label>
+                                                    <select name="is_required" id="is_required" class="form-control" required>
+                                                        <option value="Required" <%= mapping.is_required === 'Required' ? 'selected' : '' %>>Required</option>
+                                                        <option value="Optional" <%= mapping.is_required === 'Optional' ? 'selected' : '' %>>Optional</option>
+                                                        <option value="Hidden" <%= mapping.is_required === 'Hidden' ? 'selected' : '' %>>Hidden</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Status -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                                    <select name="status" id="status" class="form-control" required>
+                                                        <option value="1" <%= mapping.status ? 'selected' : '' %>>Active</option>
+                                                        <option value="0" <%= !mapping.status ? 'selected' : '' %>>Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Update -->
+                                        <div class="mt-4 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save me-1"></i> Update Mapping
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>

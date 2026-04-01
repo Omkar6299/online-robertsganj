@@ -29,9 +29,9 @@
                 </li>
 
                 <% if (typeof user !== 'undefined' && user.role === 'Super Admin') { %>
-                <li class="nav-item <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/courses*','/admin/skills*', '/admin/cocurricular*','/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*']) ? 'menu-open' : '' %>">
+                <li class="nav-item <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/courses*','/admin/skills*', '/admin/cocurricular*','/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*', '/admin/document_types*', '/admin/course_semester_documents*']) ? 'menu-open' : '' %>">
                     <a href="#"
-                        class="nav-link <%= typeof set_active !== 'undefined' && set_active(['/admin/courses*','/admin/skills*','/admin/cocurricular*', '/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*']) ? 'active' : '' %>">
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active(['/admin/courses*','/admin/skills*','/admin/cocurricular*', '/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*', '/admin/document_types*', '/admin/course_semester_documents*']) ? 'active' : '' %>">
                         <i class="nav-icon bi bi-grid"></i>
                         <p>
                             Masters
@@ -39,7 +39,7 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview"
-                        style="display: <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/courses*','/admin/skills*', '/admin/cocurricular*','/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*']) ? 'block' : 'none' %>">
+                        style="display: <%= typeof set_menu_open !== 'undefined' && set_menu_open(['/admin/courses*','/admin/skills*', '/admin/cocurricular*','/admin/subjects*', '/admin/weightages*', '/admin/semesters*', '/admin/course_types*', '/admin/qualifications*', '/admin/registration_qualifications*', '/admin/fee_maintenance*', '/admin/document_types*', '/admin/course_semester_documents*']) ? 'block' : 'none' %>">
                         <li class="nav-item">
                             <a href="/admin/qualifications"
                                 class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/qualifications*') ? 'active' : '' %>">
@@ -108,6 +108,20 @@
                                 class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/fee_maintenance*') ? 'active' : '' %>">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Fee Maintenance</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/document_types"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/document_types*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Document Types</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/course_semester_documents"
+                                class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/course_semester_documents*') ? 'active' : '' %>">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Document Mapping</p>
                             </a>
                         </li>
                     </ul>

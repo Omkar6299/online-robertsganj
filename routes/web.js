@@ -18,6 +18,8 @@ import * as UserController from '../controllers/admin/UserController.js';
 import * as RoleController from '../controllers/admin/RoleController.js';
 import * as RegisterStudentController from '../controllers/admin/RegisterStudentController.js';
 import * as FeeMaintenanceController from '../controllers/admin/FeeMaintenanceController.js';
+import * as DocumentTypeController from '../controllers/admin/DocumentTypeController.js';
+import * as CourseSemesterDocumentController from '../controllers/admin/CourseSemesterDocumentController.js';
 import { isAdmin } from '../middleware/isAdmin.js';
 import { isSuperAdmin } from '../middleware/isSuperAdmin.js';
 import { checkAdmissionLogin } from '../middleware/checkAdmissionLogin.js';
@@ -422,9 +424,33 @@ router.post('/admin/fee_maintenance/:id', isSuperAdmin, (req, res, next) => {
   res.redirect('/admin/fee_maintenance');
 });
 
-// Admin Form Verification routes
-router.get('/admin/form_verification', isAdmin, FormVerificationController.index);
-router.post('/admin/form_verification_post/:registration_no', isAdmin, FormVerificationController.updateStatus);
+// Admin Document Type routes
+router.get('/admin/document_types', isSuperAdmin, DocumentTypeController.index);
+router.get('/admin/document_types/create', isSuperAdmin, DocumentTypeController.create);
+router.post('/admin/document_types', isSuperAdmin, DocumentTypeController.store);
+router.get('/admin/document_types/:id/edit', isSuperAdmin, DocumentTypeController.edit);
+router.put('/admin/document_types/:id', isSuperAdmin, DocumentTypeController.update);
+router.delete('/admin/document_types/:id', isSuperAdmin, DocumentTypeController.destroy);
+router.post('/admin/document_types/:id', isSuperAdmin, (req, res, next) => {
+  if (req.body._method === 'DELETE') return DocumentTypeController.destroy(req, res, next);
+  if (req.body._method === 'PUT') return DocumentTypeController.update(req, res, next);
+  res.redirect('/admin/document_types');
+});
+
+// Admin Course Semester Document Mapping routes
+router.get('/admin/course_semester_documents', isSuperAdmin, CourseSemesterDocumentController.index);
+router.get('/admin/course_semester_documents/create', isSuperAdmin, CourseSemesterDocumentController.create);
+router.post('/admin/course_semester_documents', isSuperAdmin, CourseSemesterDocumentController.store);
+router.get('/admin/course_semester_documents/:id/edit', isSuperAdmin, CourseSemesterDocumentController.edit);
+router.put('/admin/course_semester_documents/:id', isSuperAdmin, CourseSemesterDocumentController.update);
+router.delete('/admin/course_semester_documents/:id', isSuperAdmin, CourseSemesterDocumentController.destroy);
+router.get('/admin/course_semester_documents/get-semesters/:courseId', isSuperAdmin, CourseSemesterDocumentController.getSemesters);
+router.get('/admin/course_semester_documents/get-mappings/:courseId/:semesterId', isSuperAdmin, CourseSemesterDocumentController.getExistingMappings);
+router.post('/admin/course_semester_documents/:id', isSuperAdmin, (req, res, next) => {
+  if (req.body._method === 'DELETE') return CourseSemesterDocumentController.destroy(req, res, next);
+  if (req.body._method === 'PUT') return CourseSemesterDocumentController.update(req, res, next);
+  res.redirect('/admin/course_semester_documents');
+});
 
 export default router;
 

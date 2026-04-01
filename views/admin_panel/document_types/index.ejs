@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Document Types' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0"><%= typeof title !== 'undefined' ? title : 'Document Types' %></h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Document Types</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="mb-0">Manage Document Types</h5>
+                                        </div>
+                                        <div class="col-md-6 d-flex justify-content-end">
+                                            <a class="btn btn-primary" href="/admin/document_types/create">Add Document Type</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle" id="dataTable">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Code</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (typeof documentTypes !== 'undefined' && documentTypes.length > 0) { %>
+                                                    <% documentTypes.forEach(function(doc, index) { %>
+                                                        <tr>
+                                                            <td><%= index + 1 %></td>
+                                                            <td><%= doc.name %></td>
+                                                            <td><code><%= doc.code %></code></td>
+                                                            <td>
+                                                                <% if (doc.status) { %>
+                                                                    <span class="badge bg-success">Active</span>
+                                                                <% } else { %>
+                                                                    <span class="badge bg-danger">Inactive</span>
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/admin/document_types/<%= doc.id %>/edit" class="btn btn-sm btn-warning">
+                                                                    <i class="bi bi-pencil"></i> Edit
+                                                                </a>
+                                                                <form action="/admin/document_types/<%= doc.id %>" method="POST" class="d-inline" onsubmit="return confirm('Delete this document type?');">
+                                                                    <input type="hidden" name="_method" value="DELETE">
+                                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                                        <i class="bi bi-trash"></i> Delete
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    <% }); %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">No document types found.</td>
+                                                    </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+    <%- include('../layouts/datatable_init') %>
+</body>
+</html>
