@@ -101,12 +101,20 @@ const startServer = async () => {
       // await sequelize.sync({ alter: true });
     }
 
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
+    // Start server (only if not on Vercel)
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+      });
+    } else {
+      console.log('Vercel environment detected. Skipping app.listen().');
+    }
   } catch (error) {
     console.error('Unable to connect to the database:', error);
-    process.exit(1);
+    // Only exit if not on Vercel
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 };
 
