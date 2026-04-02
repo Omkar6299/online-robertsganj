@@ -385,6 +385,10 @@ router.get('/admin/students/:id/edit', isAdmin, RegisterStudentController.edit);
 router.post('/admin/students/:id/update', isAdmin, RegisterStudentController.update);
 router.post('/admin/students/:id/update-status', isAdmin, RegisterStudentController.updateStatus);
 
+// Admin Form Verification routes
+router.get('/admin/form_verification', isAdmin, FormVerificationController.index);
+router.post('/admin/form_verification_post/:registration_no', isAdmin, FormVerificationController.updateStatus);
+
 // Admin Role routes
 router.get('/admin/roles', isSuperAdmin, RoleController.index);
 router.get('/admin/roles/create', isSuperAdmin, RoleController.create);
