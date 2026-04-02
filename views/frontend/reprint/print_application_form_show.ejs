@@ -41,7 +41,7 @@
         .college-header h2 { font-size: 22px; font-weight: bold; margin: 0 0 5px 0; color: #333; text-transform: uppercase; }
         .college-header h5 { font-size: 14px; margin: 0; color: #555; }
         .college-header h4 { font-size: 15px; font-weight: bold; margin-top: 10px; display: inline-block; border-radius: 4px; padding: 2px 0;}
-        
+
         .header-info {
             display: flex;
             justify-content: space-between;
@@ -109,7 +109,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .qr-placeholder {
             width: 80px;
             height: 80px;
@@ -241,7 +241,7 @@
 
     <div class="page">
         <% if (typeof student !== 'undefined' && student) { %>
-            
+
             <div class="header-info">
                 <span><%= new Date().toLocaleString() %></span>
                 <span><%= fieldLabels.header.college_name_en %></span>
@@ -316,11 +316,11 @@
                             </td></tr>
                         </table>
                     </div>
-                    
+
                     <!-- Right Column -->
                     <div class="col-6">
                         <table class="kv-table">
-                            <% 
+                            <%
                                 let formattedRegDate = '-';
                                 if (typeof payment !== 'undefined' && payment) {
                                     if (payment.txnCompleteDate) {
@@ -378,7 +378,7 @@
                 <div class="row">
                     <div class="col-8">
                         <table class="kv-table" style="font-size: 10px;">
-                            <% 
+                            <%
                                 let claimedWeightageIds = [];
                                 let studentWeightageObj = student.weightage;
                                 if (typeof studentWeightageObj === 'string') {
@@ -406,6 +406,32 @@
                         </table>
                     </div>
                     <div class="col-4"></div>
+                </div>
+            </div>
+
+            <!-- Dynamic Documents Table - Two Column Design -->
+            <div class="fieldset-box">
+                <div class="legend-box">Uploaded Documents Summary</div>
+                <% 
+                    let filteredDocs = [];
+                    if (typeof student !== 'undefined' && typeof student.documents !== 'undefined' && student.documents.length > 0) {
+                        filteredDocs = student.documents.filter(doc => {
+                            const code = doc.documentType ? doc.documentType.code : '';
+                            return !['photo', 'signature', 'sign'].includes(code);
+                        });
+                    }
+                %>
+                <div class="row" style="margin-top: 5px;">
+                    <% if (filteredDocs.length > 0) { %>
+                        <% filteredDocs.forEach((doc, idx) => { %>
+                            <div class="col-6" style="border-bottom: 0.5px solid #bcc9a8; padding: 3px 5px;">
+                                <span style="color: #555; font-size: 10px; min-width: 15px; display: inline-block;"><%= idx + 1 %>.</span>
+                                <span style="font-size: 10.5px; font-weight: bold;"><%= doc.documentType ? doc.documentType.name : 'Unknown' %></span>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="col-12 text-center" style="padding: 10px; color: #666;">No additional documents uploaded</div>
+                    <% } %>
                 </div>
             </div>
 
@@ -575,7 +601,7 @@
                         <div style="margin-top: 5px;">दिनांक :</div>
                     </div>
                 </div>
-                
+
                 <p style="font-size: 10px; margin-top: 15px; border-top: 1px solid #eee; padding-top: 5px; font-style: italic;">
                     नोट : एक कागज पर हस्ताक्षर और फोटो भी फार्म के साथ संलग्न करें |
                 </p>
@@ -592,7 +618,7 @@
             <div class="text-center no-print mt-4">
                 <button onclick="window.print()" class="btn btn-dark btn-sm">Final Print Application</button>
             </div>
-            
+
         <% } else { %>
             <div class="text-center" style="padding: 50px; color: red; font-size: 14px;">Student record not found.</div>
         <% } %>

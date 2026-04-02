@@ -11,7 +11,9 @@ import {
   Weightage,
   Subject,
   Skills,
-  Cocurricular
+  Cocurricular,
+  StudentDocument,
+  DocumentType
 } from '../models/index.js';
 
 /**
@@ -602,7 +604,12 @@ export const showApplicationForm = async (req, res) => {
         { model: Subject, as: 'major2' },
         { model: Subject, as: 'minor' },
         { model: Skills, as: 'skill' },
-        { model: Cocurricular, as: 'cocurricular' }
+        { model: Cocurricular, as: 'cocurricular' },
+        { 
+          model: StudentDocument, 
+          as: 'documents',
+          include: [{ model: DocumentType, as: 'documentType' }]
+        }
       ]
     });
 
