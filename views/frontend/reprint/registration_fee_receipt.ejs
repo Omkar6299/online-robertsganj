@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<% if (typeof layout !== 'undefined' && layout === 'frontend') { %>
+    <% if (typeof layout !== 'undefined' && layout === 'frontend') { %>
         <%- include('../layout/css_link') %>
     <% } else { %>
         <%- include('../../student_panel/layout/css_link') %>
@@ -9,325 +9,237 @@
     <title><%= typeof title !== 'undefined' ? title : 'Registration Fee Receipt' %></title>
 
     <style>
-        body {
-            background: #f4f6f9;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+        :root {
+            --primary: #0f4c81;
+            --primary-dark: #0a3559;
+            --secondary: #8b1e3f;
+            --accent: #c8a96a;
+            --border: #cfd8e3;
+            --border-dark: #9fb2c8;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --bg-soft: #f5f7fb;
+            --white: #ffffff;
+            --success: #1f7a4d;
         }
 
-        /* Scrollable container for web view */
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            color: var(--text);
+            background: #eef2f7;
+            line-height: 1.4;
+        }
+
         .receipt-scroll-container {
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 20px 0;
-            background: #f4f6f9;
+            padding: 30px 15px;
+            background: #eef2f7;
+        }
+
+        .receipt-slip {
+            width: 210mm;
+            min-height: auto;
+            margin: 0 auto;
+            background: var(--white);
+            box-shadow: 0 10px 25px rgba(15, 76, 129, 0.1);
+            border: 1px solid #94a3b8;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .receipt-slip::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--secondary));
+        }
+
+        .slip-inner {
+            padding: 8mm 12mm;
+        }
+
+        .college-header-mini {
+            display: grid;
+            grid-template-columns: 60px 1fr 60px;
+            gap: 15px;
+            align-items: center;
+            border-bottom: 1px solid var(--border-dark);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .logo-mini {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .college-name-en {
+            margin: 0;
+            color: var(--primary-dark);
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .college-name-hi {
+            margin: 2px 0 0;
+            color: var(--secondary);
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .receipt-badge-wrap {
+            text-align: right;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .receipt-badge {
+            display: inline-block;
+            background: var(--success);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 8px rgba(31, 122, 77, 0.2);
+        }
+
+        .receipt-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-decoration: underline;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .info-section {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: var(--bg-soft);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 20px;
+        }
+
+        .info-item {
+            display: flex;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.4);
+            padding-bottom: 4px;
+        }
+
+        .info-label {
+            width: 45%;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .info-value {
+            width: 55%;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+            color: #fff;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .amount-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .amount-value {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .receipt-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-dark);
+        }
+
+        .footer-note {
+            font-size: 9px;
+            color: var(--muted);
+            max-width: 60%;
+            font-style: italic;
+        }
+
+        .signature-box {
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .signature-line {
+            border-top: 1px solid var(--text);
+            padding-top: 5px;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .no-print-actions {
+            text-align: center;
+            padding: 20px;
         }
 
         @media print {
             @page {
                 size: A4;
-                margin: 8mm;
-            }
-            .no-print, footer, .footer, footer *, .footer *, .no-print * {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
+                margin: 0;
             }
             body {
-                background: white !important;
-                margin: 0 !important;
-                padding: 0 !important;
+                background: #fff !important;
             }
-            html, body {
-                height: auto !important;
-                overflow: visible !important;
+            .no-print, .no-print-actions {
+                display: none !important;
             }
             .receipt-scroll-container {
-                max-height: none !important;
-                overflow: visible !important;
                 padding: 0 !important;
                 background: #fff !important;
             }
-            .receipt-box {
-                box-shadow: none !important;
-                border: 2px solid #000 !important;
-                max-width: 100% !important;
-                margin: 0 !important;
-                padding: 12px !important;
-                page-break-inside: avoid !important;
-                page-break-after: avoid !important;
-                height: auto !important;
-                width: 100% !important;
+            .receipt-slip {
+                margin: 20px auto;
+                box-shadow: none;
+                border: 1px solid #000;
+                width: 200mm;
             }
-            .header-section {
-                margin-bottom: 8px !important;
-                padding-bottom: 8px !important;
-                border-bottom: 2px solid #000 !important;
-            }
-            .header-section h2 {
-                font-size: 18px !important;
-                margin: 0 0 4px 0 !important;
-                line-height: 1.2 !important;
-            }
-            .header-section p {
-                font-size: 11px !important;
-                margin: 0 !important;
-                line-height: 1.3 !important;
-            }
-            .section-title {
-                font-size: 12px !important;
-                margin: 8px 0 4px 0 !important;
-                padding: 3px 6px !important;
-            }
-            .details-table {
-                margin: 4px 0 !important;
-            }
-            .details-table th,
-            .details-table td {
-                padding: 4px 6px !important;
-                font-size: 10px !important;
-            }
-            .amount-table th,
-            .amount-table td {
-                padding: 5px 8px !important;
-                font-size: 11px !important;
-            }
-            .signature-section {
-                margin-top: 12px !important;
-                padding-top: 8px !important;
-            }
-            .signature-box {
-                padding-top: 20px !important;
-            }
-            .signature-line {
-                margin-top: 4px !important;
-                font-size: 9px !important;
-            }
-            .footer-note {
-                margin-top: 8px !important;
-                font-size: 8px !important;
-                padding-top: 6px !important;
-                border-top: 1px solid #000 !important;
-            }
+            .receipt-slip::before { display: none; }
         }
-
-        .receipt-box {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 40px;
-            border: 1px solid #d0d0d0;
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.12);
-        }
-
-        .header-section {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #000;
-        }
-
-        .header-section .header-top {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .header-section img {
-            max-height: 60px;
-        }
-
-        .header-section h2 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 800;
-            color: #b71c1c; /* Dark Red */
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .header-section .hindi-title {
-            font-size: 13px;
-            font-weight: bold;
-            color: #1565c0; /* Blue */
-            margin-top: 2px;
-            white-space: nowrap;
-        }
-
-        .header-section .affiliation {
-            font-size: 14px;
-            color: #1976d2;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-
-        .header-section .receipt-type {
-            font-size: 18px;
-            font-weight: 700;
-            color: #000;
-            margin-top: 10px;
-            text-decoration: underline;
-        }
-
-        .section-title {
-            background: #f0f0f0;
-            border: 1px solid #000;
-            border-left: 4px solid #000;
-            padding: 8px 15px;
-            margin: 20px 0 10px 0;
-            font-weight: 700;
-            font-size: 15px;
-            color: #000;
-            text-transform: uppercase;
-        }
-
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            border: 1px solid #000;
-        }
-
-        .details-table th,
-        .details-table td {
-            border: 1px solid #000;
-            padding: 10px 12px;
-            text-align: left;
-        }
-
-        .details-table th {
-            background: #f5f5f5;
-            font-weight: 700;
-            color: #000;
-            width: 35%;
-            font-size: 14px;
-        }
-
-        .details-table td {
-            background: #fff;
-            color: #000;
-            font-size: 14px;
-        }
-
-        .details-table td strong {
-            font-weight: 700;
-            color: #000;
-        }
-
-        .amount-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            border: 2px solid #000;
-        }
-
-        .amount-table th,
-        .amount-table td {
-            border: 1px solid #000;
-            padding: 12px 15px;
-            font-size: 15px;
-        }
-
-        .amount-table th {
-            background: #f5f5f5;
-            font-weight: 700;
-            color: #000;
-            text-align: left;
-        }
-
-        .amount-table td {
-            background: #fff;
-            text-align: right;
-            font-weight: 700;
-            color: #000;
-        }
-
-        .amount-table .total-row th,
-        .amount-table .total-row td {
-            background: #e8e8e8;
-            font-size: 17px;
-            font-weight: 700;
-            border-top: 2px solid #000;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            background: #28a745;
-            color: white;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 14px;
-            border: 1px solid #28a745;
-        }
-
-        .signature-section {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .signature-box {
-            text-align: center;
-            min-width: 200px;
-        }
-
-        .signature-line {
-            border-top: 2px solid #000;
-            margin-top: 50px;
-            padding-top: 8px;
-            font-weight: 700;
-            color: #000;
-            font-size: 13px;
-        }
-
-        .footer-note {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #000;
-            font-size: 11px;
-            color: #333;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .actions {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .btn-main {
-            background: #007bff;
-            color: white;
-            padding: 12px 32px;
-            font-size: 15px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            margin: 8px;
-            transition: background 0.2s ease;
-        }
-
-        .btn-main:hover {
-            background: #0056b3 !important;
-            color: #fff !important;
-        }
-
-        .btn-outline {
-            padding: 10px 28px;
-            border: 1px solid #555;
-            border-radius: 5px;
-            background: white;
-            margin: 8px;
-            text-decoration: none;
-            color: #333 !important;
-        }
-        .btn-outline:hover { background: #eee; }
     </style>
 </head>
 
@@ -341,190 +253,79 @@
     <% } %>
 </div>
 
-<div class="receipt-scroll-container">
-    <div class="receipt-box">
-
-        <div class="header-section">
-            <div class="header-top">
-                <img src="/uploads/static/logo_header.png" alt="Logo Left">
-                <div class="flex-grow-1">
-                    <h2>Government Women Degree College Robertsganj Sonebhadra</h2>
-                    <div class="hindi-title">(राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र)</div>
-                    <div class="affiliation">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
-                    <div class="receipt-type"><%= fieldLabels.header.registration_receipt_title %></div>
-                </div>
-                <img src="/uploads/static/logo_header_right.png" alt="Logo Right">
-            </div>
-        </div>
-
-        <% if (payment && user) { %>
-
-        <div class="section-title"><%= fieldLabels.receipt.sections.student_details %></div>
-
-        <table class="details-table">
-            <tr>
-                <th><%= fieldLabels.receipt.fields.name %></th>
-                <td><strong><%= user.name || registrationData?.name || '-' %></strong></td>
-            </tr>
-
-            <% if (typeof registrationData !== 'undefined' && registrationData && registrationData.registration_no) { %>
-            <tr>
-                <th><%= fieldLabels.receipt.fields.reg_no %></th>
-                <td><strong><%= registrationData.registration_no || '-' %></strong></td>
-            </tr>
-            <% } %>
-
-            <tr>
-                <th>Email Address</th>
-                <td><%= user.email || registrationData?.email || '-' %></td>
-            </tr>
-
-            <tr>
-                <th>Contact Number</th>
-                <td><%= user.phone || registrationData?.phone || '-' %></td>
-            </tr>
-
-            <% if (typeof registrationData !== 'undefined' && registrationData && registrationData.father_name) { %>
-            <tr>
-                <th><%= fieldLabels.receipt.fields.father_name %></th>
-                <td><%= registrationData.father_name || '-' %></td>
-            </tr>
-            <% } %>
-
-            <% if (typeof registrationData !== 'undefined' && registrationData && registrationData.mother_name) { %>
-            <tr>
-                <th><%= fieldLabels.receipt.fields.mother_name %></th>
-                <td><%= registrationData.mother_name || '-' %></td>
-            </tr>
-            <% } %>
-        </table>
-
-        <div class="section-title">Course Details</div>
-
-        <table class="details-table">
-            <% if (typeof course !== 'undefined' && course) { %>
-            <tr>
-                <th><%= fieldLabels.receipt.fields.course %></th>
-                <td><strong><%= course?.name || '-' %></strong></td>
-            </tr>
-            <% } %>
-
-            <% if (typeof courseType !== 'undefined' && courseType) { %>
-            <tr>
-                <th>Course Type</th>
-                <td><%= courseType?.name || '-' %></td>
-            </tr>
-            <% } %>
-
-            <% if (typeof semester !== 'undefined' && semester) { %>
-            <tr>
-                <th><%= fieldLabels.receipt.fields.semester %></th>
-                <td><%= semester?.name || '-' %></td>
-            </tr>
-            <% } %>
-
-            <% if (typeof academicYear !== 'undefined' && academicYear) { %>
-            <tr>
-                <th>Academic Session</th>
-                <td><%= academicYear.session %></td>
-            </tr>
-            <% } %>
-        </table>
-
-        <div class="section-title">Transaction Details</div>
-
-        <table class="details-table">
-            <tr>
-                <th><%= fieldLabels.receipt.fields.txn_id %></th>
-                <td><strong><%= payment.merchant_txn_id || '-' %></strong></td>
-            </tr>
-
-            <% if (payment.bank_transaction_id || payment.atom_txn_id) { %>
-            <tr>
-                <th><%= fieldLabels.receipt.fields.bank_ref_no %></th>
-                <td><%= payment.bank_transaction_id || payment.atom_txn_id || '-' %></td>
-            </tr>
-            <% } %>
-
-            <tr>
-                <th><%= fieldLabels.receipt.fields.txn_date %></th>
-                <td>
-                    <% if (paymentDate) { %>
-                        <%= paymentDate %> <%= paymentTime || '' %>
-                    <% } else { %>
-                        <%= payment.txnCompleteDate || payment.transaction_date || payment.created_at || '-' %>
-                    <% } %>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Payment Status</th>
-                <td>
-                    <span class="status-badge">
-                        <%= payment.status === 'Success' ? 'SUCCESS' : payment.status || '-' %>
-                    </span>
-                </td>
-            </tr>
-        </table>
-
-        <div class="section-title">Amount Details</div>
-
-        <table class="amount-table">
-            <tr>
-                <th>Registration Fee</th>
-                <td>₹<%= payment.amount ? Number(payment.amount).toFixed(2) : "0.00" %></td>
-            </tr>
-            <tr class="total-row">
-                <th>Total Amount Paid</th>
-                <td>₹<%= payment.amount ? Number(payment.amount).toFixed(2) : "0.00" %></td>
-            </tr>
-        </table>
-
-        <div class="signature-section">
-            <div class="signature-box">
-                <div class="signature-line">Date: <%= new Date().toLocaleDateString('en-IN') %></div>
-            </div>
-            <div class="signature-box">
-                <div class="signature-line">Authorized Signature</div>
-            </div>
-        </div>
-
-        <div class="footer-note">
-            This is a computer-generated receipt and does not require a physical signature.<br>
-            For any queries, please contact the college administration.
-        </div>
-
-        <div class="actions no-print">
-            <button onclick="window.print()" class="btn-main">Print Receipt</button>
-
-            <% if (registrationData && payment.merchant_txn_id && (user.phone || registrationData?.phone)) { %>
-            <a class="btn-main"
-               href="/admission_login?transaction_id=<%= encodeURIComponent(payment.merchant_txn_id) %>&phone=<%= encodeURIComponent(user.phone || registrationData?.phone) %>">
-                Apply Online
-            </a>
-            <% } %>
-
-            <% if (typeof layout !== 'undefined' && layout === 'student') { %>
-                <a href="/student/dashboard" class="btn-outline">Back to Dashboard</a>
-            <% } else { %>
-                <a href="/" class="btn-outline">Back to Home</a>
-            <% } %>
-        </div>
-
-        <% } else { %>
-            <div class="alert alert-warning mt-4">Payment details not found. Please contact support.</div>
-        <% } %>
-
-    </div>
+<div class="no-print-actions">
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> Print Receipt</button>
+    <% if (typeof layout !== 'undefined' && layout === 'student') { %>
+        <a href="/student/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+    <% } else { %>
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+    <% } %>
 </div>
 
-<div class="no-print">
-    <% if (typeof layout !== 'undefined' && layout === 'frontend') { %>
-        <%- include('../layout/footer') %>
-    <% } else if (typeof layout !== 'undefined' && layout === 'student') { %>
-        <%- include('../../student_panel/layout/footer') %>
-    <% } %>
-    <%- include('../layout/script_link') %>
+<div class="receipt-scroll-container">
+    <div class="receipt-slip">
+        <div class="slip-inner">
+            <div class="receipt-badge-wrap">
+                <span class="receipt-badge">Payment Success</span>
+            </div>
+
+            <div class="college-header-mini">
+                <img src="/uploads/static/logo_header.png" class="logo-mini">
+                <div>
+                    <h1 class="college-name-en">Government Women Degree College Robertsganj Sonebhadra</h1>
+                    <div class="college-name-hi">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</div>
+                </div>
+                <img src="/uploads/static/logo_header_right.png" class="logo-mini">
+            </div>
+
+            <div class="receipt-title"><%= fieldLabels.header.registration_receipt_title %></div>
+
+            <% if (payment && user) { %>
+                <div class="info-section">
+                    <div class="info-grid">
+                        <div class="info-item"><div class="info-label">Student Name</div><div class="info-value"><%= user.name || registrationData?.name || '-' %></div></div>
+                        <% if (typeof registrationData !== 'undefined' && registrationData && registrationData.registration_no) { %>
+                            <div class="info-item"><div class="info-label">Registration No</div><div class="info-value"><%= registrationData.registration_no %></div></div>
+                        <% } %>
+                        <div class="info-item"><div class="info-label">Mobile No</div><div class="info-value"><%= user.phone || registrationData?.phone || '-' %></div></div>
+                        <% if (typeof registrationData !== 'undefined' && registrationData && (registrationData.father_name || registrationData.mother_name)) { %>
+                            <div class="info-item"><div class="info-label">Parent Name</div><div class="info-value"><%= registrationData.father_name || registrationData.mother_name || '-' %></div></div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-grid">
+                        <div class="info-item"><div class="info-label">Academic Session</div><div class="info-value"><%= typeof academicYear !== 'undefined' ? academicYear.session : '-' %></div></div>
+                        <div class="info-item"><div class="info-label">Course / Semester</div><div class="info-value"><%= course?.name || '-' %> / <%= semester?.name || '-' %></div></div>
+                        <div class="info-item"><div class="info-label">Transaction ID</div><div class="info-value"><%= payment.merchant_txn_id || '-' %></div></div>
+                        <div class="info-item"><div class="info-label">Transaction Date</div><div class="info-value">
+                            <% if (paymentDate) { %>
+                                <%= paymentDate %>
+                            <% } else { %>
+                                <%= new Date(payment.txnCompleteDate || payment.transaction_date || payment.created_at).toLocaleDateString('en-IN') %>
+                            <% } %>
+                        </div></div>
+                    </div>
+                </div>
+
+                <div class="amount-row">
+                    <div class="amount-label">Registration Fee Paid</div>
+                    <div class="amount-value">₹ <%= payment.amount ? Number(payment.amount).toFixed(2) : "0.00" %></div>
+                </div>
+
+                <div class="receipt-footer">
+                    <div class="footer-note">
+                        * This is a computer-generated receipt and does not require a physical signature.<br>
+                        * Generated on: <%= new Date().toLocaleString('en-IN') %>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line">Authorized Signatory</div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
 </div>
 
 </body>
