@@ -73,7 +73,7 @@ router.use((req, res, next) => {
 router.get('/', async (req, res) => {
   try {
     const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
-    res.render('frontend/home/index', { 
+    res.render('frontend/home/index', {
       title: 'Home',
       activeAcademicYear: activeAcademicYear
     });
@@ -266,7 +266,7 @@ router.get('/admin/qualifications/:id', isSuperAdmin, (req, res) => {
 router.get('/admin/registration_qualifications', isSuperAdmin, CourseSemesterController.index);
 router.get('/admin/registration_qualifications/create', isSuperAdmin, CourseSemesterController.create);
 router.post('/admin/registration_qualifications', isSuperAdmin, CourseSemesterController.store);
-router.get('/admin/registration_qualifications/get-qualifications', isSuperAdmin, CourseSemesterController.getQualifications);
+// router.get('/admin/registration_qualifications/get-qualifications', isSuperAdmin, CourseSemesterController.getQualifications);
 router.get('/admin/registration_qualifications/:id/edit', isSuperAdmin, CourseSemesterController.edit);
 router.put('/admin/registration_qualifications/:id', isSuperAdmin, CourseSemesterController.update);
 router.delete('/admin/registration_qualifications/:id', isSuperAdmin, CourseSemesterController.destroy);
