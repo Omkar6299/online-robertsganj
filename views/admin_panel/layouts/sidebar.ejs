@@ -201,8 +201,15 @@
                 <li class="nav-item">
                     <a href="/admin/roles"
                         class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/roles*') ? 'active' : '' %>">
-                        <i class="nav-icon bi bi-phone"></i>
+                        <i class="nav-icon bi bi-shield-lock"></i>
                         <p>Role</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/settings"
+                        class="nav-link <%= typeof set_active !== 'undefined' && set_active('/admin/settings*') ? 'active' : '' %>">
+                        <i class="nav-icon bi bi-gear"></i>
+                        <p>System Settings</p>
                     </a>
                 </li>
                 <% } %>

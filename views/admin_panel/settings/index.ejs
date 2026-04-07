@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'System Settings' %></title>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+    <div class="app-wrapper">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">System Settings</h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">System Settings</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="mb-0 text-primary"><i class="bi bi-gear-fill me-2"></i>Global Configurations</h5>
+                                </div>
+                                <div class="card-body">
+                                    <% if (typeof success !== 'undefined' && success.length > 0) { %>
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            <%= success.join(', ') %>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    <% } %>
+
+                                    <form action="/admin/settings/update" method="POST">
+                                        <div class="row g-4">
+                                            <% settings.forEach(setting => { %>
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="form-group">
+                                                        <label class="form-label fw-bold"><%= setting.display_name %></label>
+                                                        
+                                                        <% if (setting.type === 'boolean') { %>
+                                                            <select name="settings[<%= setting.key %>]" class="form-select">
+                                                                <option value="true" <%= setting.value === 'true' ? 'selected' : '' %>>True</option>
+                                                                <option value="false" <%= setting.value === 'false' ? 'selected' : '' %>>False</option>
+                                                            </select>
+                                                        <% } else if (setting.type === 'select' && setting.key === 'atom_environment') { %>
+                                                            <select name="settings[<%= setting.key %>]" class="form-select">
+                                                                <option value="demo" <%= setting.value === 'demo' ? 'selected' : '' %>>Demo</option>
+                                                                <option value="live" <%= setting.value === 'live' ? 'selected' : '' %>>Live</option>
+                                                            </select>
+                                                        <% } else if (setting.type === 'number') { %>
+                                                            <input type="number" step="any" name="settings[<%= setting.key %>]" value="<%= setting.value %>" class="form-control">
+                                                        <% } else { %>
+                                                            <input type="text" name="settings[<%= setting.key %>]" value="<%= setting.value %>" class="form-control">
+                                                        <% } %>
+                                                        
+                                                        <% if (setting.description) { %>
+                                                            <small class="form-text text-muted mt-1 d-block"><%= setting.description %></small>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            <% }); %>
+                                        </div>
+
+                                        <div class="mt-5 border-top pt-4 text-end">
+                                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                                <i class="bi bi-save me-2"></i>Save All Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>

@@ -24,6 +24,7 @@ import FeeMaintenance from './FeeMaintenance.js';
 import DocumentType from './DocumentType.js';
 import CourseSemesterDocument from './CourseSemesterDocument.js';
 import StudentDocument from './StudentDocument.js';
+import Setting from './Setting.js';
 
 // Define associations after all models are loaded
 // Student associations
@@ -120,5 +121,6 @@ export {
   DocumentType,
   CourseSemesterDocument,
   StudentDocument,
-  Role
+  Role,
+  Setting
 };

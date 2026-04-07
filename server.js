@@ -5,10 +5,12 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import SequelizeStore from 'connect-session-sequelize';
 import flashMiddleware from './middleware/flash.js';
+import settingMiddleware from './middleware/settingMiddleware.js';
 import methodOverride from 'method-override';
 import dotenv from 'dotenv';
 import { sequelize } from './config/database.js';
 import './models/index.js'; // Initialize model associations
+import Setting from './models/Setting.js';
 import webRoutes from './routes/web.js';
 
 dotenv.config();
@@ -61,6 +63,9 @@ app.use(session({
 // Flash messages (custom middleware to avoid deprecated APIs)
 app.use(flashMiddleware);
 
+// Load dynamic site settings
+app.use(settingMiddleware);
+
 // Global variables for views
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
@@ -111,9 +116,17 @@ const startServer = async () => {
     // Ensure session table is created/updated
     await sessionStore.sync();
 
-    // Sync database (use with caution in production)
-    if (process.env.NODE_ENV === 'development') {
-      // await sequelize.sync({ alter: true });
+    // Ensure settings table exists and has seed data
+    await Setting.sync({ alter: false, force: false });
+    const settingsCount = await Setting.count();
+    if (settingsCount === 0) {
+      await Setting.bulkCreate([
+        { key: 'is_first_time_college', value: process.env.IS_FIRST_TIME_COLLEGE || 'true', display_name: 'Is First Time College', description: 'Set to true if the college is using the system for the first time.', type: 'boolean' },
+        { key: 'registration_amount', value: '100.00', display_name: 'Registration Amount', description: 'The fee amount for student registration.', type: 'number' },
+        { key: 'min_student_age', value: '10', display_name: 'Minimum Student Age', description: 'The minimum age required for a student to register.', type: 'number' },
+        { key: 'atom_environment', value: process.env.NTTDATA_ENV || 'demo', display_name: 'Atom Payment Environment', description: 'Payment gateway environment: demo or live.', type: 'select' }
+      ]);
+      console.log('Settings seeded successfully.');
     }
 
     // Start server (only if not on Vercel)

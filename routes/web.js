@@ -21,6 +21,7 @@ import * as FeeMaintenanceController from '../controllers/admin/FeeMaintenanceCo
 import * as DocumentTypeController from '../controllers/admin/DocumentTypeController.js';
 import * as CourseSemesterDocumentController from '../controllers/admin/CourseSemesterDocumentController.js';
 import * as AcademicYearController from '../controllers/admin/AcademicYearController.js';
+import * as SettingController from '../controllers/admin/SettingController.js';
 import { isAdmin } from '../middleware/isAdmin.js';
 import { isSuperAdmin } from '../middleware/isSuperAdmin.js';
 import { checkAdmissionLogin } from '../middleware/checkAdmissionLogin.js';
@@ -462,7 +463,9 @@ router.get('/admin/academic-years', isSuperAdmin, AcademicYearController.index);
 router.get('/admin/academic-years/create', isSuperAdmin, AcademicYearController.create);
 router.post('/admin/academic-years', isSuperAdmin, AcademicYearController.store);
 router.get('/admin/academic-years/:id/edit', isSuperAdmin, AcademicYearController.edit);
-router.put('/admin/academic-years/:id', isSuperAdmin, AcademicYearController.update);
+// Settings Management (Super Admin only)
+router.get('/admin/settings', isSuperAdmin, SettingController.index);
+router.post('/admin/settings/update', isSuperAdmin, SettingController.update);
 router.patch('/admin/academic-years/:id/activate', isSuperAdmin, AcademicYearController.activate);
 // Fallback POST handler for PUT and PATCH
 router.post('/admin/academic-years/:id', isSuperAdmin, (req, res, next) => {

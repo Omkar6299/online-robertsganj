@@ -702,4 +702,25 @@ CREATE TABLE IF NOT EXISTS `Sessions` (
 
 DELIMITER ;
 
+-- ---------------------------------------------------------
+-- Table structure for Settings
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `settings`;
+CREATE TABLE IF NOT EXISTS `settings` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `key` VARCHAR(255) NOT NULL UNIQUE,
+  `value` TEXT,
+  `display_name` VARCHAR(255) NOT NULL,
+  `description` TEXT,
+  `type` ENUM('text', 'number', 'boolean', 'select') DEFAULT 'text',
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `settings` (`key`, `value`, `display_name`, `description`, `type`, `created_at`, `updated_at`) VALUES
+('is_first_time_college', 'true', 'Is First Time College', 'Set to true if the college is using the system for the first time.', 'boolean', NOW(), NOW()),
+('registration_amount', '100.00', 'Registration Amount', 'The fee amount for student registration.', 'number', NOW(), NOW()),
+('min_student_age', '10', 'Minimum Student Age', 'The minimum age required for a student to register.', 'number', NOW(), NOW()),
+('atom_environment', 'demo', 'Atom Payment Environment', 'Payment gateway environment: demo or live.', 'select', NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;

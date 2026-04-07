@@ -216,11 +216,11 @@ const formatDateDDMMYYYY = (dateString) => {
 };
 
 // Helper function to get DOB date restrictions
-const getDobDateRestrictions = () => {
+const getDobDateRestrictions = (min_age = 10) => {
   // Calculate maximum date (oldest date) based on minimum age
   // This is the latest date a student can be born to meet the minimum age requirement
   const today = new Date();
-  const maxDate = new Date(today.getFullYear() - siteconfig.min_student_age, today.getMonth(), today.getDate());
+  const maxDate = new Date(today.getFullYear() - min_age, today.getMonth(), today.getDate());
   const maxDateString = maxDate.toISOString().split('T')[0];
   const maxDateFormatted = formatDateDDMMYYYY(maxDateString);
 
@@ -264,7 +264,8 @@ export const registration_fees_payment = async (req, res) => {
       where: { status: 'Active' }
     });
 
-    const { minDobDate, maxDobDate, maxDobDateFormatted } = getDobDateRestrictions();
+    const minAge = res.locals.siteSettings?.min_student_age || 10;
+    const { minDobDate, maxDobDate, maxDobDateFormatted } = getDobDateRestrictions(minAge);
 
     console.log('Rendering registration form page');
     // Note: error, errors, and success are already in res.locals from global middleware
@@ -276,7 +277,7 @@ export const registration_fees_payment = async (req, res) => {
       minDobDate: minDobDate,
       maxDobDate: maxDobDate,
       maxDobDateFormatted: maxDobDateFormatted,
-      is_first_time_college: siteconfig.is_first_time_college || false,
+      is_first_time_college: res.locals.siteSettings?.is_first_time_college || false,
       oldInput: Array.isArray(oldInputArray) && oldInputArray.length > 0 ? (typeof oldInputArray[0] === 'object' ? oldInputArray[0] : {}) : {}
     });
   } catch (error) {
@@ -481,7 +482,7 @@ export const registration_fees_payment_post = async (req, res) => {
     try {
       const merchTxnId = await generateUniqueTransactionId(t);
       console.log('Generated unique 10-digit transaction ID:', merchTxnId);
-      const amount = siteconfig.registration_amount;
+      const amount = res.locals.siteSettings?.registration_amount || siteconfig.registration_amount;
       const login = siteconfig.atom_login;
       const password = siteconfig.atom_password;
       const prod_id = siteconfig.atom_product_id;
@@ -518,7 +519,7 @@ export const registration_fees_payment_post = async (req, res) => {
 
       // Re-registration specific validation
       // Skip this if it's a first-time college setup
-      if (isReRegistration && !siteconfig.is_first_time_college) {
+      if (isReRegistration && !res.locals.siteSettings?.is_first_time_college) {
         if (!value.registration_no || value.registration_no.trim() === '') {
           await t.rollback();
           req.flash('error', 'Registration number is required for re-registration (Semester > I).');
