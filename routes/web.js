@@ -20,6 +20,7 @@ import * as RegisterStudentController from '../controllers/admin/RegisterStudent
 import * as FeeMaintenanceController from '../controllers/admin/FeeMaintenanceController.js';
 import * as DocumentTypeController from '../controllers/admin/DocumentTypeController.js';
 import * as CourseSemesterDocumentController from '../controllers/admin/CourseSemesterDocumentController.js';
+import * as AcademicYearController from '../controllers/admin/AcademicYearController.js';
 import { isAdmin } from '../middleware/isAdmin.js';
 import { isSuperAdmin } from '../middleware/isSuperAdmin.js';
 import { checkAdmissionLogin } from '../middleware/checkAdmissionLogin.js';
@@ -454,6 +455,20 @@ router.post('/admin/course_semester_documents/:id', isSuperAdmin, (req, res, nex
   if (req.body._method === 'DELETE') return CourseSemesterDocumentController.destroy(req, res, next);
   if (req.body._method === 'PUT') return CourseSemesterDocumentController.update(req, res, next);
   res.redirect('/admin/course_semester_documents');
+});
+
+// Admin Academic Year routes
+router.get('/admin/academic-years', isSuperAdmin, AcademicYearController.index);
+router.get('/admin/academic-years/create', isSuperAdmin, AcademicYearController.create);
+router.post('/admin/academic-years', isSuperAdmin, AcademicYearController.store);
+router.get('/admin/academic-years/:id/edit', isSuperAdmin, AcademicYearController.edit);
+router.put('/admin/academic-years/:id', isSuperAdmin, AcademicYearController.update);
+router.patch('/admin/academic-years/:id/activate', isSuperAdmin, AcademicYearController.activate);
+// Fallback POST handler for PUT and PATCH
+router.post('/admin/academic-years/:id', isSuperAdmin, (req, res, next) => {
+  if (req.body._method === 'PUT') return AcademicYearController.update(req, res, next);
+  if (req.body._method === 'PATCH') return AcademicYearController.activate(req, res, next);
+  res.redirect('/admin/academic-years');
 });
 
 export default router;
