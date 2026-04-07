@@ -1,6 +1,6 @@
 -- Sardar Vallabhbhai Online Admission System
 -- Consolidated Database Structure Migration File
--- Generated on: 2026-03-31
+-- Generated on: 2026-04-07
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -16,6 +16,11 @@ CREATE TABLE IF NOT EXISTS `academic_years` (
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `academic_years` (`id`, `session`, `status`, `created_at`, `updated_at`) VALUES
+(1, '2024-2025', 'Inactive', NOW(), NOW()),
+(2, '2025-2026', 'Inactive', NOW(), NOW()),
+(3, '2026-2027', 'Inactive', NOW(), NOW());
 
 -- ---------------------------------------------------------
 -- Table structure for Admins
@@ -681,6 +686,19 @@ BEGIN
 
     SELECT (v_base_amount + v_total_practical_fee + v_late_fee_to_add) AS total_fee_amount;
 END //
+
+-- ---------------------------------------------------------
+-- Table structure for Sessions
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `Sessions`;
+CREATE TABLE IF NOT EXISTS `Sessions` (
+  `sid` VARCHAR(36) NOT NULL,
+  `expires` DATETIME DEFAULT NULL,
+  `data` TEXT,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` DATETIME NOT NULL,
+  PRIMARY KEY (`sid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DELIMITER ;
 
