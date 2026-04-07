@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import SequelizeStore from 'connect-session-sequelize';
 import flashMiddleware from './middleware/flash.js';
 import methodOverride from 'method-override';
 import dotenv from 'dotenv';
@@ -17,6 +18,15 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const MySQLStore = SequelizeStore(session.Store);
+const sessionStore = new MySQLStore({
+  db: sequelize,
+  checkExpirationInterval: 15 * 60 * 1000, // 15 minutes
+  expiration: 24 * 60 * 60 * 1000 // 24 hours
+});
+
+// Trust proxy for secure cookies on Vercel/proxies
+app.set('trust proxy', 1);
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -37,10 +47,12 @@ app.use(methodOverride('_method'));
 // Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
+  store: sessionStore,
   resave: false,
   saveUninitialized: false,
+  proxy: true, // Required for secure cookies on Vercel
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production' || !!process.env.VERCEL,
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
@@ -95,6 +107,9 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connection established successfully.');
+
+    // Ensure session table is created/updated
+    await sessionStore.sync();
 
     // Sync database (use with caution in production)
     if (process.env.NODE_ENV === 'development') {
