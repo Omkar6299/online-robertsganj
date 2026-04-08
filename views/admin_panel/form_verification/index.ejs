@@ -402,7 +402,12 @@
                                                 <i class="bi bi-check-circle-fill fs-1 text-success mb-3"></i>
                                                 <h5 class="text-success fw-bold">Application Approved</h5>
                                                 <p class="text-secondary">This application has been verified and approved. No further edits or status updates are permitted.</p>
-                                                <a href="/admin/register_student_list" class="btn btn-outline-success px-4 mt-2 fw-bold">Return to List</a>
+                                                <div class="d-flex justify-content-center gap-2 mt-2">
+                                                    <a href="/admin/form_verification/print_approval?registration_no=<%= student.registration_no %>" target="_blank" class="btn btn-primary px-4 fw-bold">
+                                                        <i class="bi bi-printer me-2"></i>Print Approval Form
+                                                    </a>
+                                                    <a href="/admin/register_student_list" class="btn btn-outline-success px-4 fw-bold">Return to List</a>
+                                                </div>
                                             </div>
                                         </div>
                                         <% } %>

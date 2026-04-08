@@ -12,6 +12,8 @@ import AcademicYear from '../../models/AcademicYear.js';
 import StudentWeightage from '../../models/StudentWeightage.js';
 import { handleError, flashSuccessAndRedirect, flashErrorAndRedirect } from '../../utils/responseHelper.js';
 import { Op } from 'sequelize';
+import FeeService from '../../utils/services/FeeService.js';
+import fieldLabels from '../../config/fieldLabels.js';
 
 export const index = async (req, res) => {
   try {
@@ -136,8 +138,66 @@ export const updateStatus = async (req, res) => {
       admission_status: admission_status
     });
 
+    if (admission_status === 'Approved') {
+      req.flash('success', 'Student admission approved successfully. Generating approval form...');
+      return res.redirect(`/admin/form_verification/print_approval?registration_no=${registration_no}`);
+    }
+
     flashSuccessAndRedirect(req, res, `Student admission status updated to ${admission_status} successfully.`, `/admin/form_verification?registration_no=${registration_no}`);
   } catch (error) {
     handleError(req, res, error, 'An error occurred while updating admission status.', '/admin/form_verification');
+  }
+};
+
+export const printApprovalForm = async (req, res) => {
+  try {
+    const { registration_no, academic_year_id } = req.query;
+
+    if (!registration_no) {
+      return flashErrorAndRedirect(req, res, 'Registration number is required.', '/admin/form_verification');
+    }
+
+    const student = await Student.findOne({
+      where: { registration_no: registration_no },
+      include: [
+        { model: User, as: 'user' },
+        { model: Course, as: 'courseName' },
+        { model: Semester, as: 'semsterName' },
+        { model: Subject, as: 'major1' },
+        { model: Subject, as: 'major2' },
+        { model: Subject, as: 'minor' },
+        { model: Skills, as: 'skill' },
+        { model: Cocurricular, as: 'cocurricular' },
+        { model: AcademicYear, as: 'academicYear' }
+      ]
+    });
+
+    if (!student) {
+      return flashErrorAndRedirect(req, res, 'Student not found.', '/admin/form_verification');
+    }
+
+    if (student.admission_status !== 'Approved') {
+      return flashErrorAndRedirect(req, res, 'Approval form can only be printed for approved students.', `/admin/form_verification?registration_no=${registration_no}`);
+    }
+
+    // Calculate fee dynamically
+    let feeAmount = 0;
+    try {
+      feeAmount = await FeeService.getCalculatedFee(student, student.year);
+    } catch (feeError) {
+      console.error('Fee calculation error:', feeError);
+      // We still allow printing but maybe with a warning or 0 amount if SP fails
+    }
+
+    res.render('admin_panel/form_verification/admission_approval_form', {
+      title: 'Admission Approval Form',
+      student,
+      studentUser: student.user,
+      feeAmount,
+      fieldLabels
+    });
+
+  } catch (error) {
+    handleError(req, res, error, 'An error occurred while generating approval form.', '/admin/form_verification');
   }
 };

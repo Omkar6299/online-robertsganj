@@ -140,6 +140,11 @@ router.get('/student/re_register', checkAdmissionLogin, ReRegistrationController
 router.get('/locations/states', LocationController.getStates);
 router.get('/locations/districts', LocationController.getDistricts);
 
+// Admin Form Verification
+router.get('/admin/form_verification', isAdmin, FormVerificationController.index);
+router.post('/admin/form_verification_post/:registration_no', isAdmin, FormVerificationController.updateStatus);
+router.get('/admin/form_verification/print_approval', isAdmin, FormVerificationController.printApprovalForm);
+
 // Admin routes
 router.get('/login', AdminLoginController.adminLogin);
 router.post('/login', AdminLoginController.adminLoginPost);

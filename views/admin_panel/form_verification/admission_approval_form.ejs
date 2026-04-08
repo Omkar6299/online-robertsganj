@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layouts/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Admission Approval Form' %></title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        /* Basic Form Styles (Used in both versions) */
+        .approval-container {
+            width: 100%;
+            max-width: 750px;
+            margin: 0 auto;
+            border: 1px solid #cbd5e1;
+            padding: 25px 35px;
+            background: #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 11px;
+            color: #1a202c;
+            line-height: 1.4;
+        }
+
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .header-logo { width: 55px; height: 55px; }
+        .college-info { text-align: center; }
+        .college-name-en { font-size: 16px; font-weight: 800; margin: 0; color: #1e3a8a; text-transform: uppercase; }
+        .college-name-hi { font-size: 13px; color: #991b1b; margin: 2px 0; font-weight: 700; }
+        
+        .form-title {
+            text-align: center;
+            border-top: 1px solid #1a202c;
+            border-bottom: 1px solid #1a202c;
+            padding: 4px 0;
+            margin: 10px 0;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: #f8fafc;
+        }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 30px; margin-bottom: 15px; }
+        .info-item { display: flex; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px; }
+        .info-label { width: 45%; font-weight: 600; color: #475569; }
+        .info-value { width: 55%; font-weight: 700; }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            border-bottom: 1px solid #cbd5e1;
+            margin: 12px 0 8px;
+            padding-bottom: 2px;
+            text-transform: uppercase;
+            color: #334155;
+        }
+
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .data-table th, .data-table td { border: 1px solid #cbd5e1; padding: 5px 10px; text-align: left; }
+        .data-table th { background-color: #f8fafc; font-size: 11px; font-weight: 700; }
+
+        .fee-status {
+            background: #f0f9ff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            border: 1px solid #bae6fd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .fee-amount { font-size: 18px; font-weight: 800; color: #0369a1; }
+
+        .signature-section { display: flex; justify-content: space-between; margin-top: 40px; }
+        .signature-box { text-align: center; width: 180px; }
+        .signature-line { border-top: 1px solid #1a202c; margin-top: 5px; padding-top: 4px; font-weight: 700; font-size: 11px; }
+
+        /* Browser View Wrapper */
+        .content-scroll-wrapper {
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+            background: #f4f6f9;
+            padding: 20px 0;
+        }
+
+        /* PRINT CONTROL */
+        .print-only-version { display: none; }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            * { box-sizing: border-box !important; }
+            .no-print, .app-wrapper { display: none !important; }
+            .print-only-version { 
+                display: block !important; 
+                visibility: visible !important;
+            }
+            .approval-container {
+                box-shadow: none !important;
+                border: 1px solid #000 !important;
+                margin: 0 auto !important;
+                width: 99% !important; /* Slightly less than 100% to ensure borders fit */
+                max-width: none !important;
+            }
+            body, html {
+                background: white !important;
+                overflow: visible !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="layout-fixed fixed-header fixed-footer sidebar-expand-lg sidebar-open sidebar-mini app-loaded bg-body-tertiary">
+
+    <!-- 1. PRINT ONLY VERSION -->
+    <div class="print-only-version">
+        <div class="approval-container">
+            <table class="header-table">
+                <tr>
+                    <td width="60"><img src="/uploads/static/logo_header.png" class="header-logo"></td>
+                    <td class="college-info">
+                        <h1 class="college-name-en"><%= fieldLabels.header.college_name_en %></h1>
+                        <div class="college-name-hi"><%= fieldLabels.header.college_name_hi %></div>
+                        <div style="font-size: 10px; color: #4b5563;"><%= fieldLabels.header.college_address_en %></div>
+                    </td>
+                    <td width="60" align="right"><img src="/uploads/static/logo_header_right.png" class="header-logo"></td>
+                </tr>
+            </table>
+
+            <div class="form-title">Admission Approval Form (Academic Session: <%= student.academicYear ? student.academicYear.session : '-' %>)</div>
+
+            <div class="info-grid">
+                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.registration_no %>:</div><div class="info-value"><%= student.registration_no %></div></div>
+                <div class="info-item"><div class="info-label">Approval Date:</div><div class="info-value"><%= student.updated_at ? new Date(student.updated_at).toLocaleDateString('en-IN') : '-' %></div></div>
+                <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.name %>:</div><div class="info-value"><%= studentUser.name %></div></div>
+                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.father_name %>:</div><div class="info-value"><%= student.father_name %></div></div>
+                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.mother_name %>:</div><div class="info-value"><%= student.mother_name %></div></div>
+                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.dob %>:</div><div class="info-value"><%= student.dob %></div></div>
+                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.category %>:</div><div class="info-value"><%= student.category %></div></div>
+                <div class="info-item"><div class="info-label">Contact Number:</div><div class="info-value"><%= studentUser.phone %></div></div>
+            </div>
+
+            <div class="section-title">Academic & Subject Details</div>
+            <div class="info-grid" style="margin-bottom: 5px;">
+                <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.course %>:</div><div class="info-value"><%= student.courseName ? student.courseName.name : '-' %></div></div>
+                <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.semester %>:</div><div class="info-value"><%= student.semsterName ? student.semsterName.name : '-' %></div></div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject Category</th>
+                        <th>Selected Subject Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Major Subject 1</td>
+                        <td><strong><%= student.major1 ? student.major1.subject_name : '-' %></strong></td>
+                    </tr>
+                    <tr>
+                        <td>Major Subject 2</td>
+                        <td><strong><%= student.major2 ? student.major2.subject_name : '-' %></strong></td>
+                    </tr>
+                    <% if (student.minor) { %>
+                    <tr>
+                        <td>Minor Subject</td>
+                        <td><strong><%= student.minor.subject_name %></strong></td>
+                    </tr>
+                    <% } %>
+                    <% if (student.skill) { %>
+                    <tr>
+                        <td>Skill Development</td>
+                        <td><strong><%= student.skill.name %></strong></td>
+                    </tr>
+                    <% } %>
+                    <% if (student.cocurricular) { %>
+                    <tr>
+                        <td>Co-Curricular</td>
+                        <td><strong><%= student.cocurricular.name %></strong></td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
+            <div class="fee-status">
+                <div style="font-weight: 700; font-size: 14px;">Total Admission Fee Payable (including practicals):</div>
+                <div class="fee-amount">₹ <%= Number(feeAmount).toFixed(2) %></div>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 10px; color: #475569; border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; line-height: 1.6;">
+                <strong style="color: #1a202c; font-size: 11px;">Instructions for Student:</strong><br>
+                1. Please log in to your student portal using your Mobile No. and Transaction ID. On click of apply online<br>
+                2. Go to the "Fee Payment" section and pay the amount shown above.<br>
+                3. After successful payment, download your fee receipt for college records.
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div style="height: 50px;"></div>
+                    <div class="signature-line">Admission Committee</div>
+                </div>
+                <div class="signature-box">
+                    <div style="height: 50px;"></div>
+                    <div class="signature-line">Authorized Signatory</div>
+                </div>
+                <div class="signature-box">
+                    <div style="height: 50px;"></div>
+                    <div class="signature-line">Principal / Dean</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 35px; border-top: 1px dotted #ccc; padding-top: 10px; font-size: 10px; color: #64748b;">
+                This document is generated by the Online Admission System of <%= fieldLabels.header.college_name_en %>.<br>
+                Generated on: <%= new Date().toLocaleString('en-IN') %>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. BROWSER VIEW VERSION -->
+    <div class="app-wrapper no-print">
+        <%- include('../layouts/header') %>
+        <%- include('../layouts/sidebar') %>
+        <main class="app-main">
+            <div class="app-content-header no-print">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">Admission Approval Form</h3>
+                        </div>
+                        <div class="col-sm-6 text-end">
+                            <a href="/admin/form_verification?registration_no=<%= student.registration_no %>" class="btn btn-outline-secondary me-2">
+                                <i class="bi bi-arrow-left me-2"></i>Go Back
+                            </a>
+                            <button onclick="window.print()" class="btn btn-primary px-4">
+                                <i class="bi bi-printer me-2"></i>Print Form
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content no-print">
+                <div class="container-fluid">
+                    <div class="content-scroll-wrapper">
+                        <div class="approval-container">
+                            <table class="header-table">
+                                <tr>
+                                    <td width="60"><img src="/uploads/static/logo_header.png" class="header-logo"></td>
+                                    <td class="college-info">
+                                        <h1 class="college-name-en"><%= fieldLabels.header.college_name_en %></h1>
+                                        <div class="college-name-hi"><%= fieldLabels.header.college_name_hi %></div>
+                                        <div style="font-size: 10px; color: #4b5563;"><%= fieldLabels.header.college_address_en %></div>
+                                    </td>
+                                    <td width="60" align="right"><img src="/uploads/static/logo_header_right.png" class="header-logo"></td>
+                                </tr>
+                            </table>
+
+                            <div class="form-title">Admission Approval Form (Academic Session: <%= student.academicYear ? student.academicYear.session : '-' %>)</div>
+
+                            <div class="info-grid">
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.registration_no %>:</div><div class="info-value"><%= student.registration_no %></div></div>
+                                <div class="info-item"><div class="info-label">Approval Date:</div><div class="info-value"><%= student.updated_at ? new Date(student.updated_at).toLocaleDateString('en-IN') : '-' %></div></div>
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.name %>:</div><div class="info-value"><%= studentUser.name %></div></div>
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.father_name %>:</div><div class="info-value"><%= student.father_name %></div></div>
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.mother_name %>:</div><div class="info-value"><%= student.mother_name %></div></div>
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.dob %>:</div><div class="info-value"><%= student.dob %></div></div>
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.category %>:</div><div class="info-value"><%= student.category %></div></div>
+                                <div class="info-item"><div class="info-label">Contact Number:</div><div class="info-value"><%= studentUser.phone %></div></div>
+                            </div>
+
+                            <div class="section-title">Academic & Subject Details</div>
+                            <div class="info-grid" style="margin-bottom: 5px;">
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.course %>:</div><div class="info-value"><%= student.courseName ? student.courseName.name : '-' %></div></div>
+                                <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.semester %>:</div><div class="info-value"><%= student.semsterName ? student.semsterName.name : '-' %></div></div>
+                            </div>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Subject Category</th>
+                                        <th>Selected Subject Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Major Subject 1</td>
+                                        <td><strong><%= student.major1 ? student.major1.subject_name : '-' %></strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Major Subject 2</td>
+                                        <td><strong><%= student.major2 ? student.major2.subject_name : '-' %></strong></td>
+                                    </tr>
+                                    <% if (student.minor) { %>
+                                    <tr>
+                                        <td>Minor Subject</td>
+                                        <td><strong><%= student.minor.subject_name %></strong></td>
+                                    </tr>
+                                    <% } %>
+                                    <% if (student.skill) { %>
+                                    <tr>
+                                        <td>Skill Development</td>
+                                        <td><strong><%= student.skill.name %></strong></td>
+                                    </tr>
+                                    <% } %>
+                                    <% if (student.cocurricular) { %>
+                                    <tr>
+                                        <td>Co-Curricular</td>
+                                        <td><strong><%= student.cocurricular.name %></strong></td>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+
+                            <div class="fee-status">
+                                <div style="font-weight: 700; font-size: 14px;">Total Admission Fee Payable (including practicals):</div>
+                                <div class="fee-amount">₹ <%= Number(feeAmount).toFixed(2) %></div>
+                            </div>
+
+                            <div style="margin-top: 20px; font-size: 10px; color: #475569; border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; line-height: 1.6;">
+                                <strong style="color: #1a202c; font-size: 11px;">Instructions for Student:</strong><br>
+                                1. Please log in to your student portal using your Mobile No. and Transaction ID. On click of apply online<br>
+                                2. Go to the "Fee Payment" section and pay the amount shown above.<br>
+                                3. After successful payment, download your fee receipt for college records.
+                            </div>
+
+                            <div class="signature-section">
+                                <div class="signature-box">
+                                    <div style="height: 50px;"></div>
+                                    <div class="signature-line">Admission Committee</div>
+                                </div>
+                                <div class="signature-box">
+                                    <div style="height: 50px;"></div>
+                                    <div class="signature-line">Authorized Signatory</div>
+                                </div>
+                                <div class="signature-box">
+                                    <div style="height: 50px;"></div>
+                                    <div class="signature-line">Principal / Dean</div>
+                                </div>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 35px; border-top: 1px dotted #ccc; padding-top: 10px; font-size: 10px; color: #64748b;">
+                                This document is generated by the Online Admission System of <%= fieldLabels.header.college_name_en %>.<br>
+                                Generated on: <%= new Date().toLocaleString('en-IN') %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../layouts/footer') %>
+    </div>
+    <%- include('../layouts/script_link') %>
+</body>
+</html>
