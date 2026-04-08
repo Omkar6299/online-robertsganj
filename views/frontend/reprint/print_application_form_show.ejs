@@ -741,10 +741,6 @@
                         <div class="label">Course / Semester</div>
                         <div class="value"><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></div>
                     </div>
-                    <div class="summary-card">
-                        <div class="label">Payment Ref.</div>
-                        <div class="value"><%= (typeof payment !== 'undefined' && payment && payment.merchant_txn_id) ? payment.merchant_txn_id : '-' %></div>
-                    </div>
                 </div>
 
                 <div class="section-card">
