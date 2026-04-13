@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="permanent_district" class="form-label">District <span class="text-danger">*</span></label>
                 <select name="permanent_district" id="permanent_district" class="form-control select2" required disabled>
@@ -54,7 +54,16 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="permanent_tehsil" class="form-label">Tehsil</label>
+                <input type="text" name="permanent_tehsil" id="permanent_tehsil" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.permanent_tehsil ? oldInput.permanent_tehsil : (typeof addressDetails !== 'undefined' && addressDetails.permanent_tehsil ? addressDetails.permanent_tehsil : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.permanent_tehsil ? previousStudent.permanent_tehsil : '')) %>"
+                    placeholder="Enter Tehsil">
+            </div>
+        </div>
+
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="permanent_pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
                 <input type="text" name="permanent_pincode" id="permanent_pincode" class="form-control" maxlength="6"
@@ -93,7 +102,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="correspondence_district" class="form-label">District <span class="text-danger">*</span></label>
                 <select name="correspondence_district" id="correspondence_district" class="form-control select2" required disabled>
@@ -102,7 +111,16 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="correspondence_tehsil" class="form-label">Tehsil</label>
+                <input type="text" name="correspondence_tehsil" id="correspondence_tehsil" class="form-control"
+                    value="<%= typeof oldInput !== 'undefined' && oldInput.correspondence_tehsil ? oldInput.correspondence_tehsil : (typeof addressDetails !== 'undefined' && addressDetails.mailing_tehsil ? addressDetails.mailing_tehsil : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.mailing_tehsil ? previousStudent.mailing_tehsil : '')) %>"
+                    placeholder="Enter Tehsil">
+            </div>
+        </div>
+
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="correspondence_pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
                 <input type="text" name="correspondence_pincode" id="correspondence_pincode" class="form-control" maxlength="6"
@@ -267,6 +285,7 @@
                 const permDistrict = $('#permanent_district').val();
 
                 $('#correspondence_address').val(permAddr);
+                $('#correspondence_tehsil').val($('#permanent_tehsil').val());
                 $('#correspondence_pincode').val($('#permanent_pincode').val());
 
                 // Set State

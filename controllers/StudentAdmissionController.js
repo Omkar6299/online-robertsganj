@@ -316,8 +316,8 @@ export const addressDetailsPost = async (req, res) => {
         }
 
         const {
-            correspondence_address, correspondence_state, correspondence_district, correspondence_pincode,
-            permanent_address, permanent_state, permanent_district, permanent_pincode,
+            correspondence_address, correspondence_state, correspondence_district, correspondence_pincode, correspondence_tehsil,
+            permanent_address, permanent_state, permanent_district, permanent_pincode, permanent_tehsil,
             local_guadian, local_guadian_address, guadian_contact
         } = req.body;
 
@@ -340,10 +340,12 @@ export const addressDetailsPost = async (req, res) => {
             mailing_address: correspondence_address,
             mailing_state: correspondence_state,
             mailing_district: correspondence_district,
+            mailing_tehsil: correspondence_tehsil,
             mailing_pincode: correspondence_pincode,
             permanent_address,
             permanent_state,
             permanent_district,
+            permanent_tehsil,
             permanent_pincode,
             address_status: '1',
             local_guadian,
