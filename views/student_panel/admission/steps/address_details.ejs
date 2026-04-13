@@ -127,7 +127,9 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="guadian_contact" class="form-label">Guardian Contact Number</label>
-                <input type="text" name="guadian_contact" id="guadian_contact" class="form-control" maxlength="10"
+                <input type="text" name="guadian_contact" id="guadian_contact" class="form-control" 
+                    maxlength="10" minlength="10" pattern="[0-9]{10}"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                     value="<%= typeof oldInput !== 'undefined' && oldInput.guadian_contact ? oldInput.guadian_contact : (typeof student !== 'undefined' && student.guadian_contact ? student.guadian_contact : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.guadian_contact ? previousStudent.guadian_contact : '')) %>"
                     placeholder="Enter 10-digit contact number">
             </div>
@@ -281,18 +283,28 @@
             }
         });
 
-        $('form').on('submit', function() {
-             // Ensure disabled fields are included?
-             // Disabled fields are NOT sent in form submit.
-             // IMPORTANT: We must enable them before submit if they have values, OR use hidden inputs.
-             // But valid data requires them to be selected, so they should be enabled.
-             // If user selects state then district, it is enabled.
-             // If user hasn't selected state, district is disabled and empty, which is fine (though required attribute might block submit if browser validation runs? No, disabled elements skip validation).
-             // But field is marked `required`. If disabled, browser ignores `required`.
-             // However, backend requires it.
-             // So user MUST select state, enabling district, then select district.
+        $('form').on('submit', function(e) {
+             const guardianContact = $('#guadian_contact').val();
+             
+             if (guardianContact) {
+                 // Check if it's exactly 10 digits
+                 if (guardianContact.length !== 10) {
+                     alert('Guardian contact number must be exactly 10 digits.');
+                     $('#guadian_contact').focus();
+                     e.preventDefault();
+                     return false;
+                 }
 
-            if ($('#same_as_permanent').is(':checked')) {
+                 // Check for repetitive digits (e.g., 0000000000)
+                 if (/^(\d)\1{9}$/.test(guardianContact)) {
+                     alert('Guardian contact number cannot be a repetitive sequence (e.g., 0000000000).');
+                     $('#guadian_contact').focus();
+                     e.preventDefault();
+                     return false;
+                 }
+             }
+
+             if ($('#same_as_permanent').is(':checked')) {
                  $('#correspondence_address').val($('#permanent_address').val());
                  $('#correspondence_state').val($('#permanent_state').val());
                  // Explicitly set value for district hidden/visible input if needed,

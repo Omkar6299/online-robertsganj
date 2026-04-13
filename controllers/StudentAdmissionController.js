@@ -321,6 +321,21 @@ export const addressDetailsPost = async (req, res) => {
             local_guadian, local_guadian_address, guadian_contact
         } = req.body;
 
+        // Validation for Guardian Contact Number
+        if (guadian_contact) {
+            if (!/^[0-9]{10}$/.test(guadian_contact)) {
+                req.flash('error', 'Guardian contact number must be a 10-digit number.');
+                req.flash('oldInput', req.body);
+                return res.redirect('/student/registration?tab=address');
+            }
+            
+            if (/^(\d)\1{9}$/.test(guadian_contact)) {
+                req.flash('error', 'Guardian contact number cannot be a repetitive sequence (e.g., 0000000000).');
+                req.flash('oldInput', req.body);
+                return res.redirect('/student/registration?tab=address');
+            }
+        }
+
         await student.update({
             mailing_address: correspondence_address,
             mailing_state: correspondence_state,
@@ -328,7 +343,6 @@ export const addressDetailsPost = async (req, res) => {
             mailing_pincode: correspondence_pincode,
             permanent_address,
             permanent_state,
-            permanent_district,
             permanent_district,
             permanent_pincode,
             address_status: '1',
