@@ -233,21 +233,26 @@ export const paymentResponse = async (req, res) => {
 
         await t.commit();
 
+        await t.commit();
+
         if (isSuccess) {
-            const redirectUrl = `/student/admission_receipt?txn_id=${admissionTxnId}`;
-            // Avoid modifying session if not present to prevent overwriting the old login cookie
-            if (req.session && req.session.admission_user_id) {
-                return flashSuccessAndRedirect(req, res, 'Admission fee paid successfully!', redirectUrl);
-            } else {
-                return res.redirect(redirectUrl);
+            // RESTORE SESSION: If session was lost due to cross-site POST (SameSite issue),
+            // we backfill it using the user_id returned by the gateway.
+            if (!req.session.admission_user_id) {
+                const userId = parsedResponse.user_id || (feeLog ? feeLog.user_id : null);
+                if (userId) {
+                    const user = await User.findByPk(userId);
+                    if (user) {
+                        req.session.admission_user_id = user.id;
+                        req.session.admission_name = user.name;
+                        console.log('Session restored after payment for User ID:', user.id);
+                    }
+                }
             }
+
+            return flashSuccessAndRedirect(req, res, 'Admission fee paid successfully!', `/student/admission_receipt?txn_id=${admissionTxnId}`);
         } else {
-            const redirectUrl = '/student/dashboard';
-            if (req.session && req.session.admission_user_id) {
-                return flashErrorAndRedirect(req, res, `Payment failed: ${parsedResponse.message}`, redirectUrl);
-            } else {
-                return res.redirect(redirectUrl);
-            }
+            return flashErrorAndRedirect(req, res, `Payment failed: ${parsedResponse.message}`, '/student/dashboard');
         }
 
     } catch (error) {

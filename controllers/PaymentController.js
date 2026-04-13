@@ -252,19 +252,22 @@ export const paymentResponse = async (req, res) => {
 
     // Render success, pending or failed page based on payment status
     if (isSuccess) {
+      // RESTORE SESSION: If session was lost due to cross-site POST (SameSite issue),
+      // we backfill it using the user_id linked to this payment.
+      if (!req.session.admission_user_id) {
+        const user = await User.findByPk(payment.user_id);
+        if (user) {
+          req.session.admission_user_id = user.id;
+          req.session.admission_name = user.name;
+          console.log('Session restored after registration payment for User ID:', user.id);
+        }
+      }
+
       // Redirect to receipt page instead of success page
       const merchantTransactionId = payment.merchant_txn_id;
       const redirectUrl = `/payment/receipt?transaction_id=${encodeURIComponent(merchantTransactionId)}`;
 
-      console.log('=== REDIRECTING TO RECEIPT PAGE ===');
-      console.log('Merchant Transaction ID:', merchantTransactionId);
-
-      // Avoid modifying session if not present to prevent overwriting the old login cookie
-      if (req.session && req.session.admission_user_id) {
-        return flashSuccessAndRedirect(req, res, 'Registration fee paid successfully!', redirectUrl);
-      } else {
-        return res.redirect(redirectUrl);
-      }
+      return flashSuccessAndRedirect(req, res, 'Registration fee paid successfully!', redirectUrl);
     } else if (isPending) {
       return res.render('frontend/payment/payment_failed', {
         title: 'Payment Pending',
