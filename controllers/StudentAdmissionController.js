@@ -394,7 +394,7 @@ export const educationalDetailsPost = async (req, res) => {
             return res.redirect('/student/registration#address');
         }
 
-        const { board, year, percentage, roll_no, qual_name, mark_type, cgpa, total_marks, obtained_marks } = req.body;
+        const { board, year, percentage, roll_no, qual_name, mark_type, cgpa, total_marks, obtained_marks, subject_details } = req.body;
         console.log('DEBUG: educationalDetailsPost req.body:', JSON.stringify(req.body, null, 2));
 
         // Delete existing records to replace them (scoped to current session user_id)
@@ -416,7 +416,8 @@ export const educationalDetailsPost = async (req, res) => {
                         mark_type: mark_type ? mark_type[qualId] : null,
                         total_marks: total_marks ? total_marks[qualId] : null,
                         obtained_marks: obtained_marks ? obtained_marks[qualId] : null,
-                        roll_no: roll_no[qualId]
+                        roll_no: roll_no[qualId],
+                        subject_details: subject_details ? subject_details[qualId] : null
                     });
                 }
             }

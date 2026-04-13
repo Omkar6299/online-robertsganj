@@ -18,7 +18,7 @@
                     <input type="hidden" name="qual_name[<%= qualification.id %>]" value="<%= qualification.name %>">
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="form-group">
                         <label for="board_<%= qualification.id %>" class="form-label">Board/University <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
                         <input type="text" name="board[<%= qualification.id %>]" id="board_<%= qualification.id %>" class="form-control"
@@ -27,7 +27,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="year_<%= qualification.id %>" class="form-label">Passing Year <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
                         <% if (qualification.max_year_gap !== null && qualification.max_year_gap !== undefined) { %>
@@ -71,6 +71,24 @@
 
                 <div class="col-md-4">
                     <div class="form-group">
+                        <label for="roll_no_<%= qualification.id %>" class="form-label">Roll Number</label>
+                        <input type="text" name="roll_no[<%= qualification.id %>]" id="roll_no_<%= qualification.id %>" class="form-control"
+                            value="<%= typeof oldInput !== 'undefined' && oldInput.roll_no && oldInput.roll_no[qualification.id] ? oldInput.roll_no[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].roll_no ? educationalDetails[qualification.name].roll_no : '') %>"
+                            placeholder="Enter Roll Number">
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="subject_details_<%= qualification.id %>" class="form-label">Subject(s) Taken (Optional)</label>
+                        <input type="text" name="subject_details[<%= qualification.id %>]" id="subject_details_<%= qualification.id %>" class="form-control"
+                            value="<%= typeof oldInput !== 'undefined' && oldInput.subject_details && oldInput.subject_details[qualification.id] ? oldInput.subject_details[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].subject_details ? educationalDetails[qualification.name].subject_details : '') %>"
+                            placeholder="Enter subjects (e.g., Hindi, English, Science, Mathematics...)">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label for="total_marks_<%= qualification.id %>" class="form-label">Total Marks</label>
                         <input type="number" name="total_marks[<%= qualification.id %>]" id="total_marks_<%= qualification.id %>" class="form-control" min="0"
                             value="<%= typeof oldInput !== 'undefined' && oldInput.total_marks && oldInput.total_marks[qualification.id] ? oldInput.total_marks[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].total_marks ? educationalDetails[qualification.name].total_marks : '') %>"
@@ -78,7 +96,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="obtained_marks_<%= qualification.id %>" class="form-label">Obtained Marks</label>
                         <input type="number" name="obtained_marks[<%= qualification.id %>]" id="obtained_marks_<%= qualification.id %>" class="form-control" min="0"
@@ -88,15 +106,6 @@
                 </div>
 
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="roll_no_<%= qualification.id %>" class="form-label">Roll Number</label>
-                        <input type="text" name="roll_no[<%= qualification.id %>]" id="roll_no_<%= qualification.id %>" class="form-control"
-                            value="<%= typeof oldInput !== 'undefined' && oldInput.roll_no && oldInput.roll_no[qualification.id] ? oldInput.roll_no[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].roll_no ? educationalDetails[qualification.name].roll_no : '') %>"
-                            placeholder="Enter Roll Number">
-                    </div>
-                </div>
-
-                <div class="col-md-6">
                     <div class="form-group">
                         <label for="mark_type_<%= qualification.id %>" class="form-label">Mark Type <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
                         <select name="mark_type[<%= qualification.id %>]" id="mark_type_<%= qualification.id %>" class="form-control mark-type-selector" data-qual-id="<%= qualification.id %>" data-status="<%= qualification.status %>" <%= qualification.status === 'required' ? 'required' : '' %>>
@@ -110,7 +119,7 @@
                     const isCGPASelected = (typeof oldInput !== 'undefined' && oldInput.mark_type && oldInput.mark_type[qualification.id] === 'CGPA') || (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].mark_type === 'CGPA');
                 %>
 
-                <div class="col-md-6 percentage-container-<%= qualification.id %>" style="<%= isCGPASelected ? 'display: none;' : '' %>">
+                <div class="col-md-4 percentage-container-<%= qualification.id %>" style="<%= isCGPASelected ? 'display: none;' : '' %>">
                     <div class="form-group">
                         <label for="percentage_<%= qualification.id %>" class="form-label">Percentage <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
                         <input type="number" name="percentage[<%= qualification.id %>]" id="percentage_<%= qualification.id %>" class="form-control" step="0.01" min="1" max="100"
@@ -119,7 +128,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 cgpa-container-<%= qualification.id %>" style="<%= isCGPASelected ? '' : 'display: none;' %>">
+                <div class="col-md-4 cgpa-container-<%= qualification.id %>" style="<%= isCGPASelected ? '' : 'display: none;' %>">
                     <div class="form-group">
                         <label for="cgpa_<%= qualification.id %>" class="form-label">CGPA <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
                         <input type="number" name="cgpa[<%= qualification.id %>]" id="cgpa_<%= qualification.id %>" class="form-control" step="0.01" min="1" max="10"
