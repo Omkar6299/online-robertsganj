@@ -254,12 +254,17 @@ export const paymentResponse = async (req, res) => {
     if (isSuccess) {
       // Redirect to receipt page instead of success page
       const merchantTransactionId = payment.merchant_txn_id;
+      const redirectUrl = `/payment/receipt?transaction_id=${encodeURIComponent(merchantTransactionId)}`;
 
       console.log('=== REDIRECTING TO RECEIPT PAGE ===');
       console.log('Merchant Transaction ID:', merchantTransactionId);
 
-      // Redirect to receipt print page
-      return res.redirect(`/payment/receipt?transaction_id=${encodeURIComponent(merchantTransactionId)}`);
+      // Avoid modifying session if not present to prevent overwriting the old login cookie
+      if (req.session && req.session.admission_user_id) {
+        return flashSuccessAndRedirect(req, res, 'Registration fee paid successfully!', redirectUrl);
+      } else {
+        return res.redirect(redirectUrl);
+      }
     } else if (isPending) {
       return res.render('frontend/payment/payment_failed', {
         title: 'Payment Pending',

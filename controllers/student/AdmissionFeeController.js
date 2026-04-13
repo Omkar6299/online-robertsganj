@@ -234,9 +234,20 @@ export const paymentResponse = async (req, res) => {
         await t.commit();
 
         if (isSuccess) {
-            flashSuccessAndRedirect(req, res, 'Admission fee paid successfully!', `/student/admission_receipt?txn_id=${admissionTxnId}`);
+            const redirectUrl = `/student/admission_receipt?txn_id=${admissionTxnId}`;
+            // Avoid modifying session if not present to prevent overwriting the old login cookie
+            if (req.session && req.session.admission_user_id) {
+                return flashSuccessAndRedirect(req, res, 'Admission fee paid successfully!', redirectUrl);
+            } else {
+                return res.redirect(redirectUrl);
+            }
         } else {
-            flashErrorAndRedirect(req, res, `Payment failed: ${parsedResponse.message}`, '/student/dashboard');
+            const redirectUrl = '/student/dashboard';
+            if (req.session && req.session.admission_user_id) {
+                return flashErrorAndRedirect(req, res, `Payment failed: ${parsedResponse.message}`, redirectUrl);
+            } else {
+                return res.redirect(redirectUrl);
+            }
         }
 
     } catch (error) {
