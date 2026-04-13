@@ -1044,7 +1044,8 @@ export const initiatePayment = async (req, res) => {
     });
 
     // Prepare payment data using PaymentService
-    const amount = siteconfig.registration_amount;
+    // Prepare payment data using PaymentService - Use amount from payment record (e.g. 500)
+    const amount = payment.amount || siteconfig.registration_amount;
     // Get APP_URL and ensure no trailing slash, then append route
     const baseUrl = (process.env.APP_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, '');
     const returnUrl = `${baseUrl}/payment/response`;
@@ -1159,8 +1160,8 @@ const generateUniqueTransactionId = async (transaction = null) => {
   return fallbackId;
 };
 
-// Helper function to generate registration number
-const generateRegistrationNumber = async (courseId, transaction = null) => {
+// Helper function to generate registration number - now exported for use in PaymentController
+export const generateRegistrationNumber = async (courseId, transaction = null) => {
   try {
     // Get course details - courseId might be string or number, convert to int for findByPk
     const courseIdInt = typeof courseId === 'string' ? parseInt(courseId) : courseId;

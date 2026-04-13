@@ -7,6 +7,8 @@ import Semester from '../models/Semester.js';
 import CourseType from '../models/CourseType.js';
 import { sequelize } from '../config/database.js';
 import PaymentService from '../utils/services/PaymentService.js';
+import { generateRegistrationNumber } from './LoginController.js';
+import { handleError, flashSuccessAndRedirect, flashErrorAndRedirect } from '../utils/responseHelper.js';
 
 export const paymentResponse = async (req, res) => {
   const t = await sequelize.transaction();
@@ -176,26 +178,47 @@ export const paymentResponse = async (req, res) => {
         console.log('Registration Number:', existingStudent.registration_no);
         console.warn('Skipping student creation');
       } else {
+        let finalRegistrationNo = String(registrationData.registration_no);
+
+        // CHECK FOR REGISTRATION NUMBER COLLISION (Within the same session)
+        // This handles race conditions where multiple students pay for the same number at once.
+        const collisionCheck = await Student.findOne({
+          where: {
+            registration_no: finalRegistrationNo,
+            academic_year: String(registrationData.academic_year)
+          },
+          transaction: t
+        });
+
+        if (collisionCheck) {
+          console.warn(`Registration number collision detected for ${finalRegistrationNo} in session ${registrationData.academic_year}`);
+          
+          // Only regenerate if it's a NEW student. 
+          // If it's a returning student re-using their ID, it should have been caught by existingStudent check.
+          // But as a failsafe, we regenerate to ensure the record is created.
+          const newRegNo = await generateRegistrationNumber(registrationData.course_id, t);
+          console.log(`Regenerated new registration number: ${newRegNo}`);
+          finalRegistrationNo = newRegNo;
+        }
+
         const studentData = {
-          user_id: String(payment.user_id),
-          student_id: registrationData.student_id,
-          registration_no: registrationData.registration_no,
-          course_type_id: String(registrationData.course_type_id),
-          course_id: String(registrationData.course_id),
+          user_id: parseInt(payment.user_id), 
+          student_id: registrationData.student_id ? String(registrationData.student_id) : null,
+          registration_no: finalRegistrationNo, // Use the verified/regenerated number
+          course_type_id: parseInt(registrationData.course_type_id),
+          course_id: parseInt(registrationData.course_id),
           year: String(registrationData.semester_id),
           academic_year: String(registrationData.academic_year),
-          father_name: registrationData.father_name,
-          mother_name: registrationData.mother_name,
-          dob: registrationData.dob,
+          father_name: String(registrationData.father_name),
+          mother_name: String(registrationData.mother_name),
+          dob: String(registrationData.dob),
           photo: registrationData.photo || null,
           sign: registrationData.sign || null,
           photographsign_status: registrationData.photographsign_status || '0'
         };
 
-        console.log('=== STUDENT DATA TYPES ===');
-        Object.keys(studentData).forEach(key => {
-          console.log(`${key}: ${studentData[key]} (${typeof studentData[key]})`);
-        });
+        console.log('=== PREPARING TO CREATE STUDENT RECORD ===');
+        console.log('Processed Student Data:', JSON.stringify(studentData, null, 2));
 
         try {
           // Create Student record
@@ -204,16 +227,14 @@ export const paymentResponse = async (req, res) => {
           console.log('=== STUDENT RECORD CREATED SUCCESSFULLY ===');
           console.log('Student ID:', student.id);
           console.log('Registration Number:', student.registration_no);
-          console.log('User ID:', student.user_id);
-          console.log('Academic Year:', student.academic_year);
         } catch (createError) {
           console.error('=== FAILED TO CREATE STUDENT RECORD ===');
-          console.error('Error name:', createError.name);
-          console.error('Error message:', createError.message);
-          console.error('Error stack:', createError.stack);
-          if (createError.errors) {
-            console.error('Validation errors:', JSON.stringify(createError.errors, null, 2));
-          }
+          console.error('Error Details:', {
+            name: createError.name,
+            message: createError.message,
+            errors: createError.errors ? JSON.stringify(createError.errors, null, 2) : 'No details'
+          });
+          
           await t.rollback();
           req.flash('error', `Failed to create student record: ${createError.message}. Please contact support.`);
           return res.redirect('/registration_fees_payment');
