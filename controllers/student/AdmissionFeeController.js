@@ -233,8 +233,6 @@ export const paymentResponse = async (req, res) => {
 
         await t.commit();
 
-        await t.commit();
-
         if (isSuccess) {
             // RESTORE SESSION: If session was lost due to cross-site POST (SameSite issue),
             // we backfill it using the user_id returned by the gateway.
@@ -245,7 +243,15 @@ export const paymentResponse = async (req, res) => {
                     if (user) {
                         req.session.admission_user_id = user.id;
                         req.session.admission_name = user.name;
-                        console.log('Session restored after payment for User ID:', user.id);
+                        
+                        // Also restore student ID if possible
+                        const student = await Student.findOne({ where: { user_id: String(user.id) }, order: [['id', 'DESC']] });
+                        if (student) {
+                            req.session.admission_student_id = student.id;
+                            req.session.admission_registration_no = student.registration_no;
+                        }
+                        
+                        console.log('Session restored after admission payment for User ID:', user.id);
                     }
                 }
             }

@@ -280,6 +280,14 @@ export const paymentResponse = async (req, res) => {
         if (user) {
           req.session.admission_user_id = user.id;
           req.session.admission_name = user.name;
+          
+          // Also restore student ID if possible
+          const student = await Student.findOne({ where: { user_id: String(user.id) }, order: [['id', 'DESC']] });
+          if (student) {
+            req.session.admission_student_id = student.id;
+            req.session.admission_registration_no = student.registration_no;
+          }
+          
           console.log('Session restored after registration payment for User ID:', user.id);
         }
       }
