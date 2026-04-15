@@ -71,9 +71,9 @@ const fieldLabels = {
       amount_details: "Amount Details"
     },
     fields: {
-      txn_id: "Bank Ref ID",
+      txn_id: "Transaction ID",
       merchant_txn_id: "Transaction ID",
-      atom_txn_id: "Atom Txn ID",
+      atom_txn_id: "Atom Transaction ID",
       bank_ref_no: "Bank Ref. No",
       txn_date: "Transaction Date",
       amount: "Amount",

@@ -298,7 +298,8 @@
                     <div class="info-grid">
                         <div class="info-item"><div class="info-label">Academic Session</div><div class="info-value"><%= typeof academicYear !== 'undefined' ? academicYear.session : '-' %></div></div>
                         <div class="info-item"><div class="info-label">Course / Semester</div><div class="info-value"><%= course?.name || '-' %> / <%= semester?.name || '-' %></div></div>
-                        <div class="info-item"><div class="info-label">Transaction ID</div><div class="info-value"><%= payment.merchant_txn_id || '-' %></div></div>
+                        <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.txn_id %></div><div class="info-value"><%= user.transaction_id || '-' %></div></div>
+                        <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.atom_txn_id %></div><div class="info-value"><%= payment.atom_txn_id || '-' %></div></div>
                         <div class="info-item"><div class="info-label">Transaction Date</div><div class="info-value">
                             <% if (paymentDate) { %>
                                 <%= paymentDate %>

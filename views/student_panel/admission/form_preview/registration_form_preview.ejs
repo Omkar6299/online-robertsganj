@@ -753,6 +753,10 @@
                         <div class="label">Course / Semester</div>
                         <div class="value"><%= student.courseName ? student.courseName.name : '-' %> - <%= student.semsterName ? student.semsterName.name : '-' %></div>
                     </div>
+                    <div class="summary-card">
+                        <div class="label">Transaction ID</div>
+                        <div class="value"><%= student.user ? student.user.transaction_id : '-' %></div>
+                    </div>
                 </div>
 
                 <div class="section-card">
@@ -904,40 +908,7 @@
                     </div>
                 </div>
 
-                <div class="section-card">
-                    <div class="section-head">
-                        <h3 class="section-title">Payment Details</h3>
-                        <div class="section-subtitle">Fee transaction summary</div>
-                    </div>
-                    <div class="section-body">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th><%= fieldLabels.receipt.fields.atom_txn_id %></th>
-                                    <th><%= fieldLabels.receipt.fields.merchant_txn_id %></th>
-                                    <th><%= fieldLabels.receipt.fields.txn_date %></th>
-                                    <th><%= fieldLabels.receipt.fields.amount %></th>
-                                    <th><%= fieldLabels.receipt.fields.status %></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (typeof payment !== 'undefined' && payment && payment.merchant_txn_id) { %>
-                                    <tr>
-                                        <td><%= payment.atom_txn_id || '-' %></td>
-                                        <td><%= payment.merchant_txn_id %></td>
-                                        <td><%= (payment.transaction_date || payment.createdAt || payment.created_at) ? new Date(payment.transaction_date || payment.createdAt || payment.created_at).toLocaleString('en-IN') : '-' %></td>
-                                        <td>₹ <%= payment.amount %></td>
-                                        <td><%= payment.status || '-' %></td>
-                                    </tr>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="5" class="text-center">No payment details found</td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+
 
                 <div class="section-card">
                     <div class="section-head">

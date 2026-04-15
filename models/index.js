@@ -96,6 +96,9 @@ StudentDocument.belongsTo(Semester, { foreignKey: 'semester_id', as: 'semester' 
 
 Student.hasMany(StudentDocument, { foreignKey: 'student_id', as: 'documents' });
 
+// Payment associations
+Payment.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
 // Export all models
 export {
   User,

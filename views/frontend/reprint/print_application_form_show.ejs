@@ -741,6 +741,10 @@
                         <div class="label">Course / Semester</div>
                         <div class="value"><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></div>
                     </div>
+                    <div class="summary-card">
+                        <div class="label">Transaction ID</div>
+                        <div class="value"><%= student.user ? student.user.transaction_id : '-' %></div>
+                    </div>
                 </div>
 
                 <div class="section-card">
