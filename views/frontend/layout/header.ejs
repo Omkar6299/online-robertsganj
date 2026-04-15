@@ -34,7 +34,7 @@
     <div class="container">
         <!-- Brand hidden on desktop, toggle on mobile -->
         <a class="navbar-brand d-lg-none fw-bold" href="/">GWDC PORTAL</a>
-        
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -52,10 +52,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('admission_login*') ? 'active' : '' %>" href="/admission_login">
+                    <a class="nav-link" href="/admission_login">
                         <i class="bi bi-person-plus-fill"></i> Apply Online
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('reprint_payment_receipt*') ? 'active' : '' %>" href="/reprint_payment_receipt">
                         <i class="bi bi-receipt"></i> Reprint Receipt
@@ -69,6 +70,11 @@
                 <li class="nav-item">
                     <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('know_your_registration*') ? 'active' : '' %>" href="/know_your_registration">
                         <i class="bi bi-search"></i> Know Reg. No.
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('admission_login*') ? 'active' : '' %>" href="/admission_login">
+                        <i class="bi bi-person-lock"></i>Student Login
                     </a>
                 </li>
             </ul>
