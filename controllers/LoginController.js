@@ -913,7 +913,7 @@ export const registration_fees_payment_post = async (req, res) => {
         phone: value.phone,
         photo: existingStudent ? existingStudent.photo : null,
         sign: existingStudent ? existingStudent.sign : null,
-        photographsign_status: existingStudent ? (existingStudent.photo && existingStudent.sign ? '1' : '0') : '0'
+        photographsign_status: '0'
       };
 
       console.log('=== CREATING PAYMENT RECORD ===');
