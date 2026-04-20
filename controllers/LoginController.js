@@ -7,7 +7,7 @@ import Semester from '../models/Semester.js';
 import AcademicYear from '../models/AcademicYear.js';
 
 import { hashPassword } from '../utils/helpers.js';
-import { admissionLoginSchema, registrationFeesPaymentSchema } from '../validations/authValidation.js';
+import { admissionLoginSchema, registrationFeesPaymentSchema, studentLoginSchema } from '../validations/authValidation.js';
 import { handleError, flashValidationErrorsAndRender, flashErrorAndRedirect, flashSuccessAndRedirect, sendErrorResponse } from '../utils/responseHelper.js';
 import { sequelize } from '../config/database.js';
 import siteconfig from '../config/siteconfig.js';
@@ -205,6 +205,137 @@ export const admission_logout = (req, res) => {
   req.session.admission_name = null;
   flashSuccessAndRedirect(req, res, 'Logged out successfully.', '/admission_login');
 };
+
+export const student_login = (req, res) => {
+  res.render('frontend/auth/student_login', {
+    title: 'Student Login - Robertsganj'
+  });
+};
+
+export const student_login_post = async (req, res) => {
+  try {
+    const { error, value } = studentLoginSchema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+      const errors = error.details.map(detail => detail.message);
+      return flashValidationErrorsAndRender(req, res, errors, 'frontend/auth/student_login', {
+        title: 'Student Login'
+      });
+    }
+
+    const { registration_no, dob } = value;
+
+    // Convert dob to string format (YYYY-MM-DD) if it's a Date object
+    let dobString = dob;
+    if (dob instanceof Date) {
+      const year = dob.getFullYear();
+      const month = String(dob.getMonth() + 1).padStart(2, '0');
+      const day = String(dob.getDate()).padStart(2, '0');
+      dobString = `${year}-${month}-${day}`;
+    }
+
+    console.log('=== STUDENT LOGIN ATTEMPT ===');
+    console.log('Registration No:', registration_no);
+    console.log('DOB:', dobString);
+
+    // Step 1: Get active academic year first
+    const activeAcademicYear = await AcademicYear.findOne({
+      where: { status: 'Active' }
+    });
+
+    if (!activeAcademicYear) {
+      req.flash('error', 'No active academic year found. Please contact administrator.');
+      return res.render('frontend/auth/student_login', {
+        title: 'Student Login',
+        oldInput: req.body
+      });
+    }
+
+    // Step 2: Find student by registration_no, dob AND active academic year
+    // This solves the multi-session conflict by picking strictly for the current session
+    const student = await Student.findOne({
+      where: {
+        registration_no: registration_no,
+        dob: dobString,
+        academic_year: String(activeAcademicYear.id)
+      },
+      include: [{
+        model: User,
+        as: 'user'
+      }]
+    });
+
+    if (!student || !student.user) {
+      console.log('--- DEBUG: LOGIN FAILED ---');
+      console.log('Search Criteria:', { registration_no, dobString, active_year: activeAcademicYear.id });
+      
+      // Fallback search to provide better debug info to console
+      const anyStudentWithRegNo = await Student.findAll({
+        where: { registration_no: registration_no }
+      });
+      
+      if (anyStudentWithRegNo.length > 0) {
+        console.log(`Found ${anyStudentWithRegNo.length} record(s) for Registration NO: ${registration_no}`);
+        anyStudentWithRegNo.forEach((s, index) => {
+          console.log(`Record ${index + 1}: Session=${s.academic_year}, DOB in DB=${s.dob}`);
+        });
+        
+        // Specific mismatch detection
+        const sessionMismatch = anyStudentWithRegNo.some(s => s.academic_year !== String(activeAcademicYear.id));
+        const dobMismatch = anyStudentWithRegNo.some(s => s.academic_year === String(activeAcademicYear.id) && s.dob !== dobString);
+        
+        if (dobMismatch) {
+          console.log('RESULT: DOB Mismatch detected for the active session.');
+        } else if (sessionMismatch && anyStudentWithRegNo.every(s => s.academic_year !== String(activeAcademicYear.id))) {
+          console.log('RESULT: Student exists but NOT in the active session.');
+        }
+      } else {
+        console.log('RESULT: No student found with this Registration Number at all.');
+      }
+      console.log('---------------------------');
+
+      req.flash('error', 'Invalid Registration Number or Date of Birth for the active session.');
+      return res.render('frontend/auth/student_login', {
+        title: 'Student Login',
+        oldInput: req.body
+      });
+    }
+
+    const user = student.user;
+    console.log('User found via student:', { user_id: user.id, name: user.name });
+
+    // Step 3: Check if payment record exists with status 'Success' for this user
+    // Since each session has a separate User, we only search for payment for this specific user
+    const payment = await Payment.findOne({
+      where: {
+        user_id: String(user.id),
+        status: 'Success'
+      }
+    });
+
+    if (!payment) {
+      req.flash('error', 'Successful registration payment not found for the current session.');
+      return res.render('frontend/auth/student_login', {
+        title: 'Student Login',
+        oldInput: req.body
+      });
+    }
+
+    // All checks passed - allow login
+    console.log('=== ALL CHECKS PASSED - STUDENT LOGIN SUCCESSFUL ===');
+    req.session.admission_user_id = user.id;
+    req.session.admission_name = user.name;
+    flashSuccessAndRedirect(req, res, 'Login successful!', '/student/dashboard');
+
+  } catch (error) {
+    console.error('=== STUDENT LOGIN ERROR ===');
+    console.error(error);
+    handleError(req, res, error, 'An error occurred. Please try again.', null, 'frontend/auth/student_login', {
+      title: 'Student Login'
+    });
+  }
+};
+
 
 // Helper function to format date to DD-MM-YYYY
 const formatDateDDMMYYYY = (dateString) => {

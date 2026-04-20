@@ -23,6 +23,16 @@ export const admissionLoginSchema = Joi.object({
   })
 });
 
+export const studentLoginSchema = Joi.object({
+  registration_no: Joi.string().trim().required().messages({
+    'any.required': 'Registration number is required.'
+  }),
+  dob: Joi.date().required().messages({
+    'any.required': 'Date of birth is required.',
+    'date.base': 'Date of birth must be a valid date.'
+  })
+});
+
 export const registrationFeesPaymentSchema = Joi.object({
   registration_no: Joi.string().optional().allow('').messages({
     'string.base': 'Registration number must be a valid string.'

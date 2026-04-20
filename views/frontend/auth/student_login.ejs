@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../layout/css_link') %>
+    <title><%= typeof title !== 'undefined' ? title : 'Student Login' %></title>
+</head>
+<body>
+    <%- include('../layout/header') %>
+    <section>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0">Student Login</h4>
+                        </div>
+                        <div class="card-body">
+                            <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        <% errors.forEach(function(error) { %>
+                                            <li><%= error %></li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof error !== 'undefined' && error.length > 0) { %>
+                                <div class="alert alert-danger">
+                                    <%= error[0] %>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof success !== 'undefined' && success.length > 0) { %>
+                                <div class="alert alert-success">
+                                    <%= success[0] %>
+                                </div>
+                            <% } %>
+
+                            <form action="/student_login_post" method="POST" id="studentLoginForm">
+                                <div class="mb-3">
+                                    <label for="registration_no" class="form-label">Registration Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="registration_no" name="registration_no"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.registration_no ? oldInput.registration_no : '' %>"
+                                        placeholder="Enter your registration number" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="dob" name="dob"
+                                        value="<%= typeof oldInput !== 'undefined' && oldInput.dob ? oldInput.dob : '' %>"
+                                        required>
+                                    <small class="form-text text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Select your Date of Birth as per records
+                                    </small>
+                                </div>
+
+                                <div class="d-grid mb-3">
+                                    <button type="submit" class="btn btn-success btn-lg" id="loginBtn">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Student Dashboard Login
+                                    </button>
+                                </div>
+
+                                <div class="row g-2 mt-2 border-top pt-3">
+                                    <div class="col-6">
+                                        <a href="/print_application_form" class="btn btn-outline-info btn-sm w-100">
+                                            <i class="bi bi-printer me-1"></i> Reprint Form
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="/know_your_registration" class="btn btn-outline-info btn-sm w-100">
+                                            <i class="bi bi-search me-1"></i> Know Reg No
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <%- include('../layout/footer') %>
+    <%- include('../layout/script_link') %>
+</body>
+</html>
