@@ -68,11 +68,17 @@ export const initiatePayment = async (req, res) => {
         // DYNAMIC FEE CALCULATION
         let feeAmount = 0;
         try {
+            console.log('Initiating fee calculation for student:', student.id, 'Session:', activeYear.id, 'Metadata:', {
+                course: student.course_id,
+                category: student.category,
+                gender: student.gender,
+                sem: targetSemesterId
+            });
             feeAmount = await FeeService.getCalculatedFee(student, targetSemesterId);
         } catch (feeError) {
-            // Block payment if fee calculation fails
+            console.error('Fee Calculation Error for Student ID:', student.id, 'Error:', feeError.message);
             await t.rollback();
-            return flashErrorAndRedirect(req, res, 'Could not calculate your admission fee. Please contact administrator.', '/student/dashboard');
+            return flashErrorAndRedirect(req, res, feeError.message || 'Could not calculate your admission fee. Please contact administrator.', '/student/dashboard');
         }
 
         // Generate unique admission transaction ID
