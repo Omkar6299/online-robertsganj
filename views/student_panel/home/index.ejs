@@ -15,9 +15,17 @@
                             <h4 class="mb-0">Student Dashboard</h4>
                         </div>
                         <div class="card-body">
-                            <% if (typeof success !== 'undefined' && success.length > 0) { %>
-                                <div class="alert alert-success">
-                                    <%= success[0] %>
+                             <% if (typeof success !== 'undefined' && success.length > 0) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i><%= success[0] %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
+
+                            <% if (typeof error !== 'undefined' && error.length > 0) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i><%= error[0] %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             <% } %>
 

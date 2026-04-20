@@ -15,11 +15,11 @@ class FeeService {
             // Validate basic required student data
             if (!student.course_id || !student.category || !student.gender) {
                 const missingFields = [];
-                if (!student.course_id) missingFields.push('course_id');
-                if (!student.category) missingFields.push('category');
-                if (!student.gender) missingFields.push('gender');
+                if (!student.course_id) missingFields.push('Course');
+                if (!student.category) missingFields.push('Category/Caste');
+                if (!student.gender) missingFields.push('Gender');
                 
-                throw new Error(`Critical student metadata missing: ${missingFields.join(', ')}`);
+                throw new Error(`Critical student metadata missing: ${missingFields.join(', ')}. Please update your profile.`);
             }
 
             // Compile subject IDs for practical fee calculation (as per user request: major1, major2, minor)

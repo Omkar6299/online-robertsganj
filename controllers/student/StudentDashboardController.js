@@ -93,9 +93,7 @@ export const index = async (req, res) => {
             admissionPayment: currentAdmissionPayment,
             nextSemester,
             nextSemesterPayment,
-            activeYear,
-            success: req.flash('success'),
-            error: req.flash('error')
+            activeYear
         });
     } catch (error) {
         console.error('Dashboard Error:', error);

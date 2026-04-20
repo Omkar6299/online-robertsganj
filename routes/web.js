@@ -99,6 +99,8 @@ router.get('/payment/failed', PaymentController.paymentFailed);
 
 router.get('/admission_login', LoginController.admission_login);
 router.post('/admission_login_post', LoginController.admission_login_post);
+router.get('/student_login', LoginController.student_login);
+router.post('/student_login_post', LoginController.student_login_post);
 
 // Reprint routes
 router.get('/reprint_payment_receipt', ReprintController.reprintPaymentReceipt);

@@ -215,9 +215,7 @@ export const registrationForm = async (req, res) => {
             previousStudent,
             stepsOrder,
             oldInput: req.flash('oldInput')[0] || {},
-            currentYear,
-            error: req.flash('error'),
-            success: req.flash('success')
+            currentYear
         });
     } catch (error) {
         handleError(req, res, error, 'An error occurred while loading registration form.', '/student/dashboard');
