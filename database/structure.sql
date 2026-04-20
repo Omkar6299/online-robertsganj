@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `students` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` BIGINT UNSIGNED NOT NULL,
   `student_id` VARCHAR(255) DEFAULT NULL COMMENT 'Common unique identifier across years',
-  `registration_no` VARCHAR(255) UNIQUE,
+  `registration_no` VARCHAR(255),
   `course_type_id` BIGINT UNSIGNED NOT NULL,
   `course_id` BIGINT UNSIGNED NOT NULL,
   `year` VARCHAR(255) NOT NULL,
