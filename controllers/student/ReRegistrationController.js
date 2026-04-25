@@ -117,7 +117,11 @@ export const reRegister = async (req, res) => {
         // Update session to use the NEW user ID
         req.session.admission_user_id = newUser.id;
 
-        flashSuccessAndRedirect(req, res, `Successfully registered for ${activeYear.session}. Please complete subject selection and pay the admission fee.`, '/student/dashboard');
+        // Save session before redirecting to avoid race conditions
+        req.session.save((err) => {
+            if (err) console.error('Session save error during re-registration:', err);
+            flashSuccessAndRedirect(req, res, `Successfully registered for ${activeYear.session}. Please complete subject selection and pay the admission fee.`, '/student/dashboard');
+        });
 
     } catch (error) {
         if (t) await t.rollback();

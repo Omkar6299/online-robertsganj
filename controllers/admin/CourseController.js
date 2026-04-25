@@ -52,7 +52,7 @@ export const store = async (req, res) => {
       });
     }
 
-    const { course_type_id, course_name, status, is_major1_required, is_major2_required, is_minor_required } = value;
+    const { course_type_id, course_name, status } = value;
     const baseSlug = generateSlug(course_name);
     const slug = await generateUniqueSlug(Course, baseSlug);
 
@@ -60,10 +60,7 @@ export const store = async (req, res) => {
       course_type_id: String(course_type_id),
       name: course_name,
       slug: slug,
-      status: status,
-      is_major1_required: is_major1_required || '0',
-      is_major2_required: is_major2_required || '0',
-      is_minor_required: is_minor_required || '0'
+      status: status
     });
 
     flashSuccessAndRedirect(req, res, 'Course created successfully.', '/admin/courses');
@@ -115,7 +112,7 @@ export const update = async (req, res) => {
       return res.redirect(`/admin/courses/${id}/edit`);
     }
 
-    const { course_type_id, course_name, status, is_major1_required, is_major2_required, is_minor_required } = value;
+    const { course_type_id, course_name, status } = value;
     const baseSlug = generateSlug(course_name);
     const slug = await generateUniqueSlug(Course, baseSlug, id);
 
@@ -123,10 +120,7 @@ export const update = async (req, res) => {
       course_type_id: String(course_type_id),
       name: course_name,
       slug: slug,
-      status: status,
-      is_major1_required: is_major1_required || '0',
-      is_major2_required: is_major2_required || '0',
-      is_minor_required: is_minor_required || '0'
+      status: status
     })
 
     flashSuccessAndRedirect(req, res, 'Course updated successfully.', '/admin/courses');

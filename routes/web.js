@@ -22,6 +22,7 @@ import * as DocumentTypeController from '../controllers/admin/DocumentTypeContro
 import * as CourseSemesterDocumentController from '../controllers/admin/CourseSemesterDocumentController.js';
 import * as AcademicYearController from '../controllers/admin/AcademicYearController.js';
 import * as SettingController from '../controllers/admin/SettingController.js';
+import * as PaymentManagementController from '../controllers/admin/PaymentManagementController.js';
 import { isAdmin } from '../middleware/isAdmin.js';
 import { isSuperAdmin } from '../middleware/isSuperAdmin.js';
 import { checkAdmissionLogin } from '../middleware/checkAdmissionLogin.js';
@@ -480,6 +481,11 @@ router.post('/admin/academic-years/:id', isSuperAdmin, (req, res, next) => {
   if (req.body._method === 'PATCH') return AcademicYearController.activate(req, res, next);
   res.redirect('/admin/academic-years');
 });
+
+// Admin Payment Management routes
+router.get('/admin/payments/sync', isSuperAdmin, PaymentManagementController.syncView);
+router.post('/admin/payments/sync', isSuperAdmin, PaymentManagementController.syncTransactionStatus);
+router.get('/admin/payments/fetch-student-details', isSuperAdmin, PaymentManagementController.fetchStudentDetails);
 
 export default router;
 

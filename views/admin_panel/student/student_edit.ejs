@@ -207,11 +207,10 @@
                             </div>
                         </div>
 
-                        <!-- 3. Mailing Address -->
+                        <!-- 3. Address Details -->
                         <div class="section-card">
                             <div class="section-header"><i class="bi bi-geo-alt-fill"></i> Address Details</div>
                             <div class="card-body">
-                                <!-- Hidden fields to store pre-filled values for JS to pick up -->
                                 <input type="hidden" id="saved_corr_state" value="<%= student.mailing_state || '' %>">
                                 <input type="hidden" id="saved_corr_district" value="<%= student.mailing_district || '' %>">
                                 <input type="hidden" id="saved_perm_state" value="<%= student.permanent_state || '' %>">
@@ -291,7 +290,7 @@
                             </div>
                         </div>
 
-                        <!-- 4. Other / Family Details -->
+                        <!-- 4. Family & Other Details -->
                         <div class="section-card">
                             <div class="section-header"><i class="bi bi-people-fill"></i> Family & Other Details</div>
                             <div class="card-body">
@@ -380,14 +379,14 @@
                             <div class="card-body">
                                 <div class="row g-3">
                                     <!-- Major Subject 1 -->
-                                    <% if (student.courseName && student.courseName.is_major1_required == '1') { %>
+                                    <% if (student.semsterName && student.semsterName.is_major1_enabled == 1) { %>
                                     <div class="col-md-6">
                                         <label class="form-label">Major Subject 1 <span class="text-danger">*</span></label>
-                                        <select class="form-select subject-select" name="major1_id" required>
+                                        <select class="form-select subject-select" name="major1_id" id="major1_id" required>
                                             <option value="">-- Select Major Subject 1 --</option>
                                             <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
                                                 <% subjects.forEach(function(subject) { %>
-                                                    <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major1_id == subject.id ? 'selected' : '' %>>
+                                                    <option value="<%= subject.id %>" data-name="<%= subject.subject_name %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major1_id == subject.id ? 'selected' : '' %>>
                                                         <%= subject.subject_name %>
                                                     </option>
                                                 <% }); %>
@@ -397,14 +396,14 @@
                                     <% } %>
 
                                     <!-- Major Subject 2 -->
-                                    <% if (student.courseName && student.courseName.is_major2_required == '1') { %>
+                                    <% if (student.semsterName && student.semsterName.is_major2_enabled == 1) { %>
                                     <div class="col-md-6">
                                         <label class="form-label">Major Subject 2 <span class="text-danger">*</span></label>
-                                        <select class="form-select subject-select" name="major2_id" required>
+                                        <select class="form-select subject-select" name="major2_id" id="major2_id" required>
                                             <option value="">-- Select Major Subject 2 --</option>
                                             <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
                                                 <% subjects.forEach(function(subject) { %>
-                                                    <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major2_id == subject.id ? 'selected' : '' %>>
+                                                    <option value="<%= subject.id %>" data-name="<%= subject.subject_name %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major2_id == subject.id ? 'selected' : '' %>>
                                                         <%= subject.subject_name %>
                                                     </option>
                                                 <% }); %>
@@ -414,14 +413,14 @@
                                     <% } %>
 
                                     <!-- Minor Subject -->
-                                    <% if (student.courseName && student.courseName.is_minor_required == '1') { %>
+                                    <% if (student.semsterName && student.semsterName.is_minor_enabled == 1) { %>
                                     <div class="col-md-6">
                                         <label class="form-label">Minor Subject <span class="text-danger">*</span></label>
-                                        <select class="form-select subject-select" name="minor_id" required>
+                                        <select class="form-select subject-select" name="minor_id" id="minor_id" required>
                                             <option value="">-- Select Minor Subject --</option>
                                             <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
                                                 <% subjects.forEach(function(subject) { %>
-                                                    <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.minor_id == subject.id ? 'selected' : '' %>>
+                                                    <option value="<%= subject.id %>" data-name="<%= subject.subject_name %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.minor_id == subject.id ? 'selected' : '' %>>
                                                         <%= subject.subject_name %>
                                                     </option>
                                                 <% }); %>
@@ -430,8 +429,20 @@
                                     </div>
                                     <% } %>
 
+                                    <!-- Research Project -->
+                                    <% if (student.semsterName && student.semsterName.is_research_project_enabled == 1) { %>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-primary fw-bold">Research Project <span class="text-danger">*</span></label>
+                                        <select class="form-select border-primary" name="research_project_id" id="research_project_id" required>
+                                            <option value="">-- Select Research Project (From Major 1/2) --</option>
+                                            <!-- Dynamically populated from Major 1 and Major 2 -->
+                                        </select>
+                                        <small class="text-muted">Research project must be selected from Major 1 or Major 2.</small>
+                                    </div>
+                                    <% } %>
+
                                     <!-- Skill Development -->
-                                    <% if (student.semsterName && student.semsterName.is_skill_required == 1) { %>
+                                    <% if (student.semsterName && (student.semsterName.is_skill_required == 1 || student.semsterName.is_skill_required == '1')) { %>
                                     <div class="col-md-6">
                                         <label class="form-label">Skill Development Course <span class="text-danger">*</span></label>
                                         <select class="form-select" name="skill_id" required>
@@ -448,7 +459,7 @@
                                     <% } %>
 
                                     <!-- Co-Curricular -->
-                                    <% if (student.semsterName && student.semsterName.is_cocurricular_required == 1) { %>
+                                    <% if (student.semsterName && (student.semsterName.is_cocurricular_required == 1 || student.semsterName.is_cocurricular_required == '1')) { %>
                                     <div class="col-md-6">
                                         <label class="form-label">Co-Curricular Course <span class="text-danger">*</span></label>
                                         <select class="form-select" name="cocurricular_id" required>
@@ -651,18 +662,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof $ === 'undefined') {
-                console.error('jQuery is not loaded! Cannot initialize address dropdowns.');
+                console.error('jQuery is not loaded!');
                 return;
             }
             $(document).ready(function() {
-                // Initialize Select2 if available
                 if ($.fn.select2) {
                     $('.select2').select2({ theme: 'bootstrap-5' });
                 }
 
                 const BASE_URL = '';
 
-                // Load States
                 function loadStates(dropdownId, selectedValue) {
                     $.ajax({
                         url: `${BASE_URL}/locations/states`,
@@ -674,16 +683,13 @@
                                 states.forEach(state => {
                                     options += `<option value="${state.name}" ${selectedValue == state.name ? 'selected' : ''}>${state.name}</option>`;
                                 });
-                                
                                 const $dropdown = $(`#${dropdownId}`);
                                 $dropdown.html(options);
                                 if ($.fn.select2) $dropdown.trigger('change.select2');
-
                                 if (selectedValue) {
                                     let districtId = dropdownId.replace('_state', '_district');
                                     let savedDistrictTag = dropdownId.includes('permanent') ? 'saved_perm_district' : 'saved_corr_district';
                                     let savedDistrict = $(`#${savedDistrictTag}`).val();
-
                                     $(`#${districtId}`).prop('disabled', false);
                                     loadDistricts(districtId, selectedValue, savedDistrict);
                                 }
@@ -692,19 +698,15 @@
                     });
                 }
 
-                // Load Districts
                 function loadDistricts(dropdownId, stateId, selectedValue) {
                     const $districtSelect = $(`#${dropdownId}`);
-
                     if (!stateId) {
                         $districtSelect.html('<option value="">-- Select District --</option>').prop('disabled', true);
                         if ($.fn.select2) $districtSelect.trigger('change.select2');
                         return;
                     }
-
                     $districtSelect.prop('disabled', false).html('<option value="">Loading...</option>');
                     if ($.fn.select2) $districtSelect.trigger('change.select2');
-
                     $.ajax({
                         url: `${BASE_URL}/locations/districts`,
                         method: 'GET',
@@ -723,25 +725,20 @@
                     });
                 }
 
-                // Initial Load
                 loadStates('permanent_state', $('#saved_perm_state').val());
                 loadStates('correspondence_state', $('#saved_corr_state').val());
 
-                // Event Listeners
-                $('#permanent_state').on('change', function() {
-                    loadDistricts('permanent_district', $(this).val(), null);
-                });
+                $('#permanent_state').on('change', function() { loadDistricts('permanent_district', $(this).val(), null); });
+                $('#correspondence_state').on('change', function() { loadDistricts('correspondence_district', $(this).val(), null); });
 
-                $('#correspondence_state').on('change', function() {
-                    loadDistricts('correspondence_district', $(this).val(), null);
-                });
-
-                // Subject dropdown uniqueness logic
-                const major1Select = document.querySelector('select[name="major1_id"]');
-                const major2Select = document.querySelector('select[name="major2_id"]');
-                const minorSelect = document.querySelector('select[name="minor_id"]');
+                // Subject dropdown logic
+                const major1Select = document.getElementById('major1_id');
+                const major2Select = document.getElementById('major2_id');
+                const minorSelect = document.getElementById('minor_id');
+                const researchSelect = document.getElementById('research_project_id');
 
                 const selects = [major1Select, major2Select, minorSelect].filter(el => el !== null);
+                const selectedResearchId = '<%= typeof selectedSubjects !== "undefined" ? selectedSubjects.research_project_id : "" %>';
 
                 function updateOptions() {
                     selects.forEach(select => {
@@ -750,36 +747,44 @@
                             const isSelectedInOther = selects.some(otherSelect => {
                                 return otherSelect !== select && otherSelect.value === option.value && otherSelect.value !== "";
                             });
-                            if (isSelectedInOther) {
-                                option.disabled = true;
-                            } else {
-                                option.disabled = false;
-                            }
+                            option.disabled = isSelectedInOther;
                         });
                     });
+
+                    if (researchSelect) {
+                        const currentResearchVal = researchSelect.value || selectedResearchId;
+                        researchSelect.innerHTML = '<option value="">-- Select Research Project (From Major 1/2) --</option>';
+                        const sourceSelects = [major1Select, major2Select].filter(el => el !== null);
+                        sourceSelects.forEach(source => {
+                            if (source.value) {
+                                const optionText = source.options[source.selectedIndex].getAttribute('data-name');
+                                const newOpt = document.createElement('option');
+                                newOpt.value = source.value;
+                                newOpt.textContent = optionText;
+                                if (source.value == currentResearchVal) newOpt.selected = true;
+                                researchSelect.appendChild(newOpt);
+                            }
+                        });
+                        researchSelect.disabled = (researchSelect.options.length <= 1);
+                    }
                 }
 
                 selects.forEach(select => select.addEventListener('change', updateOptions));
                 updateOptions();
 
-                // Educational auto-calculation logic
+                // Educational logic
                 const selectors = document.querySelectorAll('.mark-type-selector');
-
                 function calculateMarks(qualId) {
                     const totalInput = document.getElementById(`total_marks_${qualId}`);
                     const obtainedInput = document.getElementById(`obtained_marks_${qualId}`);
                     const percentageInput = document.getElementById(`percentage_${qualId}`);
                     const cgpaInput = document.getElementById(`cgpa_${qualId}`);
-
                     if (!totalInput || !obtainedInput) return;
-
                     const total = parseFloat(totalInput.value);
                     const obtained = parseFloat(obtainedInput.value);
-
                     if (!isNaN(total) && !isNaN(obtained) && total > 0) {
                         const percentage = (obtained / total) * 100;
                         if (percentageInput) percentageInput.value = percentage.toFixed(2);
-
                         const cgpa = percentage / 9.5;
                         const cappedCGPA = Math.min(cgpa, 10);
                         if (cgpaInput) cgpaInput.value = cappedCGPA.toFixed(2);
@@ -790,14 +795,12 @@
                     const qualId = selector.getAttribute('data-qual-id');
                     const totalInput = document.getElementById(`total_marks_${qualId}`);
                     const obtainedInput = document.getElementById(`obtained_marks_${qualId}`);
-
                     if (totalInput) totalInput.addEventListener('input', () => calculateMarks(qualId));
                     if (obtainedInput) obtainedInput.addEventListener('input', () => calculateMarks(qualId));
 
                     selector.addEventListener('change', function() {
                         const status = this.getAttribute('data-status');
                         const isRequired = status === 'required';
-
                         const percentageContainer = document.querySelector(`.percentage-container-${qualId}`);
                         const cgpaContainer = document.querySelector(`.cgpa-container-${qualId}`);
                         const percentageInput = document.getElementById(`percentage_${qualId}`);
@@ -814,11 +817,8 @@
                             if (cgpaInput) cgpaInput.removeAttribute('required');
                             if (isRequired && percentageInput) percentageInput.setAttribute('required', 'required');
                         }
-
                         calculateMarks(qualId);
                     });
-
-                    // Initial calculate on load
                     calculateMarks(qualId);
                 });
             });

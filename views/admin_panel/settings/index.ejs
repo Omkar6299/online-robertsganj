@@ -47,7 +47,7 @@
                                                 <div class="col-md-6 col-lg-4">
                                                     <div class="form-group">
                                                         <label class="form-label fw-bold"><%= setting.display_name %></label>
-                                                        
+
                                                         <% if (setting.type === 'boolean') { %>
                                                             <select name="settings[<%= setting.key %>]" class="form-select">
                                                                 <option value="true" <%= setting.value === 'true' ? 'selected' : '' %>>True</option>
@@ -55,7 +55,6 @@
                                                             </select>
                                                         <% } else if (setting.type === 'select' && setting.key === 'atom_environment') { %>
                                                             <select name="settings[<%= setting.key %>]" class="form-select">
-                                                                <option value="demo" <%= setting.value === 'demo' ? 'selected' : '' %>>Demo</option>
                                                                 <option value="live" <%= setting.value === 'live' ? 'selected' : '' %>>Live</option>
                                                             </select>
                                                         <% } else if (setting.type === 'number') { %>
@@ -63,7 +62,7 @@
                                                         <% } else { %>
                                                             <input type="text" name="settings[<%= setting.key %>]" value="<%= setting.value %>" class="form-control">
                                                         <% } %>
-                                                        
+
                                                         <% if (setting.description) { %>
                                                             <small class="form-text text-muted mt-1 d-block"><%= setting.description %></small>
                                                         <% } %>

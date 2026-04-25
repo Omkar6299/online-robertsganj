@@ -189,7 +189,12 @@ export const admission_login_post = async (req, res) => {
 
     req.session.admission_user_id = user.id;
     req.session.admission_name = user.name;
-    flashSuccessAndRedirect(req, res, 'Login successful! You can now proceed with your admission form.', '/student/dashboard');
+    
+    // Save session before redirecting to avoid race conditions
+    req.session.save((err) => {
+      if (err) console.error('Session save error:', err);
+      flashSuccessAndRedirect(req, res, 'Login successful! You can now proceed with your admission form.', '/student/dashboard');
+    });
   } catch (error) {
     console.error('=== ADMISSION LOGIN ERROR ===');
     console.error('Error:', error);
@@ -325,7 +330,12 @@ export const student_login_post = async (req, res) => {
     console.log('=== ALL CHECKS PASSED - STUDENT LOGIN SUCCESSFUL ===');
     req.session.admission_user_id = user.id;
     req.session.admission_name = user.name;
-    flashSuccessAndRedirect(req, res, 'Login successful!', '/student/dashboard');
+
+    // Save session before redirecting to avoid race conditions
+    req.session.save((err) => {
+      if (err) console.error('Session save error:', err);
+      flashSuccessAndRedirect(req, res, 'Login successful!', '/student/dashboard');
+    });
 
   } catch (error) {
     console.error('=== STUDENT LOGIN ERROR ===');
@@ -614,13 +624,14 @@ export const registration_fees_payment_post = async (req, res) => {
       const merchTxnId = await generateUniqueTransactionId(t);
       console.log('Generated unique 10-digit transaction ID:', merchTxnId);
       const amount = res.locals.siteSettings?.registration_amount || siteconfig.registration_amount;
-      const login = siteconfig.atom_login;
-      const password = siteconfig.atom_password;
-      const prod_id = siteconfig.atom_product_id;
-      const encRequestKey = siteconfig.atom_encryption_key;
-      const decResponseKey = siteconfig.atom_decryption_key;
-      const api_url = siteconfig.atom_api_url;
-
+      const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
+      let regProductId = res.locals.siteSettings?.registration_product_id || siteconfig.atom_registration_product_id || 'GOVTPGCOLLEGE';
+      
+      // Atom Demo environment only supports 'AIPAY' product ID
+      if (environment === 'demo') {
+        regProductId = 'AIPAY';
+      }
+      
       const hashedPassword = await hashPassword(value.phone);
       let user;
       let student;
@@ -1177,6 +1188,14 @@ export const initiatePayment = async (req, res) => {
     // Prepare payment data using PaymentService
     // Prepare payment data using PaymentService - Use amount from payment record (e.g. 500)
     const amount = payment.amount || siteconfig.registration_amount;
+    const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
+    let regProductId = res.locals.siteSettings?.registration_product_id || siteconfig.atom_registration_product_id || 'GOVTPGCOLLEGE';
+
+    // Atom Demo environment only supports 'AIPAY' product ID
+    if (environment === 'demo') {
+      regProductId = 'AIPAY';
+    }
+
     // Get APP_URL and ensure no trailing slash, then append route
     const baseUrl = (process.env.APP_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, '');
     const returnUrl = `${baseUrl}/payment/response`;
@@ -1189,6 +1208,8 @@ export const initiatePayment = async (req, res) => {
       email: registrationData.email || user.email || 'dummy@email.com',
       mobile: registrationData.phone || user.phone || '9999999999',
       returnUrl: returnUrl,
+      environment: environment,
+      prodId: regProductId,
       udf1: registrationData.registration_no || '',                        // Registration No
       udf2: transaction_id,                                                  // Merchant Transaction ID
       udf3: String(user.id || ''),                                           // User ID
@@ -1238,7 +1259,7 @@ export const initiatePayment = async (req, res) => {
       title: 'Redirecting to Payment Gateway',
       data: payData,
       atomTokenId: atomTokenId,
-      atomEnvironment: siteconfig.atom_environment || 'demo'
+      atomEnvironment: environment
     });
   } catch (error) {
     console.error('Payment initiation error:', error);
@@ -1360,4 +1381,3 @@ export const generateRegistrationNumber = async (courseId, transaction = null) =
 const createTokenId = async (data) => {
   return await PaymentService.createTokenId(data);
 };
-

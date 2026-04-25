@@ -24,6 +24,20 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Helper to extract S3 key from URL
+const getS3Key = (url) => {
+    if (!url) return null;
+    try {
+        const urlObj = new URL(url);
+        // For standard S3 URLs (https://bucket.s3.region.amazonaws.com/key)
+        // pathname will be /key
+        return decodeURIComponent(urlObj.pathname.substring(1));
+    } catch (e) {
+        // If it's not a valid URL, it might already be a key or a local path
+        return url;
+    }
+};
+
 export const registrationForm = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
@@ -77,6 +91,7 @@ export const registrationForm = async (req, res) => {
             major1_id: student.major1_id || (previousStudent ? previousStudent.major1_id : null),
             major2_id: student.major2_id || (previousStudent ? previousStudent.major2_id : null),
             minor_id: student.minor_id || (previousStudent ? previousStudent.minor_id : null),
+            research_project_id: student.research_project_id,
             skill_id: student.skill_id, // Skill is semester-specific, don't auto-fill from previous
             cocurricular_id: student.cocurricular_id // Co-curricular is semester-specific
         };
@@ -411,9 +426,11 @@ export const educationalDetailsPost = async (req, res) => {
                         school_name: qual_name[qualId], // Using school_name to store qualification name as requested
                         board_name: board[qualId],
                         year_of_passing: year[qualId],
-                        percentage: percentage[qualId] || null,
-                        cgpa: cgpa ? cgpa[qualId] : null,
-                        mark_type: mark_type ? mark_type[qualId] : null,
+                        percentage: (total_marks && obtained_marks && total_marks[qualId] && obtained_marks[qualId]) 
+                            ? ((parseFloat(obtained_marks[qualId]) / parseFloat(total_marks[qualId])) * 100).toFixed(2)
+                            : null,
+                        cgpa: null,
+                        mark_type: 'Percentage',
                         total_marks: total_marks ? total_marks[qualId] : null,
                         obtained_marks: obtained_marks ? obtained_marks[qualId] : null,
                         roll_no: roll_no[qualId],
@@ -448,7 +465,7 @@ export const educationalDetailsPost = async (req, res) => {
 export const subjectDetailsPost = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
-        const { major1_id, major2_id, minor_id, skill_id, cocurricular_id } = req.body;
+        const { major1_id, major2_id, minor_id, research_project_id, skill_id, cocurricular_id } = req.body;
 
         // Get active academic year
         const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
@@ -481,6 +498,7 @@ export const subjectDetailsPost = async (req, res) => {
             major1_id: major1_id || null,
             major2_id: major2_id || null,
             minor_id: minor_id || null,
+            research_project_id: research_project_id || null,
             skill_id: skill_id || null,
             cocurricular_id: cocurricular_id || null
         };
@@ -543,7 +561,6 @@ export const otherDetailsPost = async (req, res) => {
 
         const {
             father_occupation, mother_occupation, family_annual_income, income_certificate_no,
-            bank_name, bank_account_no, ifsc_code,
             computer_literate, extracurricular_activity, is_previous_student,
             disability_percentage, year_gap, year_gap_after_inter, gap_reason
         } = req.body;
@@ -554,9 +571,6 @@ export const otherDetailsPost = async (req, res) => {
             mother_occupation,
             family_annual_income,
             income_certificate_no,
-            bank_name,
-            bank_account_no,
-            ifsc_code,
             computer_literate,
             extracurricular_activity,
             is_previous_student,
@@ -728,9 +742,16 @@ export const photoSignPost = async (req, res) => {
 
                     if (oldDoc) {
                         try {
-                            // Deletion logic (Simplified: Actual deletion from S3/FS depends on storageType)
                             if (oldDoc.storage_type === 'S3') {
-                                // Add S3 deletion logic here if needed
+                                const { s3, DeleteObjectCommand } = await import('../middleware/uploadMiddleware.js');
+                                const key = getS3Key(oldDoc.file_path);
+                                if (key) {
+                                    await s3.send(new DeleteObjectCommand({
+                                        Bucket: process.env.AWS_BUCKET_NAME,
+                                        Key: key
+                                    }));
+                                    console.log(`Deleted old S3 file: ${key}`);
+                                }
                             } else {
                                 const fullPath = path.join(process.cwd(), 'public', oldDoc.file_path);
                                 if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
@@ -868,6 +889,7 @@ export const printApplicationForm = async (req, res) => {
                 { model: Subject, as: 'major1' },
                 { model: Subject, as: 'major2' },
                 { model: Subject, as: 'minor' },
+                { model: Subject, as: 'researchProject' },
                 { model: Skills, as: 'skill' },
                 { model: Cocurricular, as: 'cocurricular' },
                 { 

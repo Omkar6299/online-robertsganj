@@ -37,6 +37,7 @@ Student.belongsTo(AcademicYear, { foreignKey: 'academic_year', as: 'academicYear
 Student.belongsTo(Subject, { foreignKey: 'major1_id', as: 'major1' });
 Student.belongsTo(Subject, { foreignKey: 'major2_id', as: 'major2' });
 Student.belongsTo(Subject, { foreignKey: 'minor_id', as: 'minor' });
+Student.belongsTo(Subject, { foreignKey: 'research_project_id', as: 'researchProject' });
 Student.belongsTo(Skills, { foreignKey: 'skill_id', as: 'skill' });
 Student.belongsTo(Cocurricular, { foreignKey: 'cocurricular_id', as: 'cocurricular' });
 

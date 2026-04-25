@@ -374,7 +374,7 @@
 
         .subject-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px 16px;
             font-size: 11px;
         }
@@ -696,10 +696,6 @@
                             return !['photo', 'signature', 'sign'].includes(code);
                         });
                     }
-
-                    let majors = [];
-                    if (student.major1 && student.major1.subject_name) majors.push(student.major1.subject_name);
-                    if (student.major2 && student.major2.subject_name) majors.push(student.major2.subject_name);
                 %>
 
                 <div class="top-meta">
@@ -782,14 +778,34 @@
                                 <div class="subject-box">
                                     <div class="subject-title">Subject Selection</div>
                                     <div class="subject-grid">
-                                        <div><span>Major Subject 1:</span> <strong><%= majors[0] || 'N/A' %></strong></div>
-                                        <div><span>Major Subject 2:</span> <strong><%= majors[1] || 'N/A' %></strong></div>
-                                        <div><span>Minor Subject:</span> <strong><%= student.minor && student.minor.subject_name ? student.minor.subject_name : 'N/A' %></strong></div>
-                                        <div><span>Skill Development:</span> <strong><%= student.skill && student.skill.name ? student.skill.name : 'N/A' %></strong></div>
-                                        <div><span>Co-Curricular:</span> <strong><%= student.cocurricular && student.cocurricular.name ? student.cocurricular.name : 'N/A' %></strong></div>
-                                        <div><span>Previous Student:</span> <strong><%= student.is_previous_student || 'No' %></strong></div>
+                                        <% if (student.semsterName && student.semsterName.is_major1_enabled == 1) { %>
+                                            <div><span>Major 1:</span> <strong><%= (student.major1 && student.major1.subject_name) ? student.major1.subject_name : 'N/A' %></strong></div>
+                                        <% } %>
+                                        
+                                        <% if (student.semsterName && student.semsterName.is_major2_enabled == 1) { %>
+                                            <div><span>Major 2:</span> <strong><%= (student.major2 && student.major2.subject_name) ? student.major2.subject_name : 'N/A' %></strong></div>
+                                        <% } %>
+                                        
+                                        <% if (student.semsterName && student.semsterName.is_minor_enabled == 1) { %>
+                                            <div><span>Minor:</span> <strong><%= (student.minor && student.minor.subject_name) ? student.minor.subject_name : 'N/A' %></strong></div>
+                                        <% } %>
+                                        
+                                        <% if (student.semsterName && student.semsterName.is_research_project_enabled == 1) { %>
+                                            <div><span>Research Project:</span> <strong><%= (student.researchProject && student.researchProject.subject_name) ? student.researchProject.subject_name : 'N/A' %></strong></div>
+                                        <% } %>
+
+                                        <% if (student.semsterName && (student.semsterName.is_skill_required == 1 || student.semsterName.is_skill_required == '1')) { %>
+                                            <div><span>Skill:</span> <strong><%= (student.skill && student.skill.name) ? student.skill.name : 'N/A' %></strong></div>
+                                        <% } %>
+
+                                        <% if (student.semsterName && (student.semsterName.is_cocurricular_required == 1 || student.semsterName.is_cocurricular_required == '1')) { %>
+                                            <div><span>Co-Curricular:</span> <strong><%= (student.cocurricular && student.cocurricular.name) ? student.cocurricular.name : 'N/A' %></strong></div>
+                                        <% } %>
+                                        
+                                        <div><span>Prev. Student:</span> <strong><%= student.is_previous_student || 'No' %></strong></div>
                                     </div>
                                 </div>
+
                                 <div class="subject-box" style="margin-top: 8px;">
                                     <div class="subject-title">Bank Account Details</div>
                                     <div class="info-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
@@ -798,11 +814,11 @@
                                             <div class="info-value"><%= student.bank_name || '-' %></div>
                                         </div>
                                         <div class="info-item">
-                                            <div class="info-label"><%= fieldLabels.application.fields.bank_account_no %></div>
+                                            <div class="info-label">Account No</div>
                                             <div class="info-value"><%= student.bank_account_no || '-' %></div>
                                         </div>
                                         <div class="info-item">
-                                            <div class="info-label"><%= fieldLabels.application.fields.ifsc_code %></div>
+                                            <div class="info-label">IFSC Code</div>
                                             <div class="info-value"><%= student.ifsc_code || '-' %></div>
                                         </div>
                                     </div>
@@ -821,6 +837,9 @@
                                                     <span class="placeholder-text">No Photo</span>
                                                 <% } %>
                                             </div>
+                                        </div>
+                                        <div class="asset-box">
+                                            <div class="asset-label" style="background: #4b5563;">Signature</div>
                                             <div class="asset-sign">
                                                 <% if (student.sign) { %>
                                                     <img src="<%= student.sign %>?t=<%= Date.now() %>" alt="Student Signature">
@@ -831,32 +850,14 @@
                                         </div>
                                     </div>
 
-                                    <div class="info-grid" style="grid-template-columns: 1fr; gap: 8px;">
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.caste_cert_no %></div><div class="info-value"><%= student.cast_certificate_no || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.caste %></div><div class="info-value"><%= student.caste || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.blood_group %></div><div class="info-value"><%= student.blood_group || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.father_occupation %></div><div class="info-value"><%= student.father_occupation || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.mother_occupation %></div><div class="info-value"><%= student.mother_occupation || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.local_guardian_address %></div><div class="info-value"><%= student.local_guadian_address || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.income_cert_no %></div><div class="info-value"><%= student.income_certificate_no || '-' %></div></div>
-                                    </div>
-
                                     <div class="badge-row">
                                         <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.disability %></div>
-                                            <div class="value"><%= student.disability_percentage ? 'Yes' : 'No' %></div>
+                                            <div class="label">Academic Session</div>
+                                            <div class="value"><%= activeAcademicYear ? activeAcademicYear.session : '-' %></div>
                                         </div>
                                         <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.disability_percentage_label %></div>
-                                            <div class="value"><%= student.disability_percentage || '-' %></div>
-                                        </div>
-                                        <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.is_18_plus %></div>
-                                            <div class="value"><%= student.is_18_plus || 'No' %></div>
-                                        </div>
-                                        <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.epic_no %></div>
-                                            <div class="value"><%= student.epic_no || '-' %></div>
+                                            <div class="label">Admission Status</div>
+                                            <div class="value" style="color: #0f4c81"><%= student.admission_status || 'Pending' %></div>
                                         </div>
                                     </div>
                                 </div>
@@ -865,10 +866,53 @@
                     </div>
                 </div>
 
-                <div class="section-card mt-16">
+                <div class="section-card">
                     <div class="section-head">
-                        <h2 class="section-title">Weightage Details</h2>
-                        <span class="section-subtitle">Additional merit claims</span>
+                        <h3 class="section-title">Educational Qualifications</h3>
+                        <div class="section-subtitle">Academic history details</div>
+                    </div>
+                    <div class="section-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Class / Level</th>
+                                    <th>School / College Name</th>
+                                    <th>Board / University</th>
+                                    <th>Year</th>
+                                    <th>Roll No</th>
+                                    <th>Marks / CGPA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (typeof educationals !== 'undefined' && educationals.length > 0) { %>
+                                    <% educationals.forEach((edu) => { %>
+                                        <tr>
+                                            <td class="fw-700"><%= edu.qualification ? edu.qualification.name : edu.class_name %></td>
+                                            <td><%= edu.school_name || '-' %></td>
+                                            <td><%= edu.board_name || '-' %></td>
+                                            <td><%= edu.year_of_passing || '-' %></td>
+                                            <td><%= edu.roll_no || '-' %></td>
+                                            <td>
+                                                <% if (edu.mark_type === 'CGPA') { %>
+                                                    <%= edu.cgpa || '-' %> (CGPA)
+                                                <% } else { %>
+                                                    <%= edu.obtained_marks || '0' %> / <%= edu.total_marks || '0' %> (<%= edu.percentage || '0' %>%)
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr><td colspan="6" class="text-center">No educational records found.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-head">
+                        <h3 class="section-title">Weightage Details</h3>
+                        <div class="section-subtitle">Additional merit claims</div>
                     </div>
                     <div class="section-body">
                         <div class="weightage-list">
@@ -888,150 +932,58 @@
                     </div>
                 </div>
 
-                <div class="section-card mt-16">
+                <div class="section-card">
                     <div class="section-head">
-                        <h2 class="section-title">Address Details</h2>
-                        <span class="section-subtitle">Mailing and permanent residence information</span>
+                        <h3 class="section-title">Address Details</h3>
+                        <div class="section-subtitle">Mailing and permanent residence</div>
                     </div>
                     <div class="section-body">
                         <div class="grid-2-equal">
-                            <div class="profile-panel" style="background: #fff; border: 1px solid #e5e7eb;">
-                                <div class="subject-title" style="border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 2px; margin-bottom: 12px;">Mailing Address</div>
-                                <div class="info-grid" style="grid-template-columns: 1fr; gap: 6px;">
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Address</div><div class="info-value" style="width: 70%"><%= student.mailing_address || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">State</div><div class="info-value" style="width: 70%"><%= student.mailing_state || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">District</div><div class="info-value" style="width: 70%"><%= student.mailing_district || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Tehsil</div><div class="info-value" style="width: 70%"><%= student.mailing_tehsil || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Pincode</div><div class="info-value" style="width: 70%"><%= student.mailing_pincode || '-' %></div></div>
-                                </div>
+                            <div class="info-grid" style="grid-template-columns: 1fr;">
+                                <div class="fw-800 muted small mb-0" style="border-bottom: 2px solid var(--accent); display: inline-block;">MAILING ADDRESS</div>
+                                <div class="info-item"><div class="info-label" style="width:30%">Address</div><div class="info-value" style="width:70%"><%= student.mailing_address || '-' %></div></div>
+                                <div class="info-item"><div class="info-label" style="width:30%">State/Dist</div><div class="info-value" style="width:70%"><%= student.mailing_state || '-' %> / <%= student.mailing_district || '-' %></div></div>
+                                <div class="info-item"><div class="info-label" style="width:30%">Tehsil/Pin</div><div class="info-value" style="width:70%"><%= student.mailing_tehsil || '-' %> / <%= student.mailing_pincode || '-' %></div></div>
                             </div>
-                            <div class="profile-panel" style="background: #fff; border: 1px solid #e5e7eb;">
-                                <div class="subject-title" style="border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 2px; margin-bottom: 12px;">Permanent Address</div>
-                                <div class="info-grid" style="grid-template-columns: 1fr; gap: 6px;">
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Address</div><div class="info-value" style="width: 70%"><%= student.permanent_address || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">State</div><div class="info-value" style="width: 70%"><%= student.permanent_state || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">District</div><div class="info-value" style="width: 70%"><%= student.permanent_district || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Tehsil</div><div class="info-value" style="width: 70%"><%= student.permanent_tehsil || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Pincode</div><div class="info-value" style="width: 70%"><%= student.permanent_pincode || '-' %></div></div>
-                                </div>
+                            <div class="info-grid" style="grid-template-columns: 1fr;">
+                                <div class="fw-800 muted small mb-0" style="border-bottom: 2px solid var(--accent); display: inline-block;">PERMANENT ADDRESS</div>
+                                <div class="info-item"><div class="info-label" style="width:30%">Address</div><div class="info-value" style="width:70%"><%= student.permanent_address || '-' %></div></div>
+                                <div class="info-item"><div class="info-label" style="width:30%">State/Dist</div><div class="info-value" style="width:70%"><%= student.permanent_state || '-' %> / <%= student.permanent_district || '-' %></div></div>
+                                <div class="info-item"><div class="info-label" style="width:30%">Tehsil/Pin</div><div class="info-value" style="width:70%"><%= student.permanent_tehsil || '-' %> / <%= student.permanent_pincode || '-' %></div></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="section-card mt-16">
-                    <div class="section-head">
-                        <h2 class="section-title">Academic Qualifications</h2>
-                        <span class="section-subtitle">Educational history and performance</span>
-                    </div>
-                    <div class="section-body">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Level/Qualification</th>
-                                    <th>Board/University</th>
-                                    <th>Passing Year</th>
-                                    <th>Roll Number</th>
-                                    <th>Max Marks</th>
-                                    <th>Obt. Marks</th>
-                                    <th>Place</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (typeof educationals !== 'undefined' && educationals.length > 0) { %>
-                                    <% educationals.forEach(edu => { %>
-                                        <%
-                                            let instName = edu.school_name || '-';
-                                            if (instName === '0') instName = '-';
-                                        %>
-                                        <tr>
-                                            <td class="fw-600"><%= instName %></td>
-                                            <td><%= edu.board_name || '-' %></td>
-                                            <td><%= edu.year_of_passing || '-' %></td>
-                                            <td class="fw-600"><%= edu.roll_no || '-' %></td>
-                                            <td><%= edu.total_marks || '-' %></td>
-                                            <td class="fw-700" style="color: var(--primary);"><%= edu.obtained_marks || '-' %></td>
-                                            <td>Any other</td>
-                                        </tr>
-                                    <% }); %>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <hr class="page-break">
 
-                <div class="section-card mt-16">
+                <div class="section-card">
                     <div class="section-head">
-                        <h2 class="section-title">Uploaded Documents</h2>
-                        <span class="section-subtitle">Supporting documents submitted with the application</span>
-                    </div>
-                    <div class="section-body">
-                        <div class="documents-grid">
-                            <% if (filteredDocs.length > 0) { %>
-                                <% filteredDocs.forEach((doc, idx) => { %>
-                                    <div class="document-chip">
-                                        <%= idx + 1 %>. <%= doc.documentType ? doc.documentType.name : 'Unknown Document' %>
-                                    </div>
-                                <% }); %>
-                            <% } else { %>
-                                <div class="empty-state">No documents listed</div>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-card mt-16">
-                    <div class="section-head">
-                        <h2 class="section-title">Declaration / Undertaking</h2>
-                        <span class="section-subtitle">Applicant self-declaration</span>
+                        <h3 class="section-title">Declaration & Undertaking</h3>
+                        <div class="section-subtitle">Applicant commitment</div>
                     </div>
                     <div class="section-body">
                         <div class="undertaking-box">
-                            <p class="mb-0">
-                                मैं <strong><%= student.user ? student.user.name : '-' %></strong> पुत्री/पत्नी <strong><%= student.father_name || '-' %></strong>, कक्षा <strong><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></strong> में प्रवेश हेतु यह शपथपूर्वक घोषित करती हूँ कि:-
-                            </p>
-                            <ol>
-                                <li>मैंने वर्तमान सत्र में इस महाविद्यालय के अतिरिक्त अन्य किसी विश्वविद्यालय / महाविद्यालय / प्रशिक्षण संस्थान में प्रवेश नहीं लिया है तथा मैं कहीं सेवारत नहीं हूँ|</li>
-                                <li>मैं कक्षा में न्यूनतम 75 प्रतिशत उपस्थिति सुनिश्चित करने का वचन देती हूँ|</li>
-                                <li>मैं महाविद्यालय के अनुशासन, आचार-संहिता एवं नियमों का पूर्ण पालन करुँगी|</li>
-                                <li>मेरे द्वारा आवेदन-पत्र / घोषणा-पत्र में दी गई सभी सूचनाएँ सत्य हैं| कोई सूचना असत्य पाए जाने पर प्रवेश निरस्त किए जाने पर मुझे कोई आपत्ति नहीं होगी|</li>
-                                <li>मैं महाविद्यालय परिसर को रैगिंग मुक्त एवं तम्बाकू / गुटका मुक्त बनाए रखने में सहयोग करुँगी|</li>
+                            <p class="fw-700 mb-0">घोषणा (Declaration):</p>
+                            <ol class="small">
+                                <li>मैं प्रमाणित करती हूँ कि इस आवेदन पत्र में दी गई सभी सूचनाएं सत्य और सही हैं।</li>
+                                <li>मैंने महाविद्यालय की नियमावली पढ़ ली है और मैं उसका पालन करने के लिए बाध्य हूँ।</li>
+                                <li>यदि मेरे द्वारा दी गई कोई भी सूचना गलत पाई जाती है, तो मेरा प्रवेश बिना किसी सूचना के निरस्त किया जा सकता है।</li>
+                                <li>मैं शपथ लेती हूँ कि मैं महाविद्यालय परिसर में अनुशासन बनाए रखूंगी और किसी भी रैगिंग या अवांछित गतिविधि में शामिल नहीं होऊंगी।</li>
                             </ol>
 
-                            <div class="highlight-box">
-                                <span class="fw-700" style="color: var(--secondary); font-size: 10px; display: block; margin-bottom: 4px;">अभ्यर्थी द्वारा अतिरिक्त अंडरटेकिंग:</span>
-                                <p class="mb-0" style="font-size: 10.5px; line-height: 1.5; color: #4b5563;">
-                                    महात्मा गाँधी काशी विद्यापीठ के कार्यालय आदेश दि० 05/09/2020 में प्रोन्नति के सम्बन्ध में दी गयी शर्तो के अधीन अगली कक्षा में प्रोन्नति के पश्चात् प्रवेश हेतु मेरा आवेदन किया जा रहा है| यदि इन शर्तो/प्रतिबंधो के आधार पर यदि मैं भविष्य में पिछली कक्षा में वि० वि० द्वारा अनुत्तीर्ण घोषित की जाती हूँ तो प्रवेश निरस्त किये जाने पर मुझे कोई आपत्ति नहीं होगी|
-                                </p>
-                            </div>
-
-                            <div class="signature-row">
-                                <div class="signature-box">
-                                    <div class="signature-line">Guardian's Signature</div>
-                                </div>
-                                <div class="signature-box">
-                                    <div class="signature-line">Applicant's Signature</div>
-                                </div>
+                            <div class="highlight-box mt-16">
+                                <p class="mb-0 small"><strong>Note:</strong> Please bring all original documents (Marksheets, Certificates, Aadhar, etc.) along with 2 sets of photocopies at the time of physical verification in college.</p>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="section-card mt-16">
-                    <div class="section-head">
-                        <h2 class="section-title">Important Instructions</h2>
-                        <span class="section-subtitle">Documents required for verification</span>
-                    </div>
-                    <div class="section-body">
-                        <div class="instruction-grid">
-                            <div>1. हाईस्कूल अंक पत्र एवं प्रमाण-पत्र की छाया प्रति</div>
-                            <div>2. इण्टरमीडिएट अंक पत्र एवं प्रमाण-पत्र की छाया प्रति</div>
-                            <div>3. चरित्र प्रमाण-पत्र की छाया प्रति</div>
-                            <div>4. स्थानान्तरण प्रमाण-पत्र (टी.सी.) की छाया प्रति</div>
-                            <div>5. जाति प्रमाण-पत्र (SC/ST/OBC हेतु) की छाया प्रति</div>
-                            <div>6. आधार कार्ड की छाया प्रति</div>
-                            <div>7. अन्य प्रमाण पत्र (भारांक सम्बन्धी) की छाया प्रति</div>
-                            <div>8. गैप होने की दशा में शपथ पत्र की छाया प्रति</div>
+                        <div class="signature-row">
+                            <div class="signature-box">
+                                <div class="signature-line">Guardian Signature</div>
+                            </div>
+                            <div class="signature-box">
+                                <div class="signature-line">Student Signature</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1039,35 +991,43 @@
                 <div class="receipt-cut"></div>
 
                 <div class="receipt-panel">
-                    <div class="receipt-header">फार्म प्राप्ति रसीद</div>
+                    <div class="receipt-header">STUDENT ADMISSION SLIP (COLLEGE COPY) - SESSION <%= activeAcademicYear ? activeAcademicYear.session : '-' %></div>
                     <div class="receipt-body">
-                        <div class="info-grid">
-                            <div class="info-item"><div class="info-label">आवेदन पत्र संख्या</div><div class="info-value"><%= student.registration_no || '-' %></div></div>
+                        <div class="grid-2-equal">
+                            <div class="info-grid" style="grid-template-columns: 1fr;">
+                                <div class="info-item"><div class="info-label">Student Name</div><div class="info-value"><%= student.user ? student.user.name : '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Father's Name</div><div class="info-value"><%= student.father_name || '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Registration No</div><div class="info-value"><%= student.registration_no || '-' %></div></div>
+                            </div>
+                            <div class="info-grid" style="grid-template-columns: 1fr;">
+                                <div class="info-item"><div class="info-label">Course Name</div><div class="info-value"><%= student.courseName ? student.courseName.name : '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Semester</div><div class="info-value"><%= student.semsterName ? student.semsterName.name : '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Category</div><div class="info-value"><%= student.category || '-' %></div></div>
+                            </div>
                         </div>
-                        <p class="mt-12" style="font-size: 12px; line-height: 1.6;">
-                            छात्रा <strong><%= student.user ? student.user.name : '-' %></strong>, पिता का नाम <strong><%= student.father_name || '-' %></strong>, कक्षा <strong><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></strong> में प्रवेश हेतु आवेदन पत्र प्राप्त किया गया।
-                        </p>
+
+                        <div class="footer-mini-header">
+                            <img src="/uploads/static/logo_header.png" style="height: 18px">
+                            <%= fieldLabels.header.college_name_en %>
+                        </div>
+
                         <div class="receipt-footer">
-                            <div>दिनांक: <strong><%= new Date().toLocaleDateString('en-IN') %></strong></div>
-                            <div class="signature-box" style="min-width: 200px;">
-                                <div class="signature-line" style="margin-top: 20px;">प्राप्तकर्ता के हस्ताक्षर</div>
+                            <div class="small muted">Date: <%= new Date().toLocaleDateString('en-IN') %></div>
+                            <div class="text-right">
+                                <div style="height: 40px;"></div>
+                                <div class="fw-700" style="border-top: 1px solid #000; display: inline-block; padding-top: 2px;">Admission In-charge Signature</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="footer-mini-header">
-                    <img src="/uploads/static/logo_header.png" style="height: 24px;">
-                    Government Women Degree College Robertsganj Sonebhadra
-                </div>
-
             <% } else { %>
-                <div class="empty-state">Applicant data session expired. Please search again.</div>
+                <div class="empty-state">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 3rem"></i>
+                    <h3>Student Data Not Found</h3>
+                    <p>We couldn't retrieve the application details. Please contact the administrator.</p>
+                </div>
             <% } %>
         </div>
     </div>
-
-    <%- include('../../layout/footer') %>
-    <%- include('../../layout/script_link') %>
 </body>
 </html>

@@ -48,6 +48,26 @@ const Semester = sequelize.define('Semester', {
     defaultValue: 0,
     comment: 'Is co-curricular selection required for this semester'
   },
+  is_major1_enabled: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    comment: 'Is Major 1 selection enabled for this semester'
+  },
+  is_major2_enabled: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    comment: 'Is Major 2 selection enabled for this semester'
+  },
+  is_minor_enabled: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    comment: 'Is Minor selection enabled for this semester'
+  },
+  is_research_project_enabled: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    comment: 'Is Research Project selection enabled for this semester'
+  },
   approval_required: {
     type: DataTypes.TINYINT,
     defaultValue: 0,
@@ -74,4 +94,3 @@ const Semester = sequelize.define('Semester', {
 });
 
 export default Semester;
-

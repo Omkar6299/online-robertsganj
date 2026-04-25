@@ -177,6 +177,57 @@
                                             </div>
                                         </div>
 
+                                        <!-- Subject Selection Settings -->
+                                        <div class="row g-3 mt-3">
+                                            <div class="col-md-12">
+                                                <div class="card border-info">
+                                                    <div class="card-header bg-info text-white">
+                                                        <h6 class="mb-0">Subject Selection Settings (Semester Wise)</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-3">
+                                                                <input type="hidden" name="is_major1_enabled" value="0">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox" name="is_major1_enabled" id="is_major1_enabled" value="1" 
+                                                                    <%= (typeof semester !== 'undefined' && (semester.is_major1_enabled == 1 || semester.is_major1_enabled == '1')) || (typeof oldInput !== 'undefined' && oldInput.is_major1_enabled == '1') ? 'checked' : '' %>>
+                                                                    <label class="form-check-label fw-bold" for="is_major1_enabled">Major 1</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <input type="hidden" name="is_major2_enabled" value="0">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox" name="is_major2_enabled" id="is_major2_enabled" value="1"
+                                                                    <%= (typeof semester !== 'undefined' && (semester.is_major2_enabled == 1 || semester.is_major2_enabled == '1')) || (typeof oldInput !== 'undefined' && oldInput.is_major2_enabled == '1') ? 'checked' : '' %>>
+                                                                    <label class="form-check-label fw-bold" for="is_major2_enabled">Major 2</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <input type="hidden" name="is_minor_enabled" value="0">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox" name="is_minor_enabled" id="is_minor_enabled" value="1"
+                                                                    <%= (typeof semester !== 'undefined' && (semester.is_minor_enabled == 1 || semester.is_minor_enabled == '1')) || (typeof oldInput !== 'undefined' && oldInput.is_minor_enabled == '1') ? 'checked' : '' %>>
+                                                                    <label class="form-check-label fw-bold" for="is_minor_enabled">Minor</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <input type="hidden" name="is_research_project_enabled" value="0">
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox" name="is_research_project_enabled" id="is_research_project_enabled" value="1"
+                                                                    <%= (typeof semester !== 'undefined' && (semester.is_research_project_enabled == 1 || semester.is_research_project_enabled == '1')) || (typeof oldInput !== 'undefined' && oldInput.is_research_project_enabled == '1') ? 'checked' : '' %>>
+                                                                    <label class="form-check-label fw-bold text-danger" for="is_research_project_enabled">Research Project</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-2 text-muted small">
+                                                            <i class="bi bi-info-circle me-1"></i> Control which subject categories are available for selection in this specific semester. 
+                                                            <br><strong>Note:</strong> Research Project can only be selected if Major 1 or Major 2 is chosen.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <script>
                                             function toggleMutuallyExclusive(activeId, otherId) {
                                                 const activeCheckbox = document.getElementById(activeId);

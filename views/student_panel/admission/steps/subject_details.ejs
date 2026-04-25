@@ -8,17 +8,17 @@
     </div>
 <% } %>
 
-<form action="/student/subject_details_post" method="POST">
+<form action="/student/subject_details_post" method="POST" id="subjectForm">
     <div class="row g-3">
         <!-- Major Subject 1 -->
-        <% if (student.courseName && student.courseName.is_major1_required == '1') { %>
+        <% if (student.semsterName && student.semsterName.is_major1_enabled == 1) { %>
         <div class="col-md-6">
             <label class="form-label">Major Subject 1 <span class="text-danger">*</span></label>
-            <select class="form-select" name="major1_id" required>
+            <select class="form-select subject-slot" name="major1_id" id="major1_id" required>
                 <option value="">-- Select Major Subject 1 --</option>
                 <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
                     <% subjects.forEach(function(subject) { %>
-                        <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major1_id == subject.id ? 'selected' : '' %>>
+                        <option value="<%= subject.id %>" data-name="<%= subject.subject_name %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major1_id == subject.id ? 'selected' : '' %>>
                             <%= subject.subject_name %>
                         </option>
                     <% }); %>
@@ -28,14 +28,14 @@
         <% } %>
 
         <!-- Major Subject 2 -->
-        <% if (student.courseName && student.courseName.is_major2_required == '1') { %>
+        <% if (student.semsterName && student.semsterName.is_major2_enabled == 1) { %>
         <div class="col-md-6">
             <label class="form-label">Major Subject 2 <span class="text-danger">*</span></label>
-            <select class="form-select" name="major2_id" required>
+            <select class="form-select subject-slot" name="major2_id" id="major2_id" required>
                 <option value="">-- Select Major Subject 2 --</option>
                 <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
                     <% subjects.forEach(function(subject) { %>
-                        <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major2_id == subject.id ? 'selected' : '' %>>
+                        <option value="<%= subject.id %>" data-name="<%= subject.subject_name %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.major2_id == subject.id ? 'selected' : '' %>>
                             <%= subject.subject_name %>
                         </option>
                     <% }); %>
@@ -45,19 +45,31 @@
         <% } %>
 
         <!-- Minor Subject -->
-        <% if (student.courseName && student.courseName.is_minor_required == '1') { %>
+        <% if (student.semsterName && student.semsterName.is_minor_enabled == 1) { %>
         <div class="col-md-6">
             <label class="form-label">Minor Subject <span class="text-danger">*</span></label>
-            <select class="form-select" name="minor_id" required>
+            <select class="form-select subject-slot" name="minor_id" id="minor_id" required>
                 <option value="">-- Select Minor Subject --</option>
                 <% if (typeof subjects !== 'undefined' && subjects.length > 0) { %>
                     <% subjects.forEach(function(subject) { %>
-                        <option value="<%= subject.id %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.minor_id == subject.id ? 'selected' : '' %>>
+                        <option value="<%= subject.id %>" data-name="<%= subject.subject_name %>" <%= typeof selectedSubjects !== 'undefined' && selectedSubjects.minor_id == subject.id ? 'selected' : '' %>>
                             <%= subject.subject_name %>
                         </option>
                     <% }); %>
                 <% } %>
             </select>
+        </div>
+        <% } %>
+
+        <!-- Research Project -->
+        <% if (student.semsterName && student.semsterName.is_research_project_enabled == 1) { %>
+        <div class="col-md-6">
+            <label class="form-label text-primary fw-bold">Research Project <span class="text-danger">*</span></label>
+            <select class="form-select border-primary" name="research_project_id" id="research_project_id" required>
+                <option value="">-- Select Research Project (From Major 1/2) --</option>
+                <!-- Dynamically populated from Major 1 and Major 2 -->
+            </select>
+            <small class="text-muted">Research project must be selected from your Major 1 or Major 2 subjects.</small>
         </div>
         <% } %>
 
@@ -104,34 +116,48 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const major1Select = document.querySelector('select[name="major1_id"]');
-        const major2Select = document.querySelector('select[name="major2_id"]');
-        const minorSelect = document.querySelector('select[name="minor_id"]');
+        const major1Select = document.getElementById('major1_id');
+        const major2Select = document.getElementById('major2_id');
+        const minorSelect = document.getElementById('minor_id');
+        const researchSelect = document.getElementById('research_project_id');
 
         const selects = [major1Select, major2Select, minorSelect].filter(el => el !== null);
+        const selectedResearchId = '<%= typeof selectedSubjects !== "undefined" ? selectedSubjects.research_project_id : "" %>';
 
         function updateOptions() {
             const selectedValues = selects.map(s => s.value).filter(v => v !== "");
 
+            // 1. Mutually Exclusive Logic
             selects.forEach(select => {
-                const currentVal = select.value;
                 Array.from(select.options).forEach(option => {
-                    if (option.value === "") return; // Skip placeholder
-                    // Disable if it is selected in ANY OTHER select.
-
+                    if (option.value === "") return;
                     const isSelectedInOther = selects.some(otherSelect => {
                         return otherSelect !== select && otherSelect.value === option.value && otherSelect.value !== "";
                     });
-
-                    if (isSelectedInOther) {
-                        option.disabled = true;
-                        // option.style.display = 'none'; // Optional: hide completely
-                    } else {
-                        option.disabled = false;
-                        // option.style.display = 'block';
-                    }
+                    option.disabled = isSelectedInOther;
                 });
             });
+
+            // 2. Research Project Logic (Populate from Major 1 and Major 2)
+            if (researchSelect) {
+                const currentResearchVal = researchSelect.value || selectedResearchId;
+                researchSelect.innerHTML = '<option value="">-- Select Research Project (From Major 1/2) --</option>';
+                
+                const sourceSelects = [major1Select, major2Select].filter(el => el !== null);
+                sourceSelects.forEach(source => {
+                    if (source.value) {
+                        const optionText = source.options[source.selectedIndex].getAttribute('data-name');
+                        const newOpt = document.createElement('option');
+                        newOpt.value = source.value;
+                        newOpt.textContent = optionText;
+                        if (source.value == currentResearchVal) newOpt.selected = true;
+                        researchSelect.appendChild(newOpt);
+                    }
+                });
+
+                // Disable if no sources selected
+                researchSelect.disabled = (researchSelect.options.length <= 1);
+            }
         }
 
         selects.forEach(select => {

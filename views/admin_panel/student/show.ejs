@@ -164,22 +164,47 @@
                                                 <label>Semester / Year</label>
                                                 <div class="preview-value"><%= student.semsterName && student.semsterName.name ? student.semsterName.name : '-' %></div>
                                             </div>
-                                            <div class="col-md-3">
-                                                <label>Major 1</label>
-                                                <div class="preview-value"><%= student.major1 ? student.major1.subject_name : '-' %></div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label>Major 2</label>
-                                                <div class="preview-value"><%= student.major2 ? student.major2.subject_name : '-' %></div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label>Minor</label>
-                                                <div class="preview-value"><%= student.minor ? student.minor.subject_name : '-' %></div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label>Skill / Voc</label>
-                                                <div class="preview-value"><%= student.skill ? student.skill.name : '-' %></div>
-                                            </div>
+                                            <% if (student.semsterName && student.semsterName.is_major1_enabled == 1) { %>
+                                                <div class="col-md-3">
+                                                    <label>Major 1</label>
+                                                    <div class="preview-value"><%= student.major1 ? student.major1.subject_name : '-' %></div>
+                                                </div>
+                                            <% } %>
+                                            
+                                            <% if (student.semsterName && student.semsterName.is_major2_enabled == 1) { %>
+                                                <div class="col-md-3">
+                                                    <label>Major 2</label>
+                                                    <div class="preview-value"><%= student.major2 ? student.major2.subject_name : '-' %></div>
+                                                </div>
+                                            <% } %>
+                                            
+                                            <% if (student.semsterName && student.semsterName.is_minor_enabled == 1) { %>
+                                                <div class="col-md-3">
+                                                    <label>Minor</label>
+                                                    <div class="preview-value"><%= student.minor ? student.minor.subject_name : '-' %></div>
+                                                </div>
+                                            <% } %>
+
+                                            <% if (student.semsterName && student.semsterName.is_research_project_enabled == 1) { %>
+                                                <div class="col-md-3">
+                                                    <label>Research Project</label>
+                                                    <div class="preview-value"><%= student.researchProject ? student.researchProject.subject_name : '-' %></div>
+                                                </div>
+                                            <% } %>
+
+                                            <% if (student.semsterName && student.semsterName.is_skill_required == 1) { %>
+                                                <div class="col-md-3">
+                                                    <label>Skill / Voc</label>
+                                                    <div class="preview-value"><%= student.skill ? student.skill.name : '-' %></div>
+                                                </div>
+                                            <% } %>
+
+                                            <% if (student.semsterName && student.semsterName.is_cocurricular_required == 1) { %>
+                                                <div class="col-md-3">
+                                                    <label>Co-Curricular</label>
+                                                    <div class="preview-value"><%= student.cocurricular ? student.cocurricular.name : '-' %></div>
+                                                </div>
+                                            <% } %>
                                         </div>
 
                                         <!-- 3. Education History -->
