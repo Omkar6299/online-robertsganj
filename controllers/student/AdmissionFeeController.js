@@ -81,8 +81,11 @@ export const initiatePayment = async (req, res) => {
             return flashErrorAndRedirect(req, res, feeError.message || 'Could not calculate your admission fee. Please contact administrator.', '/student/dashboard');
         }
 
-        // Generate unique admission transaction ID
-        const admissionTxnId = `ADM-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        // Generate unique 10-digit numeric admission transaction ID
+        const minTxn = 1000000000;
+        const maxTxn = 9999999999;
+        const randomTxnId = Math.floor(Math.random() * (maxTxn - minTxn + 1)) + minTxn;
+        const admissionTxnId = String(randomTxnId);
 
         // LOG ALL PAYMENT DATA IN student_fees_details (StudentFeeDetail model)
         const semesterType = (targetSem && parseInt(targetSem.order) % 2 === 0) ? 'Even' : 'Odd';
@@ -112,11 +115,15 @@ export const initiatePayment = async (req, res) => {
         await t.commit();
 
         const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
-        let admProductId = res.locals.siteSettings?.admission_product_id || siteconfig.atom_admission_product_id || 'COLLEGE';
+        const regProductId = res.locals.siteSettings?.atom_reg_product_id || siteconfig.atom_registration_product_id || 'SONEBHADRA';
+        const admProductId = res.locals.siteSettings?.atom_adm_product_id || siteconfig.atom_admission_product_id || 'EXAM_FEE';
+
+        // Select Product ID based on semester type: Odd -> Registration ID, Even -> Admission ID
+        let targetProductId = (semesterType === 'Even') ? admProductId : regProductId;
 
         // Atom Demo environment only supports 'AIPAY' product ID
         if (environment === 'demo') {
-            admProductId = 'AIPAY';
+            targetProductId = 'AIPAY';
         }
 
         // Prepare payment data for Atom
@@ -127,7 +134,7 @@ export const initiatePayment = async (req, res) => {
             mobile: student.user.phone,
             returnUrl: `${req.protocol}://${req.get('host')}/student/admission_payment_response`,
             environment: environment,
-            prodId: admProductId,
+            prodId: targetProductId,
             udf1: student.registration_no || '',                 // Registration No
             udf2: admissionTxnId,                                 // Merchant Transaction ID
             udf3: String(student.id) || '',                       // Student ID

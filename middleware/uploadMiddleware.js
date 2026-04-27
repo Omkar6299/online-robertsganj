@@ -16,7 +16,9 @@ import { AcademicYear } from '../models/index.js';
 import fs from 'fs';
 
 const fsPromises = fs.promises;
-const s3 = new S3Client({
+export { DeleteObjectCommand } from '@aws-sdk/client-s3';
+
+export const s3 = new S3Client({
     region: process.env.AWS_REGION,
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -126,15 +128,22 @@ export const admissionUpload = (req, res, next) => {
     const uploadAny = upload.any();
 
     uploadAny(req, res, (err) => {
-        if (err instanceof multer.MulterError) {
-            if (err.code === 'LIMIT_FILE_SIZE') {
-                req.flash('error', 'File too large! Max allowed size is 5MB per file.');
-            } else {
-                req.flash('error', `Upload error: ${err.message}`);
+        if (err) {
+            let errorMessage = err.message;
+            if (err instanceof multer.MulterError) {
+                if (err.code === 'LIMIT_FILE_SIZE') {
+                    errorMessage = 'File too large! Max allowed size is 5MB per file.';
+                } else {
+                    errorMessage = `Upload error: ${err.message}`;
+                }
             }
-            return res.redirect('/student/registration?tab=photo');
-        } else if (err) {
-            req.flash('error', err.message);
+
+            // Check if it's an AJAX request
+            if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+                return res.status(400).json({ success: false, message: errorMessage });
+            }
+
+            req.flash('error', errorMessage);
             return res.redirect('/student/registration?tab=photo');
         }
         next();

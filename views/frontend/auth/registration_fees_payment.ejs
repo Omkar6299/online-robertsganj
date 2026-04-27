@@ -213,6 +213,9 @@
     <%- include('../layout/footer') %>
     <%- include('../layout/script_link') %>
     <script>
+        // Define oldInput for client-side JS
+        const oldInput = <%- JSON.stringify(typeof oldInput !== 'undefined' ? oldInput : {}) %>;
+
         $(document).ready(function() {
             // Fetch student by registration number
             $('#fetchStudentBtn').on('click', function() {
