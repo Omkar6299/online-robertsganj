@@ -20,8 +20,8 @@ class PaymentService {
   /**
    * Get payment gateway configuration based on environment
    */
-  getConfig() {
-    const environment = process.env.NTTDATA_ENV || siteconfig.atom_environment || 'demo';
+  getConfig(env = null) {
+    const environment = env || process.env.NTTDATA_ENV || siteconfig.atom_environment || 'demo';
 
     if (environment === 'live') {
       return {
@@ -114,12 +114,13 @@ class PaymentService {
   /**
    * Generate signature for response validation (HMAC-SHA512)
    */
-  generateSignature(respArray) {
+  generateSignature(respArray, env = null) {
     try {
       if (!respArray || !Array.isArray(respArray) || respArray.length === 0) {
         return '';
       }
 
+      const config = this.getConfig(env);
       const firstElement = respArray[0];
       if (!firstElement || !firstElement.merchDetails || !firstElement.payDetails || !firstElement.responseDetails) {
         return '';
@@ -138,7 +139,7 @@ class PaymentService {
 
       const signatureString = merchId + atomTxnId + merchTxnId + totalAmount + statusCode + subChannel + bankTxnId;
 
-      const hmac = crypto.createHmac('sha512', this.config.res_hash_key);
+      const hmac = crypto.createHmac('sha512', config.res_hash_key);
       hmac.update(signatureString);
       return hmac.digest('hex');
     } catch (error) {
@@ -150,7 +151,7 @@ class PaymentService {
   /**
    * Verify signature from payment response
    */
-  verifySignature(paymentResponse) {
+  verifySignature(paymentResponse, env = null) {
     try {
       const responseSignature = paymentResponse.payInstrument?.responseDetails?.signature || 
                                 paymentResponse.responseDetails?.signature;
@@ -162,7 +163,7 @@ class PaymentService {
 
       // Convert response back to array format for generateSignature
       const respArray = [paymentResponse.payInstrument || paymentResponse];
-      const calculatedSignature = this.generateSignature(respArray);
+      const calculatedSignature = this.generateSignature(respArray, env);
 
       console.log('Signature verification:', {
         received: responseSignature,
@@ -450,12 +451,17 @@ class PaymentService {
       email,
       mobile,
       returnUrl,
+      environment = null, // Dynamic environment from settings
+      prodId = null,      // Dynamic product ID from settings
       udf1 = '',
       udf2 = '',
       udf3 = '',
       udf4 = '',
       udf5 = ''
     } = options;
+
+    // Get config for the specified environment
+    const config = this.getConfig(environment);
 
     // Format date for Atom payment gateway (YYYY-MM-DD HH:MM:SS)
     const now = new Date();
@@ -468,16 +474,15 @@ class PaymentService {
     const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
     return {
-      login: this.config.login,
-      password: this.config.password,
+      login: config.login,
+      password: config.password,
       amount: amount,
-      prod_id: this.config.prod_id,
+      prod_id: prodId || config.prod_id,
       txnId: transactionId,
       date: formattedDate,
-      encKey: this.config.enc_request_key,
-      decKey: this.config.dec_response_key,
-      payUrl: this.config.api_url,
-      paymentPageUrl: this.config.payment_url,
+      encKey: config.enc_request_key,
+      decKey: config.dec_response_key,
+      payUrl: config.api_url,
       email: email || 'dummy@email.com',
       mobile: mobile || '9999999999',
       txnCurrency: 'INR',
@@ -495,18 +500,20 @@ class PaymentService {
    * @param {string} encData - Encrypted response data
    * @returns {Object|null} - Parsed payment response or null
    */
-  parsePaymentResponse(encData) {
+  parsePaymentResponse(encData, env = null) {
     try {
       if (!encData) {
         console.error('No encrypted data provided for parsing');
         return null;
       }
 
+      const config = this.getConfig(env);
+
       // Decrypt the response
       const decryptedData = this.decrypt(
         encData,
-        this.config.dec_response_key,
-        this.config.dec_response_key
+        config.dec_response_key,
+        config.dec_response_key
       );
 
       if (!decryptedData) {
@@ -521,11 +528,11 @@ class PaymentService {
       console.log('Full payment response structure:', JSON.stringify(paymentResponse, null, 2));
 
       // Verify signature
-      const isSignatureValid = this.verifySignature(paymentResponse);
+      const isSignatureValid = this.verifySignature(paymentResponse, env);
       console.log('Is signature valid:', isSignatureValid);
       
       // If we have a hash key configured, we should strictly verify
-      if (this.config.res_hash_key && !isSignatureValid) {
+      if (config.res_hash_key && !isSignatureValid) {
         console.error('Signature verification failed! Potential tampering detected.');
         // return null; // Un-comment this for strict security in production
       }
@@ -595,6 +602,125 @@ class PaymentService {
       console.error('Error parsing payment response:', error);
       console.error('Error stack:', error.stack);
       return null;
+    }
+  }
+
+  /**
+   * Query transaction status from Atom (NTT Data) API (Out-of-Session Query)
+   * @param {string} merchTxnId - Merchant Transaction ID to query
+   * @param {string} environment - 'demo' or 'live'
+   * @param {string} txnDate - Optional date (YYYY-MM-DD)
+   * @returns {Promise<Object|null>} - Parsed transaction details or null
+   */
+  async queryTransactionStatus(merchTxnId, environment = null, txnDate = null, txnAmount = null) {
+    try {
+      const config = this.getConfig(environment);
+
+      let formattedDate;
+      if (txnDate) {
+        // If user provides a date (YYYY-MM-DD), use it
+        formattedDate = `${txnDate} 00:00:00`;
+      } else {
+        // Default to current date
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      }
+
+      // Build JSON payload for Query API
+      const merchDetails = {
+        merchId: config.login,
+        password: config.password,
+        merchTxnId: merchTxnId,
+        merchTxnDate: formattedDate
+      };
+
+      if (txnAmount) {
+        merchDetails.amount = parseFloat(txnAmount).toFixed(2);
+      }
+
+      const jsonData = JSON.stringify({
+        payInstrument: {
+          headDetails: {
+            version: 'OTSv1.1',
+            api: 'QUERY',
+            platform: 'FLASH'
+          },
+          merchDetails: merchDetails
+        }
+      }, null, 0);
+
+      console.log('Query API Request for:', merchTxnId, 'Environment:', environment);
+
+      // Encrypt request
+      const encData = this.encrypt(jsonData, config.enc_request_key, config.enc_request_key);
+
+      const requestParams = new URLSearchParams({
+        encData: encData,
+        merchId: config.login
+      });
+
+      // Unified OTS v1.1 endpoint often uses the same URL for Auth and Query
+      const queryUrl = config.api_url;
+
+      // Call Atom API
+      const response = await axios.post(
+        queryUrl,
+        requestParams,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          timeout: 30000
+        }
+      );
+
+      console.log('Raw Query API Response Type:', typeof response.data);
+      console.log('Raw Query API Response:', response.data);
+
+      if (!response.data) {
+        console.error('Empty response from Query API');
+        return null;
+      }
+
+      // Parse response
+      let responseData = response.data;
+      let encresp = null;
+
+      if (typeof responseData === 'string') {
+          const respArr = {};
+          responseData.trim().split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            if (key) respArr[key] = value || '';
+          });
+          encresp = respArr['encResp'] || respArr['encData'] || null;
+      } else if (typeof responseData === 'object') {
+          encresp = responseData.encResp || responseData.encData || null;
+      }
+
+      if (!encresp) {
+        console.error('No encrypted response found in Query API response');
+        return null;
+      }
+
+      // Decrypt response
+      const decData = this.decrypt(encresp, config.dec_response_key, config.dec_response_key);
+      const res = JSON.parse(decData);
+
+      console.log('Query API Decrypted Response:', JSON.stringify(res, null, 2));
+
+      // Use parsePaymentResponse logic but adapted for Query response if needed
+      // Actually, parsePaymentResponse is already quite generic, let's see if we can reuse it
+      // But we need to pass the encrypted data to it directly
+      return this.parsePaymentResponse(encresp, environment);
+    } catch (error) {
+      console.error('Transaction query error:', error);
+      throw error;
     }
   }
 

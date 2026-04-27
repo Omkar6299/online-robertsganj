@@ -111,6 +111,14 @@ export const initiatePayment = async (req, res) => {
 
         await t.commit();
 
+        const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
+        let admProductId = res.locals.siteSettings?.admission_product_id || siteconfig.atom_admission_product_id || 'COLLEGE';
+
+        // Atom Demo environment only supports 'AIPAY' product ID
+        if (environment === 'demo') {
+            admProductId = 'AIPAY';
+        }
+
         // Prepare payment data for Atom
         const paymentData = PaymentService.preparePaymentData({
             transactionId: admissionTxnId,
@@ -118,6 +126,8 @@ export const initiatePayment = async (req, res) => {
             email: student.user.email,
             mobile: student.user.phone,
             returnUrl: `${req.protocol}://${req.get('host')}/student/admission_payment_response`,
+            environment: environment,
+            prodId: admProductId,
             udf1: student.registration_no || '',                 // Registration No
             udf2: admissionTxnId,                                 // Merchant Transaction ID
             udf3: String(student.id) || '',                       // Student ID
@@ -138,7 +148,7 @@ export const initiatePayment = async (req, res) => {
             merchId: paymentData.login,
             payUrl: paymentData.paymentPageUrl,
             data: paymentData,
-            atomEnvironment: siteconfig.atom_environment || 'demo'
+            atomEnvironment: environment
         });
 
     } catch (error) {
@@ -261,8 +271,12 @@ export const paymentResponse = async (req, res) => {
                     }
                 }
             }
-
-            return flashSuccessAndRedirect(req, res, 'Admission fee paid successfully!', `/student/admission_receipt?txn_id=${admissionTxnId}`);
+            
+            // Save session before redirecting to avoid race conditions
+            return req.session.save((err) => {
+                if (err) console.error('Session save error during admission payment response:', err);
+                flashSuccessAndRedirect(req, res, 'Admission fee paid successfully!', `/student/admission_receipt?txn_id=${admissionTxnId}`);
+            });
         } else {
             return flashErrorAndRedirect(req, res, `Payment failed: ${parsedResponse.message}`, '/student/dashboard');
         }

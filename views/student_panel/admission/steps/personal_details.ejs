@@ -208,3 +208,17 @@
     </div>
 </form>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categorySelect = document.getElementById('category');
+        const castCertInput = document.getElementById('cast_certificate_no');
+
+        if (categorySelect && castCertInput) {
+            categorySelect.addEventListener('change', function() {
+                if (this.value === 'General') {
+                    castCertInput.value = '0000000000';
+                }
+            });
+        }
+    });
+</script>

@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%- include('../../layout/css_link') %>
+    <% if (typeof layout !== 'undefined' && layout === 'frontend') { %>
+        <%- include('../../../frontend/layout/css_link') %>
+    <% } else { %>
+        <%- include('../../layout/css_link') %>
+    <% } %>
     <title><%= typeof title !== 'undefined' ? title : 'Application Form Preview' %></title>
     <style>
         :root {
@@ -9,7 +13,7 @@
             --primary-dark: #0a3559;
             --secondary: #8b1e3f;
             --accent: #c8a96a;
-            --border: #cfd8e3;
+            --border: #d1d9e6;
             --border-dark: #9fb2c8;
             --text: #1f2937;
             --muted: #6b7280;
@@ -29,229 +33,209 @@
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
             color: var(--text);
-            background: #eef2f7;
-            line-height: 1.4;
+            background: #dde3ed;
+            line-height: 1.35;
+        }
+
+        .application-sheet {
+            font-size: 9.5px;
         }
 
         .no-print-toolbar {
             text-align: center;
-            padding: 18px 12px;
+            padding: 14px 12px;
         }
 
+        /* ─── PAGE SHEET ─────────────────────────────── */
         .application-sheet {
             width: 210mm;
-            min-height: 297mm;
-            margin: 14px auto;
+            margin: 12px auto;
             background: var(--white);
-            box-shadow: 0 14px 35px rgba(15, 76, 129, 0.12);
+            box-shadow: 0 10px 30px rgba(15,76,129,0.13);
             border: 1px solid #94a3b8;
             position: relative;
             overflow: hidden;
-            font-size: 11px;
         }
 
         .application-sheet::before {
             content: "";
             position: absolute;
             inset: 0 0 auto 0;
-            height: 10px;
+            height: 5px;
             background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--secondary));
         }
 
         .sheet-inner {
-            padding: 10mm 10mm 10mm;
+            padding: 5mm 8mm 6mm;
         }
 
+        /* ─── UTILITIES ──────────────────────────────── */
         .text-center { text-align: center; }
-        .text-right { text-align: right; }
         .fw-700 { font-weight: 700; }
         .fw-600 { font-weight: 600; }
-        .small { font-size: 10px; }
         .muted { color: var(--muted); }
         .mb-0 { margin-bottom: 0; }
-        .mt-0 { margin-top: 0; }
-        .mt-8 { margin-top: 8px; }
-        .mt-12 { margin-top: 12px; }
-        .mt-16 { margin-top: 16px; }
-        .mt-20 { margin-top: 20px; }
-        .mt-24 { margin-top: 24px; }
 
+        /* ─── TOP META ───────────────────────────────── */
         .top-meta {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
-            align-items: center;
-            font-size: 10px;
+            font-size: 8.5px;
             color: var(--muted);
-            margin-bottom: 10px;
-            padding-bottom: 6px;
+            margin-bottom: 5px;
+            padding-bottom: 4px;
             border-bottom: 1px dashed var(--border-dark);
         }
 
+        /* ─── COLLEGE HEADER ─────────────────────────── */
         .college-header {
-            border: 1px solid var(--border-dark);
-            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-            padding: 8px 12px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-        }
-
-        .college-header-grid {
             display: grid;
             grid-template-columns: 70px 1fr 70px;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
+            border: 1px solid var(--border-dark);
+            background: linear-gradient(180deg,#fff 0%,#f8fbff 100%);
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 7px;
         }
 
-        .college-logo {
-            width: 70px;
-            height: 70px;
-            object-fit: contain;
-        }
+        .college-logo { width: 70px; height: 70px; object-fit: contain; }
 
         .college-name-en {
             margin: 0;
             color: var(--primary-dark);
             font-size: 20px;
-            line-height: 1.2;
             text-transform: uppercase;
             letter-spacing: 0.3px;
+            line-height: 1.2;
         }
 
         .college-name-hi {
-            margin: 4px 0 0;
+            margin: 3px 0 0;
             color: var(--secondary);
             font-size: 16px;
-            line-height: 1.25;
             font-weight: 700;
         }
 
         .college-subtitle {
-            margin-top: 6px;
+            margin-top: 3px;
             font-size: 11px;
             color: var(--muted);
             font-weight: 600;
         }
 
-        .title-ribbon-wrap {
-            text-align: center;
-            margin-top: 12px;
-        }
+        /* ─── TITLE RIBBON ───────────────────────────── */
+        .title-ribbon-wrap { text-align: center; margin: 6px 0; }
 
         .title-ribbon {
             display: inline-block;
-            padding: 7px 20px;
+            padding: 4px 18px;
             background: linear-gradient(90deg, var(--primary), var(--primary-dark));
             color: #fff;
             border-radius: 999px;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
-            box-shadow: 0 6px 14px rgba(15, 76, 129, 0.18);
+            letter-spacing: 0.5px;
         }
 
+        /* ─── SUMMARY BAND ───────────────────────────── */
         .summary-band {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin: 10px 0 12px;
+            grid-template-columns: repeat(4,1fr);
+            gap: 5px;
+            margin-bottom: 7px;
         }
 
         .summary-card {
             border: 1px solid #cbd5e1;
             background: var(--bg-panel);
-            border-radius: 8px;
-            padding: 5px 10px;
-            min-height: 52px;
+            border-radius: 6px;
+            padding: 4px 8px;
         }
 
         .summary-card .label {
-            font-size: 10px;
+            font-size: 8.5px;
             color: var(--muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            letter-spacing: 0.4px;
+            margin-bottom: 2px;
         }
 
         .summary-card .value {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--primary-dark);
             word-break: break-word;
         }
 
+        /* ─── SECTION CARD ───────────────────────────── */
         .section-card {
             border: 1px solid #94a3b8;
-            border-radius: 10px;
-            margin-top: 10px;
+            border-radius: 7px;
+            margin-top: 5px;
             overflow: hidden;
             background: #fff;
         }
 
         .section-head {
-            padding: 6px 14px;
-            background: linear-gradient(90deg, rgba(15, 76, 129, 0.08), rgba(139, 30, 63, 0.06));
+            padding: 4px 10px;
+            background: linear-gradient(90deg, rgba(15,76,129,0.07), rgba(139,30,63,0.05));
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 8px;
         }
 
         .section-title {
             margin: 0;
-            font-size: 13px;
+            font-size: 10.5px;
             font-weight: 800;
             color: var(--primary-dark);
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
 
-        .section-subtitle {
-            font-size: 10px;
-            color: var(--muted);
-        }
+        .section-subtitle { font-size: 8.5px; color: var(--muted); }
 
-        .section-body {
-            padding: 8px 14px;
-        }
+        .section-body { padding: 5px 9px; }
 
-        .grid-2 {
+        /* ─── GRIDS ──────────────────────────────────── */
+        .grid-main {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 16px;
+            grid-template-columns: 1fr 108px;
+            gap: 10px;
         }
 
         .grid-2-equal {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 10px;
         }
 
+        /* ─── INFO ITEMS ─────────────────────────────── */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px 16px;
+            gap: 3px 10px;
         }
 
         .info-item {
             display: flex;
             align-items: flex-start;
-            gap: 8px;
+            gap: 4px;
             border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 4px;
-            min-height: 25px;
+            padding-bottom: 2px;
+            min-height: 18px;
+            font-size: 9px;
         }
 
-        .info-label {
-            width: 44%;
-            color: #4b5563;
-            font-weight: 600;
-        }
+        .info-label { width: 46%; color: #4b5563; font-weight: 600; }
 
         .info-value {
-            width: 56%;
+            width: 54%;
             color: #111827;
             font-weight: 700;
             word-break: break-word;
@@ -259,141 +243,104 @@
 
         .info-value::before {
             content: ':';
-            margin-right: 8px;
+            margin-right: 5px;
             color: #4b5563;
             font-weight: 500;
         }
 
-        .profile-panel {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            background: var(--bg-soft);
-            height: 100%;
-        }
-
-        .photo-sign-stack {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 14px;
-        }
-
+        /* ─── PHOTO / SIGN ───────────────────────────── */
         .asset-box {
-            width: 120px;
+            width: 108px;
             border: 1px solid var(--border-dark);
-            border-radius: 10px;
+            border-radius: 7px;
             background: #fff;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(15, 76, 129, 0.05);
         }
 
         .asset-label {
             background: var(--primary);
             color: #fff;
-            font-size: 10px;
+            font-size: 8.5px;
             font-weight: 700;
             text-transform: uppercase;
             text-align: center;
-            padding: 5px 4px;
-            letter-spacing: 0.4px;
+            padding: 3px 4px;
         }
 
         .asset-image {
-            height: 118px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
-            padding: 6px;
+            height: 96px;
+            display: flex; align-items: center; justify-content: center;
+            background: #fff; padding: 4px;
         }
 
         .asset-sign {
-            height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
-            padding: 6px;
+            height: 42px;
+            display: flex; align-items: center; justify-content: center;
+            background: #fff; padding: 4px;
             border-top: 1px solid var(--border);
         }
 
-        .asset-image img,
-        .asset-sign img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+        .asset-image img, .asset-sign img {
+            max-width: 100%; max-height: 100%; object-fit: contain;
         }
 
-        .placeholder-text {
-            font-size: 10px;
-            color: #9ca3af;
-        }
+        .placeholder-text { font-size: 8.5px; color: #9ca3af; }
 
-        .badge-row {
+        /* ─── SIDE BADGES ────────────────────────────── */
+        .side-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 3px 8px;
+            margin-top: 6px;
         }
 
         .mini-badge {
             border: 1px solid #cbd5e1;
             background: #fff;
-            border-radius: 8px;
-            padding: 5px 10px;
+            border-radius: 5px;
+            padding: 3px 7px;
         }
 
-        .mini-badge .label {
-            font-size: 10px;
-            color: var(--muted);
-            margin-bottom: 3px;
-        }
+        .mini-badge .label { font-size: 8px; color: var(--muted); margin-bottom: 1px; }
+        .mini-badge .value { font-size: 10px; font-weight: 700; }
 
-        .mini-badge .value {
-            font-size: 12px;
-            font-weight: 700;
-        }
-
+        /* ─── SUBJECT BOX ────────────────────────────── */
         .subject-box {
             border: 1px solid #cbd5e1;
-            padding: 8px 10px;
-            border-radius: 8px;
+            padding: 5px 8px;
+            border-radius: 6px;
             background: #fcfdfe;
-            margin-top: 12px;
+            margin-top: 6px;
         }
 
         .subject-title {
-            font-size: 11px;
+            font-size: 9.5px;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
             color: var(--primary-dark);
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .subject-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 16px;
-            font-size: 11px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 3px 12px;
+            font-size: 9px;
         }
 
-        .subject-grid div span {
-            color: var(--muted);
-            font-weight: 600;
-        }
+        .subject-grid div span { color: var(--muted); font-weight: 600; }
 
+        /* ─── DATA TABLE ─────────────────────────────── */
         table.data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 9px;
         }
 
-        .data-table th,
-        .data-table td {
+        .data-table th, .data-table td {
             border: 1px solid var(--border);
-            padding: 7px 8px;
+            padding: 4px 6px;
             text-align: left;
             vertical-align: top;
         }
@@ -402,128 +349,114 @@
             background: #eef4fb;
             color: var(--primary-dark);
             font-weight: 800;
-            font-size: 10.5px;
+            font-size: 8.5px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
 
+        /* ─── WEIGHTAGE ──────────────────────────────── */
         .weightage-list {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px 16px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px 10px;
         }
 
         .weightage-item {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px 10px;
-            background: var(--bg-panel);
-        }
-
-        .status-pill {
-            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            min-width: 54px;
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            border: 1px solid transparent;
-        }
-
-        .status-yes {
-            color: var(--success);
-            background: rgba(31, 122, 77, 0.1);
-            border-color: rgba(31, 122, 77, 0.2);
-        }
-
-        .status-no {
-            color: #9b1c1c;
-            background: rgba(155, 28, 28, 0.08);
-            border-color: rgba(155, 28, 28, 0.15);
-        }
-
-        .documents-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px 14px;
-        }
-
-        .document-chip {
+            gap: 6px;
             border: 1px solid var(--border);
-            border-left: 4px solid var(--accent);
-            border-radius: 10px;
-            padding: 8px 10px;
-            background: #fff;
-            font-weight: 600;
-            color: #374151;
+            border-radius: 6px;
+            padding: 4px 8px;
+            background: var(--bg-panel);
+            font-size: 9px;
         }
 
+        /* ─── STATUS PILLS ───────────────────────────── */
+        .status-pill {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 40px; padding: 1px 7px;
+            border-radius: 999px; font-size: 8.5px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid transparent;
+        }
+
+        .status-yes { color: var(--success); background: rgba(31,122,77,0.1); border-color: rgba(31,122,77,0.2); }
+        .status-no  { color: #9b1c1c; background: rgba(155,28,28,0.08); border-color: rgba(155,28,28,0.15); }
+
+        /* ─── ADDRESS ────────────────────────────────── */
+        .addr-panel {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 7px;
+            padding: 6px 9px;
+        }
+
+        .addr-title {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--primary-dark);
+            font-weight: 800;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+            padding-bottom: 1px;
+            margin-bottom: 5px;
+        }
+
+        .addr-info { display: grid; grid-template-columns: 1fr; gap: 3px; }
+
+        /* ─── UNDERTAKING ────────────────────────────── */
         .undertaking-box {
             border: 1px solid var(--border-dark);
-            border-radius: 14px;
-            padding: 14px;
-            background: linear-gradient(180deg, #fffefb 0%, #ffffff 100%);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: linear-gradient(180deg,#fffefb 0%,#fff 100%);
+            font-size: 9px;
         }
 
         .undertaking-box ol {
-            margin: 8px 0 0;
-            padding-left: 18px;
+            margin: 5px 0 0;
+            padding-left: 15px;
         }
 
-        .undertaking-box li {
-            margin-bottom: 6px;
-            text-align: justify;
-        }
+        .undertaking-box li { margin-bottom: 3px; text-align: justify; }
 
-        .highlight-box {
-            margin-top: 14px;
-            border: 1px solid rgba(139, 30, 63, 0.2);
-            background: rgba(139, 30, 63, 0.04);
-            border-radius: 12px;
-            padding: 12px;
-        }
-
+        /* ─── SIGNATURE ROW ──────────────────────────── */
         .signature-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 24px;
+            gap: 24px;
+            margin-top: 14px;
             align-items: end;
         }
 
-        .signature-box {
-            text-align: center;
-        }
+        .signature-box { text-align: center; }
 
         .signature-line {
             border-top: 1px solid #111827;
-            margin-top: 36px;
-            padding-top: 5px;
+            margin-top: 26px;
+            padding-top: 4px;
             font-weight: 700;
+            font-size: 9px;
         }
 
+        /* ─── INSTRUCTION GRID ───────────────────────── */
         .instruction-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px 18px;
-            font-size: 11px;
+            gap: 4px 14px;
+            font-size: 9px;
         }
 
+        /* ─── RECEIPT ────────────────────────────────── */
         .receipt-cut {
             border-top: 2px dashed #111827;
-            margin: 24px 0;
+            margin: 12px 0;
         }
 
         .receipt-panel {
             border: 1px solid var(--border-dark);
-            border-radius: 14px;
+            border-radius: 8px;
             overflow: hidden;
         }
 
@@ -531,132 +464,118 @@
             background: linear-gradient(90deg, var(--primary), var(--primary-dark));
             color: #fff;
             text-align: center;
-            padding: 8px 10px;
-            font-size: 13px;
+            padding: 5px 10px;
+            font-size: 11px;
             font-weight: 800;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
         }
 
         .receipt-body {
-            padding: 14px;
+            padding: 8px 12px;
             background: #fff;
+            font-size: 9.5px;
         }
 
         .receipt-footer {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
-            margin-top: 18px;
-            align-items: end;
+            align-items: flex-end;
+            margin-top: 10px;
         }
 
         .footer-mini-header {
-            margin-top: 16px;
-            padding-top: 12px;
+            margin-top: 10px;
+            padding-top: 8px;
             border-top: 1px dashed var(--border-dark);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             color: var(--primary-dark);
             font-weight: 700;
+            font-size: 9.5px;
         }
 
-        .empty-state {
-            padding: 50px 20px;
-            text-align: center;
-            color: #b91c1c;
+        .empty-state { padding: 40px 20px; text-align: center; color: #b91c1c; font-weight: 700; }
+
+        /* ─── PAGE BREAK ─────────────────────────────── */
+        .page-break {
+            border: none;
+            border-top: 3px dashed #94a3b8;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .page-break::after {
+            content: "── Page 2 ──";
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 0 10px;
+            color: var(--muted);
+            font-size: 8px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
+        /* ─── PRINT ──────────────────────────────────── */
         @media print {
-            @page {
-                size: A4;
-                margin: 8mm 0;
-            }
-            body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: #fff;
-            }
+            @page { size: A4; margin: 6mm 0; }
 
-            .no-print,
-            .no-print-toolbar {
-                display: none !important;
-            }
+            body { margin: 0 !important; padding: 0 !important; background: #fff; font-size: 9px; }
+
+            .no-print, .no-print-toolbar { display: none !important; }
 
             .application-sheet {
-                margin: 0;
-                width: 100%;
-                min-height: auto;
-                box-shadow: none;
-                border: 1px solid #000;
-                border-radius: 0;
+                margin: 0; width: 100%; box-shadow: none;
+                border: none;
             }
 
             .application-sheet::before { display: none; }
 
-            .sheet-inner {
-                padding: 8mm 10mm 10mm;
-            }
+            .sheet-inner { padding: 6mm 8mm 7mm; }
 
-            .section-card {
-                margin-top: 8px;
-                border-radius: 8px;
-                break-inside: avoid;
-                page-break-inside: avoid;
+            .page-break {
+                display: block !important;
+                page-break-before: always;
+                break-before: page;
+                border: none;
+                margin: 0;
             }
+            .page-break::after { display: none; }
 
-            .section-head {
-                padding: 6px 10px;
-            }
-
-            .section-body {
-                padding: 8px 10px;
-            }
-
-            .summary-band {
-                margin: 10px 0 10px;
-                gap: 6px;
-            }
-
-            .subject-box,
-            .receipt-panel,
-            .summary-card {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-
-            .section-card,
-            .undertaking-box,
-            .receipt-panel,
-            .college-header,
-            .summary-card,
-            .profile-panel,
-            .weightage-item,
-            .document-chip {
+            .section-card, .summary-card, .weightage-item,
+            .receipt-panel, .college-header, .addr-panel {
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
         }
 
         @media (max-width: 900px) {
-            .application-sheet {
-                width: calc(100% - 20px);
-            }
+            .application-sheet { width: calc(100% - 20px); }
         }
     </style>
 </head>
 <body>
     <div class="no-print">
-        <%- include('../../layout/header') %>
+        <% if (typeof layout !== 'undefined' && layout === 'frontend') { %>
+            <%- include('../../../frontend/layout/header') %>
+        <% } else { %>
+            <%- include('../../layout/header') %>
+        <% } %>
     </div>
 
     <div class="no-print-toolbar no-print">
         <button onclick="window.print()" class="btn btn-primary btn-sm">
             <i class="bi bi-printer"></i> Print Application
         </button>
-        <a href="/" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+        <% if (typeof layout !== 'undefined' && layout === 'student') { %>
+            <a href="/student/dashboard" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+        <% } else { %>
+            <a href="/print_application_form" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+        <% } %>
     </div>
 
     <div class="application-sheet">
@@ -702,32 +621,34 @@
                     if (student.major2 && student.major2.subject_name) majors.push(student.major2.subject_name);
                 %>
 
+                <!-- ══════════════════════ PAGE 1 ══════════════════════ -->
+
                 <div class="top-meta">
                     <div>Generated On: <strong><%= new Date().toLocaleString('en-IN') %></strong></div>
                     <div>Institution: <strong><%= fieldLabels.header.college_name_en %></strong></div>
                 </div>
 
+                <!-- College Header -->
                 <div class="college-header">
-                    <div class="college-header-grid">
-                        <div class="text-center">
-                            <img src="/uploads/static/logo_header.png" alt="College Logo" class="college-logo">
-                        </div>
-                        <div class="text-center">
-                            <h1 class="college-name-en">Government Women Degree College Robertsganj Sonebhadra</h1>
-                            <div class="college-name-hi">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</div>
-                            <div class="college-subtitle">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
-                        </div>
-                        <div class="text-center">
-                            <img src="/uploads/static/logo_header_right.png" alt="College Logo" class="college-logo">
+                    <div class="text-center">
+                        <img src="/uploads/static/logo_header.png" alt="College Logo" class="college-logo">
+                    </div>
+                    <div class="text-center">
+                        <h1 class="college-name-en">Government Women Degree College Robertsganj Sonebhadra</h1>
+                        <div class="college-name-hi">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</div>
+                        <div class="college-subtitle">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
+                        <div class="title-ribbon-wrap" style="margin-top:5px;">
+                            <div class="title-ribbon">
+                                <%= fieldLabels.header.application_title %> | Session: <%= activeAcademicYear ? activeAcademicYear.session : '' %>
+                            </div>
                         </div>
                     </div>
-                    <div class="title-ribbon-wrap">
-                        <div class="title-ribbon">
-                            <%= fieldLabels.header.application_title %> | Session: <%= activeAcademicYear ? activeAcademicYear.session : '' %>
-                        </div>
+                    <div class="text-center">
+                        <img src="/uploads/static/logo_header_right.png" alt="College Logo" class="college-logo">
                     </div>
                 </div>
 
+                <!-- Summary Band -->
                 <div class="summary-band">
                     <div class="summary-card">
                         <div class="label">Registration No.</div>
@@ -747,13 +668,15 @@
                     </div>
                 </div>
 
+                <!-- Student Profile -->
                 <div class="section-card">
                     <div class="section-head">
                         <h2 class="section-title">Student Profile</h2>
                         <span class="section-subtitle">Primary applicant information</span>
                     </div>
                     <div class="section-body">
-                        <div class="grid-2">
+                        <div class="grid-main">
+                            <!-- Left: Info Grid -->
                             <div>
                                 <div class="info-grid">
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.name %></div><div class="info-value"><%= student.user ? student.user.name : '-' %></div></div>
@@ -763,14 +686,24 @@
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.gender %></div><div class="info-value"><%= student.gender || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.category %></div><div class="info-value"><%= student.category || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.religion %></div><div class="info-value"><%= student.religion || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.caste %></div><div class="info-value"><%= student.caste || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.father_name %></div><div class="info-value"><%= student.father_name || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.mother_name %></div><div class="info-value"><%= student.mother_name || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.local_guardian %></div><div class="info-value"><%= student.local_guadian || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.guardian_contact %></div><div class="info-value"><%= student.guadian_contact || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.local_guardian_address %></div><div class="info-value"><%= student.local_guadian_address || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.family_income %></div><div class="info-value"><%= student.family_annual_income || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.father_occupation %></div><div class="info-value"><%= student.father_occupation || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.mother_occupation %></div><div class="info-value"><%= student.mother_occupation || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.blood_group %></div><div class="info-value"><%= student.blood_group || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.computer_literate %></div><div class="info-value"><%= student.computer_literate || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.adhar_no %></div><div class="info-value"><%= student.adhar_no || '-' %></div></div>
                                     <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.samarth_no %></div><div class="info-value"><%= student.samarth_no || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.caste_cert_no %></div><div class="info-value"><%= student.cast_certificate_no || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.income_cert_no %></div><div class="info-value"><%= student.income_certificate_no || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.epic_no %></div><div class="info-value"><%= student.epic_no || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.disability %></div><div class="info-value"><%= student.disability_percentage ? 'Yes (' + student.disability_percentage + '%)' : 'No' %></div></div>
+                                    <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.is_18_plus %></div><div class="info-value"><%= student.is_18_plus || 'No' %></div></div>
                                     <% if (student.year_gap === 'Yes') { %>
                                         <div class="info-item"><div class="info-label">Gap Years</div><div class="info-value"><%= student.year_gap_after_inter || '-' %> Years</div></div>
                                         <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.gap_reason %></div><div class="info-value"><%= student.gap_reason || '-' %></div></div>
@@ -778,94 +711,77 @@
                                         <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.year_gap %></div><div class="info-value">No</div></div>
                                     <% } %>
                                 </div>
+                            </div>
 
-                                <div class="subject-box">
-                                    <div class="subject-title">Subject Selection</div>
-                                    <div class="subject-grid">
-                                        <div><span>Major Subject 1:</span> <strong><%= majors[0] || 'N/A' %></strong></div>
-                                        <div><span>Major Subject 2:</span> <strong><%= majors[1] || 'N/A' %></strong></div>
-                                        <div><span>Minor Subject:</span> <strong><%= student.minor && student.minor.subject_name ? student.minor.subject_name : 'N/A' %></strong></div>
-                                        <div><span>Skill Development:</span> <strong><%= student.skill && student.skill.name ? student.skill.name : 'N/A' %></strong></div>
-                                        <div><span>Co-Curricular:</span> <strong><%= student.cocurricular && student.cocurricular.name ? student.cocurricular.name : 'N/A' %></strong></div>
-                                        <div><span>Previous Student:</span> <strong><%= student.is_previous_student || 'No' %></strong></div>
+                            <!-- Right: Photo + Sign -->
+                            <div>
+                                <div class="asset-box">
+                                    <div class="asset-label">Photograph</div>
+                                    <div class="asset-image">
+                                        <% if (student.photo) { %>
+                                            <img src="<%= student.photo %>?t=<%= Date.now() %>" alt="Student Photo">
+                                        <% } else { %>
+                                            <span class="placeholder-text">No Photo</span>
+                                        <% } %>
                                     </div>
-                                </div>
-                                <div class="subject-box" style="margin-top: 8px;">
-                                    <div class="subject-title">Bank Account Details</div>
-                                    <div class="info-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                                        <div class="info-item">
-                                            <div class="info-label"><%= fieldLabels.application.fields.bank_name %></div>
-                                            <div class="info-value"><%= student.bank_name || '-' %></div>
-                                        </div>
-                                        <div class="info-item">
-                                            <div class="info-label"><%= fieldLabels.application.fields.bank_account_no %></div>
-                                            <div class="info-value"><%= student.bank_account_no || '-' %></div>
-                                        </div>
-                                        <div class="info-item">
-                                            <div class="info-label"><%= fieldLabels.application.fields.ifsc_code %></div>
-                                            <div class="info-value"><%= student.ifsc_code || '-' %></div>
-                                        </div>
+                                    <div class="asset-label" style="background: #4b5563;">Signature</div>
+                                    <div class="asset-sign">
+                                        <% if (student.sign) { %>
+                                            <img src="<%= student.sign %>?t=<%= Date.now() %>" alt="Student Signature">
+                                        <% } else { %>
+                                            <span class="placeholder-text">No Signature</span>
+                                        <% } %>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div>
-                                <div class="profile-panel">
-                                    <div class="photo-sign-stack">
-                                        <div class="asset-box">
-                                            <div class="asset-label">Photograph</div>
-                                            <div class="asset-image">
-                                                <% if (student.photo) { %>
-                                                    <img src="<%= student.photo %>?t=<%= Date.now() %>" alt="Student Photo">
-                                                <% } else { %>
-                                                    <span class="placeholder-text">No Photo</span>
-                                                <% } %>
-                                            </div>
-                                            <div class="asset-sign">
-                                                <% if (student.sign) { %>
-                                                    <img src="<%= student.sign %>?t=<%= Date.now() %>" alt="Student Signature">
-                                                <% } else { %>
-                                                    <span class="placeholder-text">No Signature</span>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <!-- Subject Box (Full Width) -->
+                        <div class="subject-box">
+                            <div class="subject-title">Subject Selection</div>
+                            <div class="subject-grid">
+                                <% if (student.semsterName && student.semsterName.is_major1_enabled == 1) { %>
+                                    <div><span>Major 1:</span> <strong><%= (student.major1 && student.major1.subject_name) ? student.major1.subject_name : 'N/A' %></strong></div>
+                                <% } %>
+                                
+                                <% if (student.semsterName && student.semsterName.is_major2_enabled == 1) { %>
+                                    <div><span>Major 2:</span> <strong><%= (student.major2 && student.major2.subject_name) ? student.major2.subject_name : 'N/A' %></strong></div>
+                                <% } %>
+                                
+                                <% if (student.semsterName && student.semsterName.is_minor_enabled == 1) { %>
+                                    <div><span>Minor:</span> <strong><%= (student.minor && student.minor.subject_name) ? student.minor.subject_name : 'N/A' %></strong></div>
+                                <% } %>
+                                
+                                <% if (student.semsterName && student.semsterName.is_research_project_enabled == 1) { %>
+                                    <div><span>Research Project:</span> <strong><%= (student.researchProject && student.researchProject.subject_name) ? student.researchProject.subject_name : 'N/A' %></strong></div>
+                                <% } %>
 
-                                    <div class="info-grid" style="grid-template-columns: 1fr; gap: 8px;">
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.caste_cert_no %></div><div class="info-value"><%= student.cast_certificate_no || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.caste %></div><div class="info-value"><%= student.caste || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.blood_group %></div><div class="info-value"><%= student.blood_group || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.father_occupation %></div><div class="info-value"><%= student.father_occupation || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.mother_occupation %></div><div class="info-value"><%= student.mother_occupation || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.local_guardian_address %></div><div class="info-value"><%= student.local_guadian_address || '-' %></div></div>
-                                        <div class="info-item"><div class="info-label"><%= fieldLabels.application.fields.income_cert_no %></div><div class="info-value"><%= student.income_certificate_no || '-' %></div></div>
-                                    </div>
+                                <% if (student.semsterName && (student.semsterName.is_skill_required == 1 || student.semsterName.is_skill_required == '1')) { %>
+                                    <div><span>Skill:</span> <strong><%= (student.skill && student.skill.name) ? student.skill.name : 'N/A' %></strong></div>
+                                <% } %>
 
-                                    <div class="badge-row">
-                                        <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.disability %></div>
-                                            <div class="value"><%= student.disability_percentage ? 'Yes' : 'No' %></div>
-                                        </div>
-                                        <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.disability_percentage_label %></div>
-                                            <div class="value"><%= student.disability_percentage || '-' %></div>
-                                        </div>
-                                        <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.is_18_plus %></div>
-                                            <div class="value"><%= student.is_18_plus || 'No' %></div>
-                                        </div>
-                                        <div class="mini-badge">
-                                            <div class="label"><%= fieldLabels.application.fields.epic_no %></div>
-                                            <div class="value"><%= student.epic_no || '-' %></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <% if (student.semsterName && (student.semsterName.is_cocurricular_required == 1 || student.semsterName.is_cocurricular_required == '1')) { %>
+                                    <div><span>Co-Curricular:</span> <strong><%= (student.cocurricular && student.cocurricular.name) ? student.cocurricular.name : 'N/A' %></strong></div>
+                                <% } %>
+                                
+                                <div><span>Prev. Student:</span> <strong><%= student.is_previous_student || 'No' %></strong></div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Details -->
+                        <div class="subject-box" style="margin-top: 8px;">
+                            <div class="subject-title">Bank Account Details</div>
+                            <div class="subject-grid" style="grid-template-columns: repeat(3, 1fr);">
+                                <div><span>Bank Name:</span> <strong><%= student.bank_name || '-' %></strong></div>
+                                <div><span>Account No:</span> <strong><%= student.bank_account_no || '-' %></strong></div>
+                                <div><span>IFSC Code:</span> <strong><%= student.ifsc_code || '-' %></strong></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="section-card mt-16">
+                <!-- Weightage -->
+                <div class="section-card" style="margin-top:5px;">
                     <div class="section-head">
                         <h2 class="section-title">Weightage Details</h2>
                         <span class="section-subtitle">Additional merit claims</span>
@@ -888,38 +804,93 @@
                     </div>
                 </div>
 
-                <div class="section-card mt-16">
+                <!-- Address Details (Moved to Page 1) -->
+                <div class="section-card" style="margin-top:5px;">
                     <div class="section-head">
                         <h2 class="section-title">Address Details</h2>
-                        <span class="section-subtitle">Mailing and permanent residence information</span>
+                        <span class="section-subtitle">Mailing and permanent residence</span>
                     </div>
                     <div class="section-body">
                         <div class="grid-2-equal">
-                            <div class="profile-panel" style="background: #fff; border: 1px solid #e5e7eb;">
-                                <div class="subject-title" style="border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 2px; margin-bottom: 12px;">Mailing Address</div>
-                                <div class="info-grid" style="grid-template-columns: 1fr; gap: 6px;">
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Address</div><div class="info-value" style="width: 70%"><%= student.mailing_address || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">State</div><div class="info-value" style="width: 70%"><%= student.mailing_state || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">District</div><div class="info-value" style="width: 70%"><%= student.mailing_district || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Tehsil</div><div class="info-value" style="width: 70%"><%= student.mailing_tehsil || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Pincode</div><div class="info-value" style="width: 70%"><%= student.mailing_pincode || '-' %></div></div>
+                            <div class="addr-panel">
+                                <div class="addr-title">Mailing Address</div>
+                                <div class="addr-info">
+                                    <div class="info-item"><div class="info-label" style="width:30%">Address</div><div class="info-value" style="width:70%"><%= student.mailing_address || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">State</div><div class="info-value" style="width:70%"><%= student.mailing_state || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">District</div><div class="info-value" style="width:70%"><%= student.mailing_district || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">Tehsil</div><div class="info-value" style="width:70%"><%= student.mailing_tehsil || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">Pincode</div><div class="info-value" style="width:70%"><%= student.mailing_pincode || '-' %></div></div>
                                 </div>
                             </div>
-                            <div class="profile-panel" style="background: #fff; border: 1px solid #e5e7eb;">
-                                <div class="subject-title" style="border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 2px; margin-bottom: 12px;">Permanent Address</div>
-                                <div class="info-grid" style="grid-template-columns: 1fr; gap: 6px;">
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Address</div><div class="info-value" style="width: 70%"><%= student.permanent_address || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">State</div><div class="info-value" style="width: 70%"><%= student.permanent_state || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">District</div><div class="info-value" style="width: 70%"><%= student.permanent_district || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Tehsil</div><div class="info-value" style="width: 70%"><%= student.permanent_tehsil || '-' %></div></div>
-                                    <div class="info-item"><div class="info-label" style="width: 30%">Pincode</div><div class="info-value" style="width: 70%"><%= student.permanent_pincode || '-' %></div></div>
+                            <div class="addr-panel">
+                                <div class="addr-title">Permanent Address</div>
+                                <div class="addr-info">
+                                    <div class="info-item"><div class="info-label" style="width:30%">Address</div><div class="info-value" style="width:70%"><%= student.permanent_address || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">State</div><div class="info-value" style="width:70%"><%= student.permanent_state || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">District</div><div class="info-value" style="width:70%"><%= student.permanent_district || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">Tehsil</div><div class="info-value" style="width:70%"><%= student.permanent_tehsil || '-' %></div></div>
+                                    <div class="info-item"><div class="info-label" style="width:30%">Pincode</div><div class="info-value" style="width:70%"><%= student.permanent_pincode || '-' %></div></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="section-card mt-16">
+                <!-- ══════════════════════ PAGE BREAK ══════════════════════ -->
+                <hr class="page-break">
+
+                <!-- Page 2 Header (compact) -->
+                <div class="top-meta" style="margin-top:0;">
+                    <div><strong><%= student.user ? student.user.name : '-' %></strong> | Reg: <strong><%= student.registration_no || '-' %></strong></div>
+                    <div><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %> | Session: <%= activeAcademicYear ? activeAcademicYear.session : '' %></div>
+                </div>
+
+                <!-- Payment Details -->
+                <div class="section-card" style="margin-top:5px;">
+                    <div class="section-head">
+                        <h2 class="section-title">Payment Details</h2>
+                        <span class="section-subtitle">Transaction summary</span>
+                    </div>
+                    <div class="section-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Atom Txn ID</th>
+                                    <th>Fee Type</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (typeof payment !== 'undefined' && payment) { %>
+                                    <tr>
+                                        <td class="fw-600"><%= payment.merchant_txn_id || '-' %></td>
+                                        <td><%= payment.atom_txn_id || '-' %></td>
+                                        <td>Form Fee</td>
+                                        <td class="fw-700">₹ <%= payment.amount || '0.00' %></td>
+                                        <td><%= new Date(payment.payment_date || payment.createdAt || Date.now()).toLocaleDateString('en-IN') %></td>
+                                        <td><span class="status-pill status-yes"><%= payment.status || 'Success' %></span></td>
+                                    </tr>
+                                <% } else if (student.user && student.user.transaction_id) { %>
+                                    <tr>
+                                        <td class="fw-600"><%= student.user.transaction_id %></td>
+                                        <td>-</td><td>Form Fee</td><td class="fw-700">-</td><td>-</td>
+                                        <td><span class="status-pill status-yes">Success</span></td>
+                                    </tr>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;" class="muted">Payment details not available</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Academic Qualifications -->
+                <div class="section-card" style="margin-top:5px;">
                     <div class="section-head">
                         <h2 class="section-title">Academic Qualifications</h2>
                         <span class="section-subtitle">Educational history and performance</span>
@@ -934,24 +905,20 @@
                                     <th>Roll Number</th>
                                     <th>Max Marks</th>
                                     <th>Obt. Marks</th>
-                                    <th>Place</th>
+                                    <th style="width: 25%;">Subjects</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% if (typeof educationals !== 'undefined' && educationals.length > 0) { %>
                                     <% educationals.forEach(edu => { %>
-                                        <%
-                                            let instName = edu.school_name || '-';
-                                            if (instName === '0') instName = '-';
-                                        %>
                                         <tr>
-                                            <td class="fw-600"><%= instName %></td>
+                                            <td class="fw-600"><%= edu.school_name || (edu.qualification ? edu.qualification.name : edu.class_name) %></td>
                                             <td><%= edu.board_name || '-' %></td>
                                             <td><%= edu.year_of_passing || '-' %></td>
                                             <td class="fw-600"><%= edu.roll_no || '-' %></td>
                                             <td><%= edu.total_marks || '-' %></td>
-                                            <td class="fw-700" style="color: var(--primary);"><%= edu.obtained_marks || '-' %></td>
-                                            <td>Any other</td>
+                                            <td class="fw-700" style="color:var(--primary);"><%= edu.obtained_marks || '-' %></td>
+                                            <td style="font-size: 8.5px; line-height: 1.2;"><%= edu.subject_details || '-' %></td>
                                         </tr>
                                     <% }); %>
                                 <% } %>
@@ -960,78 +927,38 @@
                     </div>
                 </div>
 
-                <div class="section-card mt-16">
-                    <div class="section-head">
-                        <h2 class="section-title">Uploaded Documents</h2>
-                        <span class="section-subtitle">Supporting documents submitted with the application</span>
-                    </div>
-                    <div class="section-body">
-                        <div class="documents-grid">
-                            <% if (filteredDocs.length > 0) { %>
-                                <% filteredDocs.forEach((doc, idx) => { %>
-                                    <div class="document-chip">
-                                        <%= idx + 1 %>. <%= doc.documentType ? doc.documentType.name : 'Unknown Document' %>
-                                    </div>
-                                <% }); %>
-                            <% } else { %>
-                                <div class="empty-state">No documents listed</div>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-card mt-16">
+                <!-- Declaration -->
+                <div class="section-card" style="margin-top:5px;">
                     <div class="section-head">
                         <h2 class="section-title">Declaration / Undertaking</h2>
                         <span class="section-subtitle">Applicant self-declaration</span>
                     </div>
                     <div class="section-body">
                         <div class="undertaking-box">
-                            <p class="mb-0">
-                                मैं <strong><%= student.user ? student.user.name : '-' %></strong> पुत्री/पत्नी <strong><%= student.father_name || '-' %></strong>, कक्षा <strong><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></strong> में प्रवेश हेतु यह शपथपूर्वक घोषित करती हूँ कि:-
+                            <p class="mb-0" style="font-size:9px;">
+                                मैं <strong><%= student.user ? student.user.name : '-' %></strong> <%= student.gender === 'Male' ? 'पुत्र' : 'पुत्री/पत्नी' %> <strong><%= student.father_name || '-' %></strong>, कक्षा <strong><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></strong> में प्रवेश हेतु यह शपथपूर्वक घोषित <%= student.gender === 'Male' ? 'करता' : 'करती' %> हूँ कि:-
                             </p>
                             <ol>
-                                <li>मैंने वर्तमान सत्र में इस महाविद्यालय के अतिरिक्त अन्य किसी विश्वविद्यालय / महाविद्यालय / प्रशिक्षण संस्थान में प्रवेश नहीं लिया है तथा मैं कहीं सेवारत नहीं हूँ|</li>
-                                <li>मैं कक्षा में न्यूनतम 75 प्रतिशत उपस्थिति सुनिश्चित करने का वचन देती हूँ|</li>
-                                <li>मैं महाविद्यालय के अनुशासन, आचार-संहिता एवं नियमों का पूर्ण पालन करुँगी|</li>
-                                <li>मेरे द्वारा आवेदन-पत्र / घोषणा-पत्र में दी गई सभी सूचनाएँ सत्य हैं| कोई सूचना असत्य पाए जाने पर प्रवेश निरस्त किए जाने पर मुझे कोई आपत्ति नहीं होगी|</li>
-                                <li>मैं महाविद्यालय परिसर को रैगिंग मुक्त एवं तम्बाकू / गुटका मुक्त बनाए रखने में सहयोग करुँगी|</li>
+                                <li>मैं कक्षा में 75% उपस्थिति की अनिवार्यता का पालन करूँगा/करूंगी|</li>
+                                <li>प्रवेश के सम्बन्ध में अंतिम निर्णय प्रवेश समिति/प्राचार्य का होगा, जो मुझे स्वीकार्य है|</li>
+                                <li>मैं प्राचार्य एवं अनुशासन समिति (नियन्ता मण्डल) द्वारा स्थापित नियमों एवं आदेशों का निष्ठापूर्वक पालन करूँगा/करुँगी|</li>
+                                <li>मैं प्राचार्य के अधिकारों को स्वीकार करता/करती हूँ, और यदि मेरा आचरण प्रतिकूल रहा तो उनके द्वारा दी गयी व्यवस्था का प्रतिरोध न करते हुए मैं उसे अंतिम निर्णय के रूप में स्वीकार करूँगा/करुँगी|</li>
+                                <li>मैं घोषणा करता/करती हूँ कि सभी प्रविष्टियाँ सही हैं| दी गई सूचनाओं के लिए मै स्वयं पूर्णत: जिम्मेदार हूँ |</li>
+                                <li>मैं सभी विषय की कक्षाओं में नियमित रूप से उपस्थित रहूँगा/रहूँगी| मेरा यह भी उत्तरदायित्व होगा कि अपेक्षित उपस्थिति सम्बंधित सूचना सम्बंधित प्राध्यापक से प्राप्त कर लूँ|</li>
                             </ol>
-
-                            <div class="highlight-box">
-                                <span class="fw-700" style="color: var(--secondary); font-size: 10px; display: block; margin-bottom: 4px;">अभ्यर्थी द्वारा अतिरिक्त अंडरटेकिंग:</span>
-                                <p class="mb-0" style="font-size: 10.5px; line-height: 1.5; color: #4b5563;">
-                                    महात्मा गाँधी काशी विद्यापीठ के कार्यालय आदेश दि० 05/09/2020 में प्रोन्नति के सम्बन्ध में दी गयी शर्तो के अधीन अगली कक्षा में प्रोन्नति के पश्चात् प्रवेश हेतु मेरा आवेदन किया जा रहा है| यदि इन शर्तो/प्रतिबंधो के आधार पर यदि मैं भविष्य में पिछली कक्षा में वि० वि० द्वारा अनुत्तीर्ण घोषित की जाती हूँ तो प्रवेश निरस्त किये जाने पर मुझे कोई आपत्ति नहीं होगी|
-                                </p>
-                            </div>
-
                             <div class="signature-row">
                                 <div class="signature-box">
                                     <div class="signature-line">Guardian's Signature</div>
                                 </div>
                                 <div class="signature-box">
-                                    <div class="signature-line">Applicant's Signature</div>
+                                    <div style="height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;">
+                                        <% if (student.sign) { %>
+                                            <img src="<%= student.sign %>" alt="Applicant Signature" style="max-height: 100%; max-width: 150px; object-fit: contain;">
+                                        <% } %>
+                                    </div>
+                                    <div class="signature-line" style="margin-top:0;">Applicant's Signature</div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-card mt-16">
-                    <div class="section-head">
-                        <h2 class="section-title">Important Instructions</h2>
-                        <span class="section-subtitle">Documents required for verification</span>
-                    </div>
-                    <div class="section-body">
-                        <div class="instruction-grid">
-                            <div>1. हाईस्कूल अंक पत्र एवं प्रमाण-पत्र की छाया प्रति</div>
-                            <div>2. इण्टरमीडिएट अंक पत्र एवं प्रमाण-पत्र की छाया प्रति</div>
-                            <div>3. चरित्र प्रमाण-पत्र की छाया प्रति</div>
-                            <div>4. स्थानान्तरण प्रमाण-पत्र (टी.सी.) की छाया प्रति</div>
-                            <div>5. जाति प्रमाण-पत्र (SC/ST/OBC हेतु) की छाया प्रति</div>
-                            <div>6. आधार कार्ड की छाया प्रति</div>
-                            <div>7. अन्य प्रमाण पत्र (भारांक सम्बन्धी) की छाया प्रति</div>
-                            <div>8. गैप होने की दशा में शपथ पत्र की छाया प्रति</div>
                         </div>
                     </div>
                 </div>
@@ -1039,35 +966,52 @@
                 <div class="receipt-cut"></div>
 
                 <div class="receipt-panel">
-                    <div class="receipt-header">फार्म प्राप्ति रसीद</div>
+                    <div class="receipt-header">STUDENT ADMISSION SLIP (COLLEGE COPY) - SESSION <%= activeAcademicYear ? activeAcademicYear.session : '-' %></div>
                     <div class="receipt-body">
-                        <div class="info-grid">
-                            <div class="info-item"><div class="info-label">आवेदन पत्र संख्या</div><div class="info-value"><%= student.registration_no || '-' %></div></div>
+                        <div class="grid-2-equal">
+                            <div class="info-grid" style="grid-template-columns: 1fr;">
+                                <div class="info-item"><div class="info-label">Student Name</div><div class="info-value"><%= student.user ? student.user.name : '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Father's Name</div><div class="info-value"><%= student.father_name || '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Registration No</div><div class="info-value"><%= student.registration_no || '-' %></div></div>
+                            </div>
+                            <div class="info-grid" style="grid-template-columns: 1fr;">
+                                <div class="info-item"><div class="info-label">Course Name</div><div class="info-value"><%= student.courseName ? student.courseName.name : '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Semester</div><div class="info-value"><%= student.semsterName ? student.semsterName.name : '-' %></div></div>
+                                <div class="info-item"><div class="info-label">Category</div><div class="info-value"><%= student.category || '-' %></div></div>
+                            </div>
                         </div>
-                        <p class="mt-12" style="font-size: 12px; line-height: 1.6;">
-                            छात्रा <strong><%= student.user ? student.user.name : '-' %></strong>, पिता का नाम <strong><%= student.father_name || '-' %></strong>, कक्षा <strong><%= student.courseName ? student.courseName.name : '' %> - <%= student.semsterName ? student.semsterName.name : '' %></strong> में प्रवेश हेतु आवेदन पत्र प्राप्त किया गया।
-                        </p>
+
+                        <div class="footer-mini-header">
+                            <img src="/uploads/static/logo_header.png" style="height: 18px">
+                            Government Women Degree College Robertsganj Sonebhadra
+                        </div>
+
                         <div class="receipt-footer">
-                            <div>दिनांक: <strong><%= new Date().toLocaleDateString('en-IN') %></strong></div>
-                            <div class="signature-box" style="min-width: 200px;">
-                                <div class="signature-line" style="margin-top: 20px;">प्राप्तकर्ता के हस्ताक्षर</div>
+                            <div class="small muted">Date: <%= new Date().toLocaleDateString('en-IN') %></div>
+                            <div class="text-right">
+                                <div style="height: 40px;"></div>
+                                <div class="fw-700" style="border-top: 1px solid #000; display: inline-block; padding-top: 2px;">Admission In-charge Signature</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="footer-mini-header">
-                    <img src="/uploads/static/logo_header.png" style="height: 24px;">
-                    Government Women Degree College Robertsganj Sonebhadra
-                </div>
-
             <% } else { %>
                 <div class="empty-state">Applicant data session expired. Please search again.</div>
             <% } %>
         </div>
     </div>
 
-    <%- include('../../layout/footer') %>
-    <%- include('../../layout/script_link') %>
+    <div class="no-print">
+        <% if (typeof layout !== 'undefined' && layout === 'frontend') { %>
+            <%- include('../../../frontend/layout/footer') %>
+        <% } else { %>
+            <%- include('../../layout/footer') %>
+        <% } %>
+    </div>
+    <% if (typeof layout !== 'undefined' && layout === 'frontend') { %>
+        <%- include('../../../frontend/layout/script_link') %>
+    <% } else { %>
+        <%- include('../../layout/script_link') %>
+    <% } %>
 </body>
 </html>

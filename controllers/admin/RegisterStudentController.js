@@ -486,6 +486,7 @@ export const show = async (req, res) => {
                 { model: Subject, as: 'major1' },
                 { model: Subject, as: 'major2' },
                 { model: Subject, as: 'minor' },
+                { model: Subject, as: 'researchProject' },
                 { model: Skills, as: 'skill' },
                 { model: Cocurricular, as: 'cocurricular' },
                 { model: AcademicYear, as: 'academicYear' },
@@ -534,6 +535,7 @@ export const edit = async (req, res) => {
                 { model: Subject, as: 'major1' },
                 { model: Subject, as: 'major2' },
                 { model: Subject, as: 'minor' },
+                { model: Subject, as: 'researchProject' },
                 { model: Skills, as: 'skill' },
                 { model: Cocurricular, as: 'cocurricular' },
                 { model: AcademicYear, as: 'academicYear' },
@@ -618,6 +620,7 @@ export const edit = async (req, res) => {
                 major1_id: student.major1_id,
                 major2_id: student.major2_id,
                 minor_id: student.minor_id,
+                research_project_id: student.research_project_id,
                 skill_id: student.skill_id,
                 cocurricular_id: student.cocurricular_id
             },
@@ -669,7 +672,7 @@ export const update = async (req, res) => {
             computer_literate, extracurricular_activity, is_previous_student,
             disability_percentage, year_gap, year_gap_after_inter, gap_reason,
             // Subject fields
-            major1_id, major2_id, minor_id, skill_id, cocurricular_id,
+            major1_id, major2_id, minor_id, research_project_id, skill_id, cocurricular_id,
             // Weightage fields
             weightage_ids,
             // Educational fields
@@ -697,6 +700,7 @@ export const update = async (req, res) => {
             major1_id: major1_id || null,
             major2_id: major2_id || null,
             minor_id: minor_id || null,
+            research_project_id: research_project_id || null,
             skill_id: skill_id || null,
             cocurricular_id: cocurricular_id || null
         });

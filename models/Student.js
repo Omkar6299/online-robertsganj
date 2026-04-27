@@ -151,6 +151,10 @@ const Student = sequelize.define('Student', {
     type: DataTypes.BIGINT.UNSIGNED,
     allowNull: true
   },
+  research_project_id: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: true
+  },
   caste: {
     type: DataTypes.STRING,
     allowNull: true

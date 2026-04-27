@@ -24,18 +24,6 @@ const Course = sequelize.define('Course', {
     type: DataTypes.STRING,
     defaultValue: '1'
   },
-  is_major1_required: {
-    type: DataTypes.STRING,
-    defaultValue: '1'
-  },
-  is_major2_required: {
-    type: DataTypes.STRING,
-    defaultValue: '0'
-  },
-  is_minor_required: {
-    type: DataTypes.STRING,
-    defaultValue: '0'
-  },
 }, {
   tableName: 'courses',
   timestamps: true,
@@ -45,4 +33,3 @@ const Course = sequelize.define('Course', {
 });
 
 export default Course;
-

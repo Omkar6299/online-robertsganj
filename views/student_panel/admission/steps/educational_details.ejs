@@ -53,7 +53,6 @@
                                 <%
                                     const defaultYears = [];
                                     const currYr = typeof currentYear !== 'undefined' ? currentYear : new Date().getFullYear();
-                                    // Default range of 50 years if no limit is set
                                     for(let i = 0; i <= 50; i++) {
                                         defaultYears.push(currYr - i);
                                     }
@@ -80,62 +79,35 @@
 
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="subject_details_<%= qualification.id %>" class="form-label">Subject(s) Taken (Optional)</label>
+                        <label for="subject_details_<%= qualification.id %>" class="form-label">Subject(s) Taken <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
                         <input type="text" name="subject_details[<%= qualification.id %>]" id="subject_details_<%= qualification.id %>" class="form-control"
                             value="<%= typeof oldInput !== 'undefined' && oldInput.subject_details && oldInput.subject_details[qualification.id] ? oldInput.subject_details[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].subject_details ? educationalDetails[qualification.name].subject_details : '') %>"
-                            placeholder="Enter subjects (e.g., Hindi, English, Science, Mathematics...)">
+                            placeholder="Enter subjects (e.g., Hindi, English, Science, Mathematics...)" <%= qualification.status === 'required' ? 'required' : '' %>>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="total_marks_<%= qualification.id %>" class="form-label">Total Marks</label>
-                        <input type="number" name="total_marks[<%= qualification.id %>]" id="total_marks_<%= qualification.id %>" class="form-control" min="0"
+                        <label for="total_marks_<%= qualification.id %>" class="form-label">Total Marks <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
+                        <input type="number" name="total_marks[<%= qualification.id %>]" id="total_marks_<%= qualification.id %>" class="form-control" min="0" step="any"
                             value="<%= typeof oldInput !== 'undefined' && oldInput.total_marks && oldInput.total_marks[qualification.id] ? oldInput.total_marks[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].total_marks ? educationalDetails[qualification.name].total_marks : '') %>"
-                            placeholder="Total Marks">
+                            placeholder="Total Marks" <%= qualification.status === 'required' ? 'required' : '' %>>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="obtained_marks_<%= qualification.id %>" class="form-label">Obtained Marks</label>
-                        <input type="number" name="obtained_marks[<%= qualification.id %>]" id="obtained_marks_<%= qualification.id %>" class="form-control" min="0"
+                        <label for="obtained_marks_<%= qualification.id %>" class="form-label">Obtained Marks <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
+                        <input type="number" name="obtained_marks[<%= qualification.id %>]" id="obtained_marks_<%= qualification.id %>" class="form-control" min="0" step="any"
                             value="<%= typeof oldInput !== 'undefined' && oldInput.obtained_marks && oldInput.obtained_marks[qualification.id] ? oldInput.obtained_marks[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].obtained_marks ? educationalDetails[qualification.name].obtained_marks : '') %>"
-                            placeholder="Obtained Marks">
+                            placeholder="Obtained Marks" <%= qualification.status === 'required' ? 'required' : '' %>>
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="mark_type_<%= qualification.id %>" class="form-label">Mark Type <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
-                        <select name="mark_type[<%= qualification.id %>]" id="mark_type_<%= qualification.id %>" class="form-control mark-type-selector" data-qual-id="<%= qualification.id %>" data-status="<%= qualification.status %>" <%= qualification.status === 'required' ? 'required' : '' %>>
-                            <option value="Percentage" <%= (typeof oldInput !== 'undefined' && oldInput.mark_type && oldInput.mark_type[qualification.id] === 'Percentage') || (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].mark_type === 'Percentage') ? 'selected' : '' %>>Percentage</option>
-                            <option value="CGPA" <%= (typeof oldInput !== 'undefined' && oldInput.mark_type && oldInput.mark_type[qualification.id] === 'CGPA') || (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].mark_type === 'CGPA') ? 'selected' : '' %>>CGPA</option>
-                        </select>
-                    </div>
-                </div>
-
-                <%
-                    const isCGPASelected = (typeof oldInput !== 'undefined' && oldInput.mark_type && oldInput.mark_type[qualification.id] === 'CGPA') || (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].mark_type === 'CGPA');
-                %>
-
-                <div class="col-md-4 percentage-container-<%= qualification.id %>" style="<%= isCGPASelected ? 'display: none;' : '' %>">
-                    <div class="form-group">
-                        <label for="percentage_<%= qualification.id %>" class="form-label">Percentage <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
-                        <input type="number" name="percentage[<%= qualification.id %>]" id="percentage_<%= qualification.id %>" class="form-control" step="0.01" min="1" max="100"
-                            value="<%= typeof oldInput !== 'undefined' && oldInput.percentage && oldInput.percentage[qualification.id] ? oldInput.percentage[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].percentage ? educationalDetails[qualification.name].percentage : '') %>"
-                            placeholder="Enter Percentage" <%= qualification.status === 'required' && !isCGPASelected ? 'required' : '' %>>
-                    </div>
-                </div>
-
-                <div class="col-md-4 cgpa-container-<%= qualification.id %>" style="<%= isCGPASelected ? '' : 'display: none;' %>">
-                    <div class="form-group">
-                        <label for="cgpa_<%= qualification.id %>" class="form-label">CGPA <span class="<%= qualification.status === 'required' ? 'text-danger' : '' %>"><%= qualification.status === 'required' ? '*' : '' %></span></label>
-                        <input type="number" name="cgpa[<%= qualification.id %>]" id="cgpa_<%= qualification.id %>" class="form-control" step="0.01" min="1" max="10"
-                            value="<%= typeof oldInput !== 'undefined' && oldInput.cgpa && oldInput.cgpa[qualification.id] ? oldInput.cgpa[qualification.id] : (typeof educationalDetails !== 'undefined' && educationalDetails[qualification.name] && educationalDetails[qualification.name].cgpa ? educationalDetails[qualification.name].cgpa : '') %>"
-                            placeholder="Enter CGPA" <%= qualification.status === 'required' && isCGPASelected ? 'required' : '' %>>
-                    </div>
-                </div>
+                <!-- Hidden fields for compatibility with older Mark Type logic if needed -->
+                <input type="hidden" name="mark_type[<%= qualification.id %>]" value="Percentage">
+                <input type="hidden" name="percentage[<%= qualification.id %>]" id="percentage_<%= qualification.id %>">
+                <input type="hidden" name="cgpa[<%= qualification.id %>]" id="cgpa_<%= qualification.id %>">
                 <% } %>
             <% }); %>
         <% } %>
@@ -149,7 +121,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const selectors = document.querySelectorAll('.mark-type-selector');
+        const totalInputs = document.querySelectorAll('input[name^="total_marks"]');
+        const obtainedInputs = document.querySelectorAll('input[name^="obtained_marks"]');
 
         function validateMarks(qualId) {
             const totalInput = document.getElementById(`total_marks_${qualId}`);
@@ -178,95 +151,28 @@
             }
         }
 
-        function calculateMarks(qualId) {
-            const totalInput = document.getElementById(`total_marks_${qualId}`);
-            const obtainedInput = document.getElementById(`obtained_marks_${qualId}`);
-            const percentageInput = document.getElementById(`percentage_${qualId}`);
-            const cgpaInput = document.getElementById(`cgpa_${qualId}`);
-
-            if (!totalInput || !obtainedInput) return;
-
-            // Validate first
-            const isValid = validateMarks(qualId);
-
-            const total = parseFloat(totalInput.value);
-            const obtained = parseFloat(obtainedInput.value);
-
-            if (isValid && !isNaN(total) && !isNaN(obtained) && total > 0) {
-                const percentage = (obtained / total) * 100;
-                percentageInput.value = percentage.toFixed(2);
-
-                const cgpa = percentage / 9.5;
-                // Restriction: CGPA capped at 10
-                const cappedCGPA = Math.min(cgpa, 10);
-                cgpaInput.value = cappedCGPA.toFixed(2);
-            }
-        }
-
-        selectors.forEach(selector => {
-            const qualId = selector.getAttribute('data-qual-id');
-            const totalInput = document.getElementById(`total_marks_${qualId}`);
-            const obtainedInput = document.getElementById(`obtained_marks_${qualId}`);
-
-            // Add input listeners for auto-calculation
-            if (totalInput) totalInput.addEventListener('input', () => calculateMarks(qualId));
-            if (obtainedInput) obtainedInput.addEventListener('input', () => calculateMarks(qualId));
-
-            selector.addEventListener('change', function() {
-                const status = this.getAttribute('data-status');
-                const isRequired = status === 'required';
-
-                const percentageContainer = document.querySelector(`.percentage-container-${qualId}`);
-                const cgpaContainer = document.querySelector(`.cgpa-container-${qualId}`);
-                const percentageInput = document.getElementById(`percentage_${qualId}`);
-                const cgpaInput = document.getElementById(`cgpa_${qualId}`);
-
-                if (this.value === 'CGPA') {
-                    percentageContainer.style.display = 'none';
-                    cgpaContainer.style.display = 'block';
-                    percentageInput.removeAttribute('required');
-                    if (isRequired) cgpaInput.setAttribute('required', 'required');
-                } else {
-                    percentageContainer.style.display = 'block';
-                    cgpaContainer.style.display = 'none';
-                    cgpaInput.removeAttribute('required');
-                    if (isRequired) percentageInput.setAttribute('required', 'required');
-                }
-
-                // Trigger calculation on type change to ensure fields are populated
-                calculateMarks(qualId);
-            });
-
-            // Initial state check for containers
-            const pContainer = document.querySelector(`.percentage-container-${qualId}`);
-            const cContainer = document.querySelector(`.cgpa-container-${qualId}`);
-
-            if (selector.value === 'CGPA') {
-                if (pContainer) pContainer.style.display = 'none';
-                if (cContainer) cContainer.style.display = 'block';
-            } else {
-                if (pContainer) pContainer.style.display = 'block';
-                if (cContainer) cContainer.style.display = 'none';
-            }
-
-            // Initial calculation if values exist
-            calculateMarks(qualId);
+        totalInputs.forEach(input => {
+            const qualId = input.id.replace('total_marks_', '');
+            input.addEventListener('input', () => validateMarks(qualId));
         });
 
-        // Block form submission if any obtained marks exceed total marks
+        obtainedInputs.forEach(input => {
+            const qualId = input.id.replace('obtained_marks_', '');
+            input.addEventListener('input', () => validateMarks(qualId));
+        });
+
         const form = document.querySelector('form[action="/student/educational_details_post"]');
         if (form) {
             form.addEventListener('submit', function(e) {
                 let hasError = false;
-                selectors.forEach(selector => {
-                    const qualId = selector.getAttribute('data-qual-id');
+                totalInputs.forEach(input => {
+                    const qualId = input.id.replace('total_marks_', '');
                     if (!validateMarks(qualId)) {
                         hasError = true;
                     }
                 });
                 if (hasError) {
                     e.preventDefault();
-                    // Scroll to first error
                     const firstInvalid = document.querySelector('.is-invalid');
                     if (firstInvalid) {
                         firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });

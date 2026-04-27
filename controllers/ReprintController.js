@@ -551,12 +551,14 @@ export const printApplicationForm = async (req, res) => {
 
     const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
 
+    const oldInput = req.flash('oldInput')[0] || req.query || {};
+
     return res.render('frontend/reprint/print_application_form', {
       title: 'Print Application Form',
       errors: req.flash('error'),
       academicYears: academicYears,
       activeAcademicYear: activeAcademicYear,
-      oldInput: req.query || {}
+      oldInput: oldInput
     });
   } catch (error) {
     console.error('Error rendering print application form:', error);
@@ -573,8 +575,15 @@ export const showApplicationForm = async (req, res) => {
     const { academic_year, registration_no, dob } = req.query;
 
     if (!academic_year || !registration_no || !dob) {
-      req.flash('error', 'All fields are required.');
-      return res.redirect('/print_application_form');
+      const academicYears = await AcademicYear.findAll({ order: [['session', 'DESC']] });
+      const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+      return res.render('frontend/reprint/print_application_form', {
+        title: 'Print Application Form',
+        errors: ['All fields are required.'],
+        academicYears,
+        activeAcademicYear,
+        oldInput: req.query
+      });
     }
 
     // Format DOB for comparison
@@ -603,10 +612,11 @@ export const showApplicationForm = async (req, res) => {
         { model: Subject, as: 'major1' },
         { model: Subject, as: 'major2' },
         { model: Subject, as: 'minor' },
+        { model: Subject, as: 'researchProject' },
         { model: Skills, as: 'skill' },
         { model: Cocurricular, as: 'cocurricular' },
-        { 
-          model: StudentDocument, 
+        {
+          model: StudentDocument,
           as: 'documents',
           include: [{ model: DocumentType, as: 'documentType' }]
         }
@@ -614,8 +624,15 @@ export const showApplicationForm = async (req, res) => {
     });
 
     if (!student) {
-      req.flash('error', 'No application found with the provided details.');
-      return res.redirect('/print_application_form');
+      const academicYears = await AcademicYear.findAll({ order: [['session', 'DESC']] });
+      const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+      return res.render('frontend/reprint/print_application_form', {
+        title: 'Print Application Form',
+        errors: ['No application found with the provided details. Please verify your Registration Number and Date of Birth.'],
+        academicYears,
+        activeAcademicYear,
+        oldInput: req.query
+      });
     }
 
     // Fetch associated data needed for the preview
@@ -627,21 +644,21 @@ export const showApplicationForm = async (req, res) => {
     const weightages = await Weightage.findAll();
 
     const payment = await Payment.findOne({
-      where: { 
-        user_id: String(student.user_id), 
+      where: {
+        user_id: String(student.user_id),
         academic_year: String(academic_year),
-        status: 'Success' 
+        status: 'Success'
       },
       order: [['created_at', 'DESC']]
     });
 
-    const activeAcademicYear = await AcademicYear.findByPk(academic_year);
+    const activeAcademicYearRecord = await AcademicYear.findByPk(academic_year);
 
     return res.render('student_panel/admission/form_preview/registration_form_preview', {
       title: 'Print Application Form',
       student,
       user: student.user,
-      activeAcademicYear,
+      activeAcademicYear: activeAcademicYearRecord,
       educationals,
       weightages,
       payment,
@@ -650,7 +667,14 @@ export const showApplicationForm = async (req, res) => {
 
   } catch (error) {
     console.error('Error showing application form:', error);
-    req.flash('error', 'An error occurred while retrieving the application form.');
-    return res.redirect('/print_application_form');
+    const academicYears = await AcademicYear.findAll({ order: [['session', 'DESC']] });
+    const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+    return res.render('frontend/reprint/print_application_form', {
+      title: 'Print Application Form',
+      errors: ['An error occurred while retrieving the application form.'],
+      academicYears,
+      activeAcademicYear,
+      oldInput: req.query
+    });
   }
 };

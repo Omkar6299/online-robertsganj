@@ -27,6 +27,26 @@ const createSemesterSchema = Joi.object({
     Joi.number().valid(1, 0),
     Joi.string().valid('1', '0'),
     Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('0'),
+  is_major1_enabled: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('1'),
+  is_major2_enabled: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('1'),
+  is_minor_enabled: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('1'),
+  is_research_project_enabled: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
   ).default('0')
 });
 
@@ -49,6 +69,26 @@ const updateSemesterSchema = Joi.object({
     Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
   ).default('0'),
   approval_required: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('0'),
+  is_major1_enabled: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('1'),
+  is_major2_enabled: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('1'),
+  is_minor_enabled: Joi.alternatives().try(
+    Joi.number().valid(1, 0),
+    Joi.string().valid('1', '0'),
+    Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
+  ).default('1'),
+  is_research_project_enabled: Joi.alternatives().try(
     Joi.number().valid(1, 0),
     Joi.string().valid('1', '0'),
     Joi.array().items(Joi.string().valid('1', '0'), Joi.number().valid(1, 0))
@@ -158,6 +198,31 @@ export const store = async (req, res) => {
       bodyForValidation.approval_required = '0';
     }
 
+    // Subject Flags
+    if (Array.isArray(bodyForValidation.is_major1_enabled)) {
+      bodyForValidation.is_major1_enabled = bodyForValidation.is_major1_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_major1_enabled === undefined) {
+      bodyForValidation.is_major1_enabled = '0';
+    }
+
+    if (Array.isArray(bodyForValidation.is_major2_enabled)) {
+      bodyForValidation.is_major2_enabled = bodyForValidation.is_major2_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_major2_enabled === undefined) {
+      bodyForValidation.is_major2_enabled = '0';
+    }
+
+    if (Array.isArray(bodyForValidation.is_minor_enabled)) {
+      bodyForValidation.is_minor_enabled = bodyForValidation.is_minor_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_minor_enabled === undefined) {
+      bodyForValidation.is_minor_enabled = '0';
+    }
+
+    if (Array.isArray(bodyForValidation.is_research_project_enabled)) {
+      bodyForValidation.is_research_project_enabled = bodyForValidation.is_research_project_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_research_project_enabled === undefined) {
+      bodyForValidation.is_research_project_enabled = '0';
+    }
+
     const { error, value } = createSemesterSchema.validate(bodyForValidation, { abortEarly: false });
 
     if (error) {
@@ -179,6 +244,11 @@ export const store = async (req, res) => {
     const regEnabled = registration_enabled === '1' || registration_enabled === 1 ? 1 : 0;
     const feeEnabled = fee_payment_enabled === '1' || fee_payment_enabled === 1 ? 1 : 0;
     const appRequired = approval_required === '1' || approval_required === 1 ? 1 : 0;
+    
+    const major1Enabled = value.is_major1_enabled === '1' || value.is_major1_enabled === 1 ? 1 : 0;
+    const major2Enabled = value.is_major2_enabled === '1' || value.is_major2_enabled === 1 ? 1 : 0;
+    const minorEnabled = value.is_minor_enabled === '1' || value.is_minor_enabled === 1 ? 1 : 0;
+    const researchProjectEnabled = value.is_research_project_enabled === '1' || value.is_research_project_enabled === 1 ? 1 : 0;
 
     // Check if order already exists for this course
     const existingOrder = await Semester.findOne({
@@ -225,7 +295,11 @@ export const store = async (req, res) => {
       status: status == '1' || status == 1 ? 1 : 0,
       registration_enabled: regEnabled,
       fee_payment_enabled: feeEnabled,
-      approval_required: appRequired
+      approval_required: appRequired,
+      is_major1_enabled: major1Enabled,
+      is_major2_enabled: major2Enabled,
+      is_minor_enabled: minorEnabled,
+      is_research_project_enabled: researchProjectEnabled
     });
 
     flashSuccessAndRedirect(req, res, 'Semester created successfully.', '/admin/semesters');
@@ -292,6 +366,31 @@ export const update = async (req, res) => {
       bodyForValidation.approval_required = '0';
     }
 
+    // Subject Flags
+    if (Array.isArray(bodyForValidation.is_major1_enabled)) {
+      bodyForValidation.is_major1_enabled = bodyForValidation.is_major1_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_major1_enabled === undefined) {
+      bodyForValidation.is_major1_enabled = '0';
+    }
+
+    if (Array.isArray(bodyForValidation.is_major2_enabled)) {
+      bodyForValidation.is_major2_enabled = bodyForValidation.is_major2_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_major2_enabled === undefined) {
+      bodyForValidation.is_major2_enabled = '0';
+    }
+
+    if (Array.isArray(bodyForValidation.is_minor_enabled)) {
+      bodyForValidation.is_minor_enabled = bodyForValidation.is_minor_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_minor_enabled === undefined) {
+      bodyForValidation.is_minor_enabled = '0';
+    }
+
+    if (Array.isArray(bodyForValidation.is_research_project_enabled)) {
+      bodyForValidation.is_research_project_enabled = bodyForValidation.is_research_project_enabled.includes('1') ? '1' : '0';
+    } else if (bodyForValidation.is_research_project_enabled === undefined) {
+      bodyForValidation.is_research_project_enabled = '0';
+    }
+
     const { error, value } = updateSemesterSchema.validate(bodyForValidation, { abortEarly: false });
 
     if (error) {
@@ -306,6 +405,11 @@ export const update = async (req, res) => {
     const regEnabled = registration_enabled === '1' || registration_enabled === 1 ? 1 : 0;
     const feeEnabled = fee_payment_enabled === '1' || fee_payment_enabled === 1 ? 1 : 0;
     const appRequired = approval_required === '1' || approval_required === 1 ? 1 : 0;
+
+    const major1Enabled = value.is_major1_enabled === '1' || value.is_major1_enabled === 1 ? 1 : 0;
+    const major2Enabled = value.is_major2_enabled === '1' || value.is_major2_enabled === 1 ? 1 : 0;
+    const minorEnabled = value.is_minor_enabled === '1' || value.is_minor_enabled === 1 ? 1 : 0;
+    const researchProjectEnabled = value.is_research_project_enabled === '1' || value.is_research_project_enabled === 1 ? 1 : 0;
 
     // Check if order already exists for this course (excluding current semester)
     const existingOrder = await Semester.findOne({
@@ -341,7 +445,11 @@ export const update = async (req, res) => {
       status: status == '1' || status == 1 ? 1 : 0,
       registration_enabled: regEnabled,
       fee_payment_enabled: feeEnabled,
-      approval_required: appRequired
+      approval_required: appRequired,
+      is_major1_enabled: major1Enabled,
+      is_major2_enabled: major2Enabled,
+      is_minor_enabled: minorEnabled,
+      is_research_project_enabled: researchProjectEnabled
     });
 
     flashSuccessAndRedirect(req, res, 'Semester updated successfully.', '/admin/semesters');
@@ -365,8 +473,3 @@ export const destroy = async (req, res) => {
     handleError(req, res, error, 'An error occurred while deleting the semester.', '/admin/semesters');
   }
 };
-
-
-
-
-

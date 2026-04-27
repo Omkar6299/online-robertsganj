@@ -29,7 +29,8 @@ export const paymentResponse = async (req, res) => {
     }
 
     // Parse payment response using PaymentService
-    const parsedResponse = PaymentService.parsePaymentResponse(encData);
+    const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
+    const parsedResponse = PaymentService.parsePaymentResponse(encData, environment);
 
     if (!parsedResponse) {
       console.error('Failed to parse payment response');
@@ -292,11 +293,14 @@ export const paymentResponse = async (req, res) => {
         }
       }
 
-      // Redirect to receipt page instead of success page
-      const merchantTransactionId = payment.merchant_txn_id;
-      const redirectUrl = `/payment/receipt?transaction_id=${encodeURIComponent(merchantTransactionId)}`;
-
-      return flashSuccessAndRedirect(req, res, 'Registration fee paid successfully!', redirectUrl);
+      // Save session before redirecting to avoid race conditions
+      return req.session.save((err) => {
+        if (err) console.error('Session save error during registration payment response:', err);
+        // Redirect to receipt page instead of success page
+        const merchantTransactionId = payment.merchant_txn_id;
+        const redirectUrl = `/payment/receipt?transaction_id=${encodeURIComponent(merchantTransactionId)}`;
+        flashSuccessAndRedirect(req, res, 'Registration fee paid successfully!', redirectUrl);
+      });
     } else if (isPending) {
       return res.render('frontend/payment/payment_failed', {
         title: 'Payment Pending',
