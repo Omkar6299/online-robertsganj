@@ -24,8 +24,7 @@ export const paymentResponse = async (req, res) => {
     if (!encData) {
       console.error('No encrypted data received from payment gateway');
       await t.rollback();
-      req.flash('error', 'Invalid payment response. Please contact support.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'Invalid payment response. Please contact support.', '/registration_fees_payment');
     }
 
     // Parse payment response using PaymentService
@@ -35,8 +34,7 @@ export const paymentResponse = async (req, res) => {
     if (!parsedResponse) {
       console.error('Failed to parse payment response');
       await t.rollback();
-      req.flash('error', 'Failed to process payment response. Please contact support.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'Failed to process payment response. Please contact support.', '/registration_fees_payment');
     }
 
     console.log('=== PARSED PAYMENT RESPONSE ===');
@@ -425,8 +423,7 @@ export const paymentReceipt = async (req, res) => {
 
   } catch (error) {
     console.error('Error showing payment receipt:', error);
-    req.flash('error', 'An error occurred while retrieving the payment receipt.');
-    return res.redirect('/registration_fees_payment');
+    return flashErrorAndRedirect(req, res, 'An error occurred while retrieving the payment receipt.', '/registration_fees_payment');
   }
 };
 

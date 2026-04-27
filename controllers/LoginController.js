@@ -583,7 +583,10 @@ export const registration_fees_payment_post = async (req, res) => {
       // This ensures URL stays as /registration_fees_payment
       req.flash('errors', errors);
       req.flash('oldInput', req.body);
-      return res.redirect('/registration_fees_payment');
+      req.session.save(() => {
+        return res.redirect('/registration_fees_payment');
+      });
+
     }
 
     console.log('Validation passed. Proceeding with registration...');
@@ -623,52 +626,63 @@ export const registration_fees_payment_post = async (req, res) => {
     try {
       const merchTxnId = await generateUniqueTransactionId(t);
       console.log('Generated unique 10-digit transaction ID:', merchTxnId);
+      console.log('DEBUG: Registration flow starting at line 629');
       const amount = res.locals.siteSettings?.registration_amount || siteconfig.registration_amount;
+      console.log('DEBUG: Amount:', amount);
       const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
-      let regProductId = res.locals.siteSettings?.registration_product_id || siteconfig.atom_registration_product_id || 'GOVTPGCOLLEGE';
+      console.log('DEBUG: Environment:', environment);
+      let regProductId = res.locals.siteSettings?.atom_reg_product_id || siteconfig.atom_registration_product_id || 'SONEBHADRA';
+      console.log('DEBUG: Product ID:', regProductId);
       
       // Atom Demo environment only supports 'AIPAY' product ID
       if (environment === 'demo') {
         regProductId = 'AIPAY';
       }
       
+      console.log('DEBUG: Hashing password for phone:', value.phone);
       const hashedPassword = await hashPassword(value.phone);
+      console.log('DEBUG: Password hashed');
       let user;
       let student;
 
+      console.log('DEBUG: Finding active academic year...');
       // Get current active academic year
       const currentAcademicYear = await AcademicYear.findOne({
-        where: { status: 'Active' }
-      }, { transaction: t });
+        where: { status: 'Active' },
+        transaction: t
+      });
 
       if (!currentAcademicYear) {
+        console.log('DEBUG: ERROR: No active academic year found');
         await t.rollback();
-        req.flash('error', 'No active academic year found. Please contact administrator.');
-        req.flash('oldInput', req.body);
-        return res.redirect('/registration_fees_payment');
+        return flashErrorAndRedirect(req, res, 'No active academic year found. Please contact administrator.', '/registration_fees_payment', req.body);
       }
+      console.log('DEBUG: Found Academic Year:', currentAcademicYear.id);
 
       // Fetch selected semester to check for re-registration validation
+      console.log('DEBUG: Finding semester:', value.semester_id);
       const activeSemester = await Semester.findByPk(value.semester_id, { transaction: t });
       if (!activeSemester) {
+        console.log('DEBUG: ERROR: Semester not found');
         await t.rollback();
-        req.flash('error', 'Selected semester not found.');
-        req.flash('oldInput', req.body);
-        return res.redirect('/registration_fees_payment');
+        return flashErrorAndRedirect(req, res, 'Selected semester not found.', '/registration_fees_payment', req.body);
       }
+      console.log('DEBUG: Found Semester:', activeSemester.name, 'Order:', activeSemester.order);
 
       const isReRegistration = activeSemester.order !== '1';
+      console.log('DEBUG: isReRegistration:', isReRegistration);
 
       // Re-registration specific validation
       // Skip this if it's a first-time college setup
       if (isReRegistration && !res.locals.siteSettings?.is_first_time_college) {
+        console.log('DEBUG: Entering re-registration validation');
         if (!value.registration_no || value.registration_no.trim() === '') {
+          console.log('DEBUG: ERROR: Reg no missing for re-reg');
           await t.rollback();
-          req.flash('error', 'Registration number is required for re-registration (Semester > I).');
-          req.flash('oldInput', req.body);
-          return res.redirect('/registration_fees_payment');
+          return flashErrorAndRedirect(req, res, 'Registration number is required for re-registration (Semester > I).', '/registration_fees_payment', req.body);
         }
 
+        console.log('DEBUG: Verifying previous record for reg_no:', value.registration_no.trim());
         // Verify registration number exists for the SAME COURSE in a PREVIOUS academic year
         const previousRecord = await Student.findOne({
           where: {
@@ -680,17 +694,18 @@ export const registration_fees_payment_post = async (req, res) => {
         });
 
         if (!previousRecord) {
+          console.log('DEBUG: ERROR: No previous record found');
           await t.rollback();
-          req.flash('error', 'No previous academic record found for this registration number and course. If you are a new student, please select Semester 1.');
-          req.flash('oldInput', req.body);
-          return res.redirect('/registration_fees_payment');
+          return flashErrorAndRedirect(req, res, 'No previous academic record found for this registration number and course. If you are a new student, please select Semester 1.', '/registration_fees_payment', req.body);
         }
+        console.log('DEBUG: Previous record found');
       }
 
+      console.log('DEBUG: Checking for duplicate student in current year...');
       // Check for duplicate email in students table for current academic year (for new registrations)
       // Only students with successful payment should block re-registration
       if (!value.registration_no || value.registration_no.trim() === '') {
-        // Check if student exists with this email for current academic year
+        console.log('DEBUG: Checking student by email:', value.email, 'for year:', currentAcademicYear.id);
         const existingStudentForYear = await Student.findOne({
           include: [{
             model: User,
@@ -702,6 +717,7 @@ export const registration_fees_payment_post = async (req, res) => {
         });
 
         if (existingStudentForYear) {
+          console.log('DEBUG: Found existing student for this year, checking payment...');
           // Check if payment was successful for this student
           const successfulPayment = await Payment.findOne({
             where: {
@@ -712,17 +728,12 @@ export const registration_fees_payment_post = async (req, res) => {
           });
 
           if (successfulPayment) {
-            // Payment was successful, don't allow re-registration
+            console.log('DEBUG: ERROR: Successful payment already exists');
             await t.rollback();
-            req.flash('error', 'This email address is already registered. If you are a returning student, please enter your registration number.');
-            req.flash('oldInput', req.body);
-            return res.redirect('/registration_fees_payment');
+            return flashErrorAndRedirect(req, res, 'This email address is already registered. If you are a returning student, please enter your registration number.', '/registration_fees_payment', req.body);
           } else {
+            console.log('DEBUG: Cleaning up incomplete records for re-registration');
             // Payment not successful, allow re-registration by deleting old records
-            console.log('Payment not successful for existing student (new registration), allowing re-registration');
-            console.log('Deleting old student record for email:', value.email, 'academic_year:', currentAcademicYear.id);
-
-            // Delete old student record for this academic year
             await Student.destroy({
               where: {
                 user_id: String(existingStudentForYear.user_id),
@@ -731,7 +742,6 @@ export const registration_fees_payment_post = async (req, res) => {
               transaction: t
             });
 
-            // Delete old payment records for this user that are not successful
             await Payment.destroy({
               where: {
                 user_id: String(existingStudentForYear.user_id),
@@ -739,9 +749,7 @@ export const registration_fees_payment_post = async (req, res) => {
               },
               transaction: t
             });
-
-            console.log('Cleaned up old incomplete registration records, proceeding with new registration');
-            // Continue with registration flow below
+            console.log('DEBUG: Cleanup complete');
           }
         }
       }
@@ -764,9 +772,7 @@ export const registration_fees_payment_post = async (req, res) => {
 
         if (!existingStudent) {
           await t.rollback();
-          req.flash('error', 'Student record not found for the provided registration number. If you are a new student, please leave the registration number blank.');
-          req.flash('oldInput', req.body);
-          return res.redirect('/registration_fees_payment');
+          return flashErrorAndRedirect(req, res, 'Student record not found for the provided registration number. If you are a new student, please leave the registration number blank.', '/registration_fees_payment', req.body);
         }
 
         finalStudentId = existingStudent.student_id || existingStudent.registration_no;
@@ -797,9 +803,7 @@ export const registration_fees_payment_post = async (req, res) => {
 
           if (successfulPayment) {
             await t.rollback();
-            req.flash('error', `You have already registered for academic year ${currentAcademicYear.session}. Please login with your original transaction ID.`);
-            req.flash('oldInput', req.body);
-            return res.redirect('/registration_fees_payment');
+            return flashErrorAndRedirect(req, res, `You have already registered for academic year ${currentAcademicYear.session}. Please login with your original transaction ID.`, '/registration_fees_payment', req.body);
           } else {
             // Clean up incomplete record to allow fresh registration
             await Student.destroy({
@@ -850,9 +854,7 @@ export const registration_fees_payment_post = async (req, res) => {
           });
           if (succPayment) {
             await t.rollback();
-            req.flash('error', 'This email is already registered for the current session.');
-            req.flash('oldInput', req.body);
-            return res.redirect('/registration_fees_payment');
+            return flashErrorAndRedirect(req, res, 'This email is already registered for the current session.', '/registration_fees_payment', req.body);
           }
           // Clean up if not successful
           await Student.destroy({ where: { user_id: String(existingStudentForYear.user_id) }, transaction: t });
@@ -896,8 +898,7 @@ export const registration_fees_payment_post = async (req, res) => {
         console.error('=== CRITICAL ERROR: USER IS NULL OR HAS NO ID ===');
         console.error('User object:', user);
         await t.rollback();
-        req.flash('error', 'Failed to create user account. Please try again.');
-        return res.redirect('/registration_fees_payment');
+        return flashErrorAndRedirect(req, res, 'Failed to create user account. Please try again.', '/registration_fees_payment');
       }
 
       console.log('=== VERIFYING USER BEFORE PAYMENT CREATION ===');
@@ -971,8 +972,7 @@ export const registration_fees_payment_post = async (req, res) => {
       if (!verifyUser) {
         console.error('=== CRITICAL: USER NOT FOUND IN DATABASE AFTER COMMIT ===');
         console.error('Expected User ID:', user.id);
-        req.flash('error', 'User account was not created. Please try again.');
-        return res.redirect('/registration_fees_payment');
+        return flashErrorAndRedirect(req, res, 'User account was not created. Please try again.', '/registration_fees_payment');
       }
       console.log('=== USER VERIFIED IN DATABASE ===');
       console.log('Verified User ID:', verifyUser.id);
@@ -985,8 +985,7 @@ export const registration_fees_payment_post = async (req, res) => {
       if (!verifyPayment) {
         console.error('=== CRITICAL: PAYMENT NOT FOUND IN DATABASE AFTER COMMIT ===');
         console.error('Expected Transaction ID:', merchTxnId);
-        req.flash('error', 'Payment record was not created. Please try again.');
-        return res.redirect('/registration_fees_payment');
+        return flashErrorAndRedirect(req, res, 'Payment record was not created. Please try again.', '/registration_fees_payment');
       }
       console.log('=== PAYMENT VERIFIED IN DATABASE ===');
       console.log('Verified Payment ID:', verifyPayment.id);
@@ -1114,7 +1113,12 @@ export const registration_fees_payment_post = async (req, res) => {
       oldInput: req.session?.flash?.oldInput ? 'set' : 'not set'
     });
 
-    return res.redirect('/registration_fees_payment');
+    // Explicitly save session before redirect to ensure flash messages are saved
+    req.session.save((err) => {
+      if (err) console.error('Session save error before redirect:', err);
+      return res.redirect('/registration_fees_payment');
+    });
+
   }
 };
 
@@ -1129,8 +1133,7 @@ export const initiatePayment = async (req, res) => {
 
     if (!transaction_id || transaction_id.trim() === '') {
       console.error('Transaction ID is missing or empty');
-      req.flash('error', 'Transaction ID is required.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'Transaction ID is required.', '/registration_fees_payment');
     }
 
     // Find payment record
@@ -1139,8 +1142,7 @@ export const initiatePayment = async (req, res) => {
     });
 
     if (!payment) {
-      req.flash('error', 'Payment record not found.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'Payment record not found.', '/registration_fees_payment');
     }
 
     // Find user record - convert string to integer for findByPk
@@ -1149,8 +1151,7 @@ export const initiatePayment = async (req, res) => {
 
     if (!user) {
       console.error('User not found for user_id:', payment.user_id);
-      req.flash('error', 'User record not found.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'User record not found.', '/registration_fees_payment');
     }
 
     // Parse registration data from payment record
@@ -1164,8 +1165,7 @@ export const initiatePayment = async (req, res) => {
       console.log('Registration data parsed from payment record:', registrationData);
     } catch (parseError) {
       console.error('Failed to parse registration data from payment record:', parseError);
-      req.flash('error', 'Failed to retrieve registration data. Please contact support.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'Failed to retrieve registration data. Please contact support.', '/registration_fees_payment');
     }
 
     // Verify active academic year exists
@@ -1174,8 +1174,7 @@ export const initiatePayment = async (req, res) => {
     });
 
     if (!activeAcademicYear) {
-      req.flash('error', 'No active academic year found. Please contact administrator.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'No active academic year found. Please contact administrator.', '/registration_fees_payment');
     }
 
     console.log('Using registration data from payment record:', {
@@ -1189,7 +1188,7 @@ export const initiatePayment = async (req, res) => {
     // Prepare payment data using PaymentService - Use amount from payment record (e.g. 500)
     const amount = payment.amount || siteconfig.registration_amount;
     const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
-    let regProductId = res.locals.siteSettings?.registration_product_id || siteconfig.atom_registration_product_id || 'GOVTPGCOLLEGE';
+    let regProductId = res.locals.siteSettings?.atom_reg_product_id || siteconfig.atom_registration_product_id || 'SONEBHADRA';
 
     // Atom Demo environment only supports 'AIPAY' product ID
     if (environment === 'demo') {
@@ -1245,13 +1244,11 @@ export const initiatePayment = async (req, res) => {
         errorMessage = `Payment gateway error: ${error.message}. Please try again or contact support.`;
       }
 
-      req.flash('error', errorMessage);
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, errorMessage, '/registration_fees_payment');
     }
 
     if (!atomTokenId) {
-      req.flash('error', 'Payment gateway initialization failed. Please try again or contact support.');
-      return res.redirect('/registration_fees_payment');
+      return flashErrorAndRedirect(req, res, 'Payment gateway initialization failed. Please try again or contact support.', '/registration_fees_payment');
     }
 
     // Render payment gateway redirect page (using frontend payment initiate page)
@@ -1264,8 +1261,7 @@ export const initiatePayment = async (req, res) => {
   } catch (error) {
     console.error('Payment initiation error:', error);
     console.error('Error stack:', error.stack);
-    req.flash('error', `An error occurred while initiating payment: ${error.message}. Please try again or contact support.`);
-    res.redirect('/registration_fees_payment');
+    return flashErrorAndRedirect(req, res, `An error occurred while initiating payment: ${error.message}. Please try again or contact support.`, '/registration_fees_payment');
   }
 };
 

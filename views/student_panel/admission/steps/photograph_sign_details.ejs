@@ -24,7 +24,7 @@
                                    class="form-control dynamic-upload" 
                                    data-code="<%= docType.code %>"
                                    id="file_<%= docType.code %>"
-                                   accept="image/*,application/pdf"
+                                   accept=".jpg,.jpeg,.png,.jfif,.pdf"
                                    <%= (!uploadedDoc && isRequired) ? 'required' : '' %>>
                         </div>
 
@@ -85,6 +85,19 @@ document.querySelectorAll('.dynamic-upload').forEach(input => {
             return;
         }
 
+        // Extension validation
+        const allowedExtensions = ['jpg', 'jpeg', 'png', 'jfif', 'pdf'];
+        const fileName = file.name.toLowerCase();
+        const extension = fileName.split('.').pop();
+        
+        if (!allowedExtensions.includes(extension)) {
+            alert('Invalid file format. Only JPG, JPEG, PNG, JFIF and PDF files are allowed.');
+            this.value = '';
+            return;
+        }
+
+        this.classList.remove('is-invalid');
+
         uploadFile(file, code);
     });
 });
@@ -114,8 +127,14 @@ async function uploadFile(file, code) {
         };
 
         xhr.onload = function() {
-            if (xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
+            let response;
+            try {
+                response = JSON.parse(xhr.responseText);
+            } catch (e) {
+                response = { message: 'Unexpected response from server' };
+            }
+
+            if (xhr.status === 200 && response.success !== false) {
                 progressBar.classList.remove('bg-primary');
                 progressBar.classList.add('bg-success');
                 
@@ -137,9 +156,10 @@ async function uploadFile(file, code) {
                     progressContainer.classList.add('d-none');
                 }, 2000);
             } else {
-                const response = JSON.parse(xhr.responseText);
                 alert('Upload failed: ' + (response.message || 'Unknown error'));
+                progressBar.classList.remove('bg-primary');
                 progressBar.classList.add('bg-danger');
+                progressBar.style.width = '100%';
             }
         };
 
@@ -163,7 +183,13 @@ document.getElementById('btn-continue-declaration').addEventListener('click', fu
     requiredInputs.forEach(input => {
         const code = input.dataset.code;
         const preview = document.getElementById(`preview_container_${code}`);
-        if (preview.innerHTML.includes('No file uploaded yet') && !input.files.length) {
+        
+        // Check if there's an image, a success alert, or "PDF Uploaded" text
+        const hasUploadedFile = preview.querySelector('img') !== null || 
+                                preview.innerHTML.includes('Uploaded Successfully') || 
+                                preview.innerHTML.includes('PDF Uploaded');
+
+        if (!hasUploadedFile) {
             allUploaded = false;
             input.classList.add('is-invalid');
         } else {

@@ -9,9 +9,14 @@
  * @param {string} message - Success message
  * @param {string} redirectUrl - URL to redirect to
  */
-export const flashSuccessAndRedirect = (req, res, message, redirectUrl) => {
+export const flashSuccessAndRedirect = (req, res, message, redirectUrl, oldInput = null) => {
   req.flash('success', message);
-  res.redirect(redirectUrl);
+  if (oldInput) {
+    req.flash('oldInput', oldInput);
+  }
+  req.session.save(() => {
+    res.redirect(redirectUrl);
+  });
 };
 
 /**
@@ -21,9 +26,14 @@ export const flashSuccessAndRedirect = (req, res, message, redirectUrl) => {
  * @param {string} message - Error message
  * @param {string} redirectUrl - URL to redirect to
  */
-export const flashErrorAndRedirect = (req, res, message, redirectUrl) => {
+export const flashErrorAndRedirect = (req, res, message, redirectUrl, oldInput = null) => {
   req.flash('error', message);
-  res.redirect(redirectUrl);
+  if (oldInput) {
+    req.flash('oldInput', oldInput);
+  }
+  req.session.save(() => {
+    res.redirect(redirectUrl);
+  });
 };
 
 /**
@@ -58,7 +68,9 @@ export const handleError = (req, res, error, errorMessage, redirectUrl = null, v
 
   if (redirectUrl) {
     req.flash('error', errorMessage);
-    res.redirect(redirectUrl);
+    req.session.save(() => {
+      res.redirect(redirectUrl);
+    });
   } else if (view) {
     req.flash('error', errorMessage);
     res.render(view, {
