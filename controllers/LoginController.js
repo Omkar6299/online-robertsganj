@@ -212,8 +212,14 @@ export const admission_logout = (req, res) => {
 };
 
 export const student_login = (req, res) => {
+  const oldInput = {
+    registration_no: req.query.registration_no || '',
+    dob: req.query.dob || ''
+  };
+
   res.render('frontend/auth/student_login', {
-    title: 'Student Login - Robertsganj'
+    title: 'Student Login - Robertsganj',
+    oldInput: oldInput
   });
 };
 

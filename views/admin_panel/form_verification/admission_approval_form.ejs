@@ -197,12 +197,16 @@
             <div style="margin-top: 20px; font-size: 10px; color: #475569; border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; line-height: 1.6; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <strong style="color: #1a202c; font-size: 11px;">Instructions for Student:</strong><br>
-                    1. Please log in to your student portal using your Mobile No. and Transaction ID. On click of apply online<br>
+                    1. Please log in to your student portal using your Registration No. and Date of Birth.<br>
                     2. Go to the "Fee Payment" section and pay the amount shown above.<br>
                     3. After successful payment, download your fee receipt for college records.
                 </div>
                 <div style="text-align: center; margin-left: 15px;">
-                    <img class="login-qr-code" src="" alt="Scan to Login" style="width: 70px; height: 70px; border: 1px solid #e2e8f0; padding: 2px; border-radius: 4px; background: #fff;">
+                    <img class="login-qr-code" 
+                         data-reg="<%= student.registration_no %>" 
+                         data-dob="<%= student.dob %>"
+                         src="" alt="Scan to Login" 
+                         style="width: 75px; height: 75px; border: 1px solid #e2e8f0; padding: 2px; border-radius: 4px; background: #fff;">
                     <div style="font-size: 9px; margin-top: 4px; font-weight: 700; color: #1e3a8a;">Scan to Login</div>
                 </div>
             </div>
@@ -332,12 +336,16 @@
                             <div style="margin-top: 20px; font-size: 10px; color: #475569; border: 1px solid #cbd5e1; padding: 12px; border-radius: 4px; line-height: 1.6; display: flex; justify-content: space-between; align-items: center;">
                                 <div>
                                     <strong style="color: #1a202c; font-size: 11px;">Instructions for Student:</strong><br>
-                                    1. Please log in to your student portal using your Mobile No. and Transaction ID. On click of apply online<br>
+                                    1. Please log in to your student portal using your Registration No. and Date of Birth.<br>
                                     2. Go to the "Fee Payment" section and pay the amount shown above.<br>
                                     3. After successful payment, download your fee receipt for college records.
                                 </div>
                                 <div style="text-align: center; margin-left: 15px;">
-                                    <img class="login-qr-code" src="" alt="Scan to Login" style="width: 70px; height: 70px; border: 1px solid #e2e8f0; padding: 2px; border-radius: 4px; background: #fff;">
+                                    <img class="login-qr-code" 
+                                         data-reg="<%= student.registration_no %>" 
+                                         data-dob="<%= student.dob %>"
+                                         src="" alt="Scan to Login" 
+                                         style="width: 75px; height: 75px; border: 1px solid #e2e8f0; padding: 2px; border-radius: 4px; background: #fff;">
                                     <div style="font-size: 9px; margin-top: 4px; font-weight: 700; color: #1e3a8a;">Scan to Login</div>
                                 </div>
                             </div>
@@ -371,10 +379,12 @@
     <%- include('../layouts/script_link') %>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var loginUrl = window.location.origin + "/student_login";
-            var qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" + encodeURIComponent(loginUrl);
             var qrs = document.querySelectorAll('.login-qr-code');
             qrs.forEach(function(img) {
+                var regNo = img.getAttribute('data-reg');
+                var dob = img.getAttribute('data-dob');
+                var loginUrl = window.location.origin + "/student_login?registration_no=" + encodeURIComponent(regNo) + "&dob=" + encodeURIComponent(dob);
+                var qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(loginUrl);
                 img.src = qrUrl;
             });
         });
