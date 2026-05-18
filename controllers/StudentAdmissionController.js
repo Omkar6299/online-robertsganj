@@ -245,6 +245,12 @@ export const personalDetailsPost = async (req, res) => {
             caste, cast_certificate_no, blood_group, adhar_no, epic_no, samarth_no, is_18_plus
         } = req.body;
 
+        if (!samarth_no || samarth_no.trim() === '') {
+            req.flash('errors', ['Samarth Registration Number is required.']);
+            req.flash('oldInput', req.body);
+            return res.redirect('/student/registration?tab=personal');
+        }
+
         // Get active academic year
         const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
 

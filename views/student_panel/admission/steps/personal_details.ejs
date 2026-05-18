@@ -164,10 +164,10 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                <label for="samarth_no" class="form-label">Samarth Registration No.</label>
+                <label for="samarth_no" class="form-label">Samarth Registration No. <span class="text-danger">*</span></label>
                 <input type="text" name="samarth_no" id="samarth_no" class="form-control"
                     value="<%= typeof oldInput !== 'undefined' && oldInput.samarth_no ? oldInput.samarth_no : (typeof student !== 'undefined' && student.samarth_no ? student.samarth_no : (typeof previousStudent !== 'undefined' && previousStudent && previousStudent.samarth_no ? previousStudent.samarth_no : '')) %>"
-                    placeholder="Enter Samarth Registration Number">
+                    placeholder="Enter Samarth Registration Number" required>
             </div>
         </div>
 
