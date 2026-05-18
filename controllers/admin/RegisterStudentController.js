@@ -679,6 +679,10 @@ export const update = async (req, res) => {
             board, year, percentage, roll_no, qual_name, mark_type, cgpa, total_marks, obtained_marks
         } = req.body;
 
+        if (!samarth_no || samarth_no.trim() === '') {
+            return flashErrorAndRedirect(req, res, 'Samarth Registration Number is required.', `/admin/students/${id}/edit`);
+        }
+
         // Update User record (Identity fields name, phone, email are locked and ignored here)
         // await User.update(
         //     { name, email, phone },
