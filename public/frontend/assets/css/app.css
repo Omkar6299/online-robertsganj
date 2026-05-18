@@ -193,6 +193,26 @@ h1, h2, h3, h4, h5, h6 {
     background: #fffafa;
 }
 
+.home-link-box.admission-notice {
+    color: #b45309;
+    border-color: #fef3c7;
+    background: #fffbeb;
+}
+
+.home-link-box.admission-notice:hover {
+    border-color: #d97706;
+}
+
+.home-link-box.payment-box {
+    color: #1e40af;
+    border-color: #dbeafe;
+    background: #f0f9ff;
+}
+
+.home-link-box.payment-box:hover {
+    border-color: #1d4ed8;
+}
+
 .home-link-box:hover {
     transform: translateY(-5px);
     box-shadow: var(--hover-shadow);
