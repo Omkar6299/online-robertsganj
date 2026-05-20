@@ -3,7 +3,7 @@ const fieldLabels = {
     college_name_hi: "राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र",
     college_address_hi: "सोनभद्र (महात्मा गांधी काशी विद्यापीठ, वाराणसी से संबद्ध)",
     college_name_en: "Government Women Degree College Robertsganj Sonebhadra",
-    college_address_en: "Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi",
+    college_address_en: "Affiliated to Maa Vindhyavasini University, Mirzapur",
     logo_path: "/assets/images/logo.png",
     application_title: "प्रवेश आवेदन पत्र (Online Admission Form)",
     receipt_title: "प्रवेश शुल्क रसीद (Admission Fee Receipt)",

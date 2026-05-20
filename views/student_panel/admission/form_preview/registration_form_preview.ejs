@@ -636,7 +636,7 @@
                     <div class="text-center">
                         <h1 class="college-name-en">Government Women Degree College Robertsganj Sonebhadra</h1>
                         <div class="college-name-hi">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</div>
-                        <div class="college-subtitle">Affiliated to Mahatma Gandhi Kashi Vidyapeeth, Varanasi</div>
+                        <div class="college-subtitle">Affiliated to Maa Vindhyavasini University, Mirzapur</div>
                         <div class="title-ribbon-wrap" style="margin-top:5px;">
                             <div class="title-ribbon">
                                 <%= fieldLabels.header.application_title %> | Session: <%= activeAcademicYear ? activeAcademicYear.session : '' %>
@@ -743,15 +743,15 @@
                                 <% if (student.semsterName && student.semsterName.is_major1_enabled == 1) { %>
                                     <div><span>Major 1:</span> <strong><%= (student.major1 && student.major1.subject_name) ? student.major1.subject_name : 'N/A' %></strong></div>
                                 <% } %>
-                                
+
                                 <% if (student.semsterName && student.semsterName.is_major2_enabled == 1) { %>
                                     <div><span>Major 2:</span> <strong><%= (student.major2 && student.major2.subject_name) ? student.major2.subject_name : 'N/A' %></strong></div>
                                 <% } %>
-                                
+
                                 <% if (student.semsterName && student.semsterName.is_minor_enabled == 1) { %>
                                     <div><span>Minor:</span> <strong><%= (student.minor && student.minor.subject_name) ? student.minor.subject_name : 'N/A' %></strong></div>
                                 <% } %>
-                                
+
                                 <% if (student.semsterName && student.semsterName.is_research_project_enabled == 1) { %>
                                     <div><span>Research Project:</span> <strong><%= (student.researchProject && student.researchProject.subject_name) ? student.researchProject.subject_name : 'N/A' %></strong></div>
                                 <% } %>
@@ -763,7 +763,7 @@
                                 <% if (student.semsterName && (student.semsterName.is_cocurricular_required == 1 || student.semsterName.is_cocurricular_required == '1')) { %>
                                     <div><span>Co-Curricular:</span> <strong><%= (student.cocurricular && student.cocurricular.name) ? student.cocurricular.name : 'N/A' %></strong></div>
                                 <% } %>
-                                
+
                                 <div><span>Prev. Student:</span> <strong><%= student.is_previous_student || 'No' %></strong></div>
                             </div>
                         </div>
