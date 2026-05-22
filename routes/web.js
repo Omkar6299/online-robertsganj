@@ -153,6 +153,7 @@ router.get('/login', AdminLoginController.adminLogin);
 router.post('/login', AdminLoginController.adminLoginPost);
 
 router.get('/admin/dashboard', isAdmin, HomeController.adminHome);
+router.post('/admin/dashboard', isAdmin, HomeController.adminHome);
 
 // Admin Course routes
 router.get('/admin/courses', isSuperAdmin, CourseController.index);
