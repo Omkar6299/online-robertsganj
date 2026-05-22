@@ -5,8 +5,15 @@
             <div class="help-desk me-3"><i class="bi bi-info-circle-fill"></i> Help Desk</div>
             <div class="contact-item"><i class="bi bi-telephone-fill"></i> +91 7268079785</div>
             <div class="contact-item ms-3"><i class="bi bi-envelope-fill"></i> onlinehelpdesk11@gmail.com</div>
+            <div class="contact-item ms-3">
+                <i class="bi bi-globe"></i>
+                <a href="http://gdcrobertsganj.ac.in" target="_blank" style="color: inherit; text-decoration: none;">
+                    Main Website
+                </a>
+            </div>
         </div>
-        <div class="contact-item d-none d-md-block"><i class="bi bi-clock-fill"></i> 10:00 AM to 06:00 PM (Mon - Sat)</div>
+        <div class="contact-item d-none d-md-block"><i class="bi bi-clock-fill"></i> 10:00 AM to 06:00 PM (Mon - Sat)
+        </div>
     </div>
 </div>
 
@@ -42,38 +49,45 @@
         <div class="collapse navbar-collapse justify-content-center" id="navMenu">
             <ul class="navbar-nav w-100 justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('/') ? 'active' : '' %>" href="/">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('/') ? 'active' : '' %>"
+                        href="/">
                         <i class="bi bi-house-door-fill"></i> Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('registration_fees_payment*') ? 'active' : '' %>" href="/registration_fees_payment">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('registration_fees_payment*') ? 'active' : '' %>"
+                        href="/registration_fees_payment">
                         <i class="bi bi-wallet2"></i> Registration Fee
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('admission_login*') ? 'active' : '' %>" href="/admission_login">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('admission_login*') ? 'active' : '' %>"
+                        href="/admission_login">
                         <i class="bi bi-person-plus-fill"></i> Apply Online
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('reprint_payment_receipt*') ? 'active' : '' %>" href="/reprint_payment_receipt">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('reprint_payment_receipt*') ? 'active' : '' %>"
+                        href="/reprint_payment_receipt">
                         <i class="bi bi-receipt"></i> Reprint Receipt
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('print_application_form*') ? 'active' : '' %>" href="/print_application_form">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('print_application_form*') ? 'active' : '' %>"
+                        href="/print_application_form">
                         <i class="bi bi-file-earmark-pdf-fill"></i> Print Form
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('know_your_registration*') ? 'active' : '' %>" href="/know_your_registration">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('know_your_registration*') ? 'active' : '' %>"
+                        href="/know_your_registration">
                         <i class="bi bi-search"></i> Know Reg. No.
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('student_login*') ? 'active' : '' %>" href="/student_login">
+                    <a class="nav-link <%= typeof set_active !== 'undefined' && set_active('student_login*') ? 'active' : '' %>"
+                        href="/student_login">
                         <i class="bi bi-person-lock"></i> Student Login
                     </a>
                 </li>
@@ -81,4 +95,3 @@
         </div>
     </div>
 </nav>
-
