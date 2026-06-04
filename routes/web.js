@@ -76,7 +76,7 @@ router.use((req, res, next) => {
 router.get('/', async (req, res) => {
   try {
     const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
-    res.render('frontend/home/index', { 
+    res.render('frontend/home/index', {
       title: 'Home',
       activeAcademicYear: activeAcademicYear
     });
@@ -362,12 +362,12 @@ router.get('/admin/cocurricular/:id', isSuperAdmin, (req, res) => {
 });
 
 // Admin User routes
-router.get('/admin/users', isAdmin, UserController.index);
-router.get('/admin/users/create', isAdmin, UserController.create);
-router.post('/admin/users', isAdmin, UserController.store);
-router.get('/admin/users/:id/edit', isAdmin, UserController.edit);
-router.put('/admin/users/:id', isAdmin, UserController.update);
-router.delete('/admin/users/:id', isAdmin, UserController.destroy);
+router.get('/admin/users', isSuperAdmin, UserController.index);
+router.get('/admin/users/create', isSuperAdmin, UserController.create);
+router.post('/admin/users', isSuperAdmin, UserController.store);
+router.get('/admin/users/:id/edit', isSuperAdmin, UserController.edit);
+router.put('/admin/users/:id', isSuperAdmin, UserController.update);
+router.delete('/admin/users/:id', isSuperAdmin, UserController.destroy);
 // Fallback POST handler for PUT and DELETE
 router.post('/admin/users/:id', isAdmin, (req, res, next) => {
   if (req.body._method === 'DELETE') {
