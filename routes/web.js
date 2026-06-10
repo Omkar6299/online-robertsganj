@@ -131,7 +131,7 @@ router.get('/student/print_application_form', checkAdmissionLogin, StudentAdmiss
 router.get('/student/show_receipt', checkAdmissionLogin, StudentAdmissionController.printReceipt);
 
 // Admission Fee Payment routes
-router.get('/student/fees_payment', checkAdmissionLogin, AdmissionFeeController.initiatePayment);
+router.get('/student/fees_payment1', checkAdmissionLogin, AdmissionFeeController.initiatePayment);
 router.post('/student/admission_payment_response', AdmissionFeeController.paymentResponse);
 router.get('/student/admission_payment_response', AdmissionFeeController.paymentResponse);
 router.get('/student/admission_receipt', checkAdmissionLogin, AdmissionFeeController.generateReceipt);
