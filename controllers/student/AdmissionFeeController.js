@@ -174,17 +174,35 @@ export const paymentResponse = async (req, res) => {
             return flashErrorAndRedirect(req, res, 'Invalid payment response received.', '/student/dashboard');
         }
 
-        const parsedResponse = PaymentService.parsePaymentResponse(encData);
+        // Pass environment so correct decryption key is used (live vs demo)
+        const environment = res.locals.siteSettings?.atom_environment || siteconfig.atom_environment || 'demo';
+        const parsedResponse = PaymentService.parsePaymentResponse(encData, environment);
 
         if (!parsedResponse) {
             await t.rollback();
-            return flashErrorAndRedirect(req, res, 'Failed to process payment response.', '/student/dashboard');
+            return flashErrorAndRedirect(req, res, 'Failed to process payment response. Please contact support.', '/student/dashboard');
         }
 
+        console.log('=== ADMISSION FEE PAYMENT RESPONSE ===');
+        console.log('Parsed response transactionId:', parsedResponse.transactionId);
+        console.log('Parsed response success:', parsedResponse.success);
+        console.log('UDFs:', { udf1: parsedResponse.udf1, udf2: parsedResponse.udf2, udf3: parsedResponse.udf3, udf4: parsedResponse.udf4, udf5: parsedResponse.udf5 });
+
         const admissionTxnId = parsedResponse.transactionId;
+
+        if (!admissionTxnId) {
+            await t.rollback();
+            return flashErrorAndRedirect(req, res, 'Could not extract transaction ID from payment response. Please contact support.', '/student/dashboard');
+        }
         
         // Find record in student_fees_details
         const feeLog = await StudentFeeDetail.findOne({
+            where: { merchant_txn_id: admissionTxnId },
+            transaction: t
+        });
+
+        // Also try matching by payment_transaction_id in case it was stored differently
+        const feeLogByTxnId = feeLog || await StudentFeeDetail.findOne({
             where: { payment_transaction_id: admissionTxnId },
             transaction: t
         });
@@ -195,72 +213,127 @@ export const paymentResponse = async (req, res) => {
             transaction: t
         });
 
-        if (!feeLog && !paymentRecord) {
+        if (!feeLogByTxnId && !paymentRecord) {
+            console.error('No fee record found for txnId:', admissionTxnId);
             await t.rollback();
-            return flashErrorAndRedirect(req, res, 'Payment record not found.', '/student/dashboard');
+            return flashErrorAndRedirect(req, res, `Payment record not found for transaction ${admissionTxnId}. Please contact support.`, '/student/dashboard');
         }
 
         const isSuccess = parsedResponse.success;
         const finalStatus = isSuccess ? 'Success' : 'Failed';
 
+        console.log('Payment status determined:', finalStatus);
+
         // Update student_fees_details (StudentFeeDetail)
-        if (feeLog) {
-            await feeLog.update({
+        if (feeLogByTxnId) {
+            await feeLogByTxnId.update({
                 status: finalStatus,
-                bank_transaction_id: parsedResponse.bankTxnId,
-                atom_txn_id: parsedResponse.atomTxnId,
-                txnCompleteDate: parsedResponse.txnCompleteDate,
-                transaction_date: parsedResponse.txnCompleteDate,
+                bank_transaction_id: parsedResponse.bankTxnId || '',
+                atom_txn_id: parsedResponse.atomTxnId || '',
+                txnCompleteDate: parsedResponse.txnCompleteDate || '',
+                transaction_date: parsedResponse.txnCompleteDate || new Date().toISOString(),
                 remark: isSuccess ? 'Payment Successful' : `Payment Failed: ${parsedResponse.message}`
             }, { transaction: t });
+            console.log('StudentFeeDetail updated to:', finalStatus);
         }
 
         // Update general Payment table
         if (paymentRecord) {
             await paymentRecord.update({
                 status: finalStatus,
-                bank_transaction_id: parsedResponse.bankTxnId,
-                atom_txn_id: parsedResponse.atomTxnId,
-                txnCompleteDate: parsedResponse.txnCompleteDate,
-                transaction_date: parsedResponse.txnCompleteDate
+                bank_transaction_id: parsedResponse.bankTxnId || '',
+                atom_txn_id: parsedResponse.atomTxnId || '',
+                txnCompleteDate: parsedResponse.txnCompleteDate || '',
+                transaction_date: parsedResponse.txnCompleteDate || null
             }, { transaction: t });
         }
 
         // IF SUCCESS: Copy to verified student_admission_fee_details (StudentAdmissionFeeDetail)
         if (isSuccess) {
-            // Fetch student/semester data from the parsed response UDFs or the existing log
-            const studentId = parsedResponse.student_id || (feeLog ? feeLog.student_id : null);
-            const registrationNo = parsedResponse.registration_no || (feeLog ? feeLog.registration_no : null);
-            const userId = parsedResponse.user_id || (feeLog ? feeLog.user_id : null);
-            const semesterId = feeLog ? feeLog.semester_id : (parsedResponse.rawResponse?.payInstrument?.extras?.udf2 || null); // Note: udf2 is txnId but we check feeLog first
-            const academicYearId = feeLog ? feeLog.academic_year : null;
+            // Retrieve user_id from UDF4 (set during initiation) or feeLog
+            // udf1=registration_no, udf2=admissionTxnId, udf3=student.id, udf4=user_id, udf5=mobile
+            const userId = parsedResponse.udf4 || (feeLogByTxnId ? feeLogByTxnId.user_id : null);
+            const semesterId = feeLogByTxnId ? feeLogByTxnId.semester_id : null;
+            const academicYearId = feeLogByTxnId ? feeLogByTxnId.academic_year : null;
 
-            // Fetch semester to get order for type categorization
+            console.log('=== ADMISSION FEE SUCCESS - FETCHING STUDENT DATA ===');
+            console.log('user_id:', userId, '| semester_id:', semesterId, '| academic_year:', academicYearId);
+
+            if (!userId) {
+                console.error('CRITICAL: Cannot determine user_id for StudentAdmissionFeeDetail creation');
+                await t.rollback();
+                return flashErrorAndRedirect(req, res, `Payment successful but failed to identify student. Please contact support with transaction ID: ${admissionTxnId}`, '/student/dashboard');
+            }
+
+            // Fetch the student record to get student_id and registration_no
+            // (these fields are NOT stored in StudentFeeDetail table)
+            const studentRecord = await Student.findOne({
+                where: {
+                    user_id: String(userId),
+                    ...(academicYearId ? { academic_year: String(academicYearId) } : {})
+                },
+                order: [['id', 'DESC']],
+                transaction: t
+            });
+
+            if (!studentRecord) {
+                console.error('CRITICAL: Student record not found for user_id:', userId, 'academic_year:', academicYearId);
+                await t.rollback();
+                return flashErrorAndRedirect(req, res, `Payment successful but student record not found. Please contact support with transaction ID: ${admissionTxnId}`, '/student/dashboard');
+            }
+
+            const studentId = studentRecord.id;
+            const registrationNo = studentRecord.registration_no || '';
+
+            console.log('Student found — id:', studentId, '| registration_no:', registrationNo);
+
+            // Fetch semester to determine Odd/Even type
             const confirmedSem = await Semester.findByPk(semesterId, { transaction: t });
             const confirmedSemesterType = (confirmedSem && parseInt(confirmedSem.order) % 2 === 0) ? 'Even' : 'Odd';
 
-            await StudentAdmissionFeeDetail.create({
-                user_id: String(userId || ''),
-                student_id: studentId,
-                registration_no: registrationNo,
-                academic_year: String(academicYearId || ''),
-                semester_id: String(semesterId || ''),
-                semester_type: confirmedSemesterType,
-                amount: feeLog ? feeLog.amount : parsedResponse.amount,
-                merchant_txn_id: admissionTxnId,
-                bank_transaction_id: parsedResponse.bankTxnId,
-                atom_txn_id: parsedResponse.atomTxnId,
-                status: 'Success'
-            }, { transaction: t });
+            // Check if record already exists (guard against duplicate gateway callbacks)
+            const existingAdmFee = await StudentAdmissionFeeDetail.findOne({
+                where: { merchant_txn_id: admissionTxnId },
+                transaction: t
+            });
+
+            if (!existingAdmFee) {
+                try {
+                    await StudentAdmissionFeeDetail.create({
+                        user_id: userId,
+                        student_id: studentId,
+                        registration_no: registrationNo,
+                        academic_year: String(academicYearId || ''),
+                        semester_id: String(semesterId || ''),
+                        semester_type: confirmedSemesterType,
+                        amount: feeLogByTxnId ? feeLogByTxnId.amount : (parsedResponse.amount || 0),
+                        merchant_txn_id: admissionTxnId,
+                        bank_transaction_id: parsedResponse.bankTxnId || '',
+                        atom_txn_id: parsedResponse.atomTxnId || '',
+                        status: 'Success'
+                    }, { transaction: t });
+
+                    console.log('=== StudentAdmissionFeeDetail CREATED SUCCESSFULLY ===');
+                } catch (createError) {
+                    console.error('=== FAILED TO CREATE StudentAdmissionFeeDetail ===');
+                    console.error('Error:', createError.message);
+                    if (createError.errors) console.error('Validation errors:', JSON.stringify(createError.errors, null, 2));
+                    await t.rollback();
+                    return flashErrorAndRedirect(req, res, `Payment successful but fee record creation failed: ${createError.message}. Please contact support with transaction ID: ${admissionTxnId}`, '/student/dashboard');
+                }
+            } else {
+                console.log('=== StudentAdmissionFeeDetail already exists, skipping duplicate insert ===');
+            }
         }
 
         await t.commit();
+        console.log('=== TRANSACTION COMMITTED SUCCESSFULLY ===');
 
         if (isSuccess) {
             // RESTORE SESSION: If session was lost due to cross-site POST (SameSite issue),
             // we backfill it using the user_id returned by the gateway.
             if (!req.session.admission_user_id) {
-                const userId = parsedResponse.user_id || (feeLog ? feeLog.user_id : null);
+                const userId = parsedResponse.udf4 || (feeLogByTxnId ? feeLogByTxnId.user_id : null);
                 if (userId) {
                     const user = await User.findByPk(userId);
                     if (user) {
