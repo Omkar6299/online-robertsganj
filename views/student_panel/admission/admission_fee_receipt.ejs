@@ -1,313 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <%- include('../layout/css_link') %>
-    <title><%= typeof title !== 'undefined' ? title : 'Admission Fee Receipt' %></title>
+        <title>
+            <%= typeof title !=='undefined' ? title : 'Admission Fee Receipt' %>
+        </title>
 
-    <style>
-        :root {
-            --primary: #0f4c81;
-            --primary-dark: #0a3559;
-            --secondary: #8b1e3f;
-            --accent: #c8a96a;
-            --border: #cfd8e3;
-            --border-dark: #9fb2c8;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --bg-soft: #f5f7fb;
-            --white: #ffffff;
-            --success: #1f7a4d;
-        }
+        <style>
+            :root {
+                --primary: #0f4c81;
+                --primary-dark: #0a3559;
+                --secondary: #8b1e3f;
+                --accent: #c8a96a;
+                --border: #cfd8e3;
+                --border-dark: #9fb2c8;
+                --text: #1f2937;
+                --muted: #6b7280;
+                --bg-soft: #f5f7fb;
+                --white: #ffffff;
+                --success: #1f7a4d;
+            }
 
-        * {
-            box-sizing: border-box;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
+            * {
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
 
-        body { 
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            color: var(--text);
-            background: #eef2f7;
-            line-height: 1.4;
-        }
-
-        .receipt-scroll-container {
-            padding: 30px 15px;
-            background: #eef2f7;
-        }
-
-        .receipt-slip {
-            width: 210mm;
-            min-height: auto;
-            margin: 0 auto;
-            background: var(--white);
-            box-shadow: 0 10px 25px rgba(15, 76, 129, 0.1);
-            border: 1px solid #94a3b8;
-            position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-            font-size: 11px;
-        }
-
-        .receipt-slip::before {
-            content: "";
-            position: absolute;
-            inset: 0 0 auto 0;
-            height: 8px;
-            background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--secondary));
-        }
-
-        .slip-inner {
-            padding: 8mm 12mm;
-        }
-
-        .college-header-mini {
-            display: grid;
-            grid-template-columns: 60px 1fr 60px;
-            gap: 15px;
-            align-items: center;
-            border-bottom: 1px solid var(--border-dark);
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-        }
-
-        .logo-mini {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-        }
-
-        .college-name-en {
-            margin: 0;
-            color: var(--primary-dark);
-            font-size: 18px;
-            font-weight: 800;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .college-name-hi {
-            margin: 2px 0 0;
-            color: var(--secondary);
-            font-size: 14px;
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .receipt-badge-wrap {
-            text-align: right;
-            margin-bottom: 5px;
-            position: relative;
-            z-index: 5;
-        }
-
-        .receipt-badge {
-            display: inline-block;
-            background: var(--success);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 8px rgba(31, 122, 77, 0.2);
-        }
-
-        .receipt-title {
-            text-align: center;
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--primary-dark);
-            text-decoration: underline;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        .info-section {
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: var(--bg-soft);
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 20px;
-        }
-
-        .info-item {
-            display: flex;
-            border-bottom: 1px solid rgba(203, 213, 225, 0.4);
-            padding-bottom: 4px;
-        }
-
-        .info-label {
-            width: 45%;
-            color: var(--muted);
-            font-weight: 600;
-        }
-
-        .info-value {
-            width: 55%;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .amount-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
-            color: #fff;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        .amount-label {
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .amount-value {
-            font-size: 20px;
-            font-weight: 800;
-        }
-
-        .receipt-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-dark);
-        }
-
-        .footer-note {
-            font-size: 9px;
-            color: var(--muted);
-            max-width: 60%;
-            font-style: italic;
-        }
-
-        .signature-box {
-            text-align: center;
-            min-width: 150px;
-        }
-
-        .signature-line {
-            border-top: 1px solid var(--text);
-            padding-top: 5px;
-            font-weight: 700;
-            font-size: 11px;
-        }
-
-        .no-print-actions {
-            text-align: center;
-            padding: 20px;
-        }
-
-        @media print {
-            @page {
-                size: A4;
+            body {
                 margin: 0;
+                font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+                color: var(--text);
+                background: #eef2f7;
+                line-height: 1.4;
             }
-            body { background: #fff !important; }
-            .no-print, .no-print-actions {
-                display: none !important;
-            }
+
             .receipt-scroll-container {
-                padding: 0 !important;
-                background: #fff !important;
+                padding: 30px 15px;
+                background: #eef2f7;
             }
+
             .receipt-slip {
-                margin: 20px auto;
-                box-shadow: none;
-                border: 1px solid #000;
-                width: 200mm;
+                width: 210mm;
+                min-height: auto;
+                margin: 0 auto;
+                background: var(--white);
+                box-shadow: 0 10px 25px rgba(15, 76, 129, 0.1);
+                border: 1px solid #94a3b8;
+                position: relative;
+                overflow: hidden;
+                border-radius: 12px;
+                font-size: 11px;
             }
-            .receipt-slip::before { display: none; }
-        }
-    </style>
+
+            .receipt-slip::before {
+                content: "";
+                position: absolute;
+                inset: 0 0 auto 0;
+                height: 8px;
+                background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--secondary));
+            }
+
+            .slip-inner {
+                padding: 8mm 12mm;
+            }
+
+            .college-header-mini {
+                display: grid;
+                grid-template-columns: 60px 1fr 60px;
+                gap: 15px;
+                align-items: center;
+                border-bottom: 1px solid var(--border-dark);
+                padding-bottom: 12px;
+                margin-bottom: 15px;
+            }
+
+            .logo-mini {
+                width: 60px;
+                height: 60px;
+                object-fit: contain;
+            }
+
+            .college-name-en {
+                margin: 0;
+                color: var(--primary-dark);
+                font-size: 18px;
+                font-weight: 800;
+                text-transform: uppercase;
+                text-align: center;
+            }
+
+            .college-name-hi {
+                margin: 2px 0 0;
+                color: var(--secondary);
+                font-size: 14px;
+                font-weight: 700;
+                text-align: center;
+            }
+
+            .receipt-badge-wrap {
+                text-align: right;
+                margin-bottom: 5px;
+                position: relative;
+                z-index: 5;
+            }
+
+            .receipt-badge {
+                display: inline-block;
+                background: var(--success);
+                color: #fff;
+                padding: 4px 12px;
+                border-radius: 999px;
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 8px rgba(31, 122, 77, 0.2);
+            }
+
+            .receipt-title {
+                text-align: center;
+                font-size: 14px;
+                font-weight: 800;
+                color: var(--primary-dark);
+                text-decoration: underline;
+                margin-bottom: 20px;
+                text-transform: uppercase;
+            }
+
+            .info-section {
+                border: 1px solid #cbd5e1;
+                border-radius: 10px;
+                padding: 12px;
+                margin-bottom: 15px;
+                background: var(--bg-soft);
+            }
+
+            .info-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px 20px;
+            }
+
+            .info-item {
+                display: flex;
+                border-bottom: 1px solid rgba(203, 213, 225, 0.4);
+                padding-bottom: 4px;
+            }
+
+            .info-label {
+                width: 45%;
+                color: var(--muted);
+                font-weight: 600;
+            }
+
+            .info-value {
+                width: 55%;
+                font-weight: 700;
+                color: var(--primary-dark);
+            }
+
+            .amount-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+                color: #fff;
+                border-radius: 8px;
+                margin-top: 10px;
+            }
+
+            .amount-label {
+                font-size: 13px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .amount-value {
+                font-size: 20px;
+                font-weight: 800;
+            }
+
+            .receipt-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                margin-top: 25px;
+                padding-top: 15px;
+                border-top: 1px dashed var(--border-dark);
+            }
+
+            .footer-note {
+                font-size: 9px;
+                color: var(--muted);
+                max-width: 60%;
+                font-style: italic;
+            }
+
+            .signature-box {
+                text-align: center;
+                min-width: 150px;
+            }
+
+            .signature-line {
+                border-top: 1px solid var(--text);
+                padding-top: 5px;
+                font-weight: 700;
+                font-size: 11px;
+            }
+
+            .no-print-actions {
+                text-align: center;
+                padding: 20px;
+            }
+
+            @media print {
+                @page {
+                    size: A4;
+                    margin: 0;
+                }
+
+                body {
+                    background: #fff !important;
+                }
+
+                .no-print,
+                .no-print-actions {
+                    display: none !important;
+                }
+
+                .receipt-scroll-container {
+                    padding: 0 !important;
+                    background: #fff !important;
+                }
+
+                .receipt-slip {
+                    margin: 20px auto;
+                    box-shadow: none;
+                    border: 1px solid #000;
+                    width: 200mm;
+                }
+
+                .receipt-slip::before {
+                    display: none;
+                }
+            }
+        </style>
 </head>
 
 <body>
 
-<div class="no-print">
-    <% if (typeof layout !== 'undefined' && layout === 'student') { %>
-        <%- include('../layout/header') %>
-    <% } %>
-</div>
+    <div class="no-print">
+        <% if (typeof layout !=='undefined' && layout==='student' ) { %>
+            <%- include('../layout/header') %>
+                <% } %>
+    </div>
 
-<div class="no-print-actions">
-    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> Print Receipt</button>
-    <% if (typeof layout !== 'undefined' && layout === 'student') { %>
-        <a href="/student/dashboard" class="btn btn-secondary">Back to Dashboard</a>
-    <% } %>
-</div>
-
-<div class="receipt-scroll-container">
-    <div class="receipt-slip">
-        <div class="slip-inner">
-            <div class="receipt-badge-wrap">
-                <span class="receipt-badge">Admission Successful</span>
-            </div>
-
-            <div class="college-header-mini">
-                <img src="/uploads/static/logo_header.png" class="logo-mini">
-                <div>
-                    <h1 class="college-name-en">Government Women Degree College Robertsganj Sonebhadra</h1>
-                    <div class="college-name-hi">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</div>
-                </div>
-                <img src="/uploads/static/logo_header_right.png" class="logo-mini">
-            </div>
-
-            <div class="receipt-title"><%= fieldLabels.header.admission_receipt_title %></div>
-
-            <% if (payment && student) { %>
-                <div class="info-section">
-                    <div class="info-grid">
-                        <div class="info-item"><div class="info-label">Registration No</div><div class="info-value"><%= payment.registration_no || '-' %></div></div>
-                        <div class="info-item"><div class="info-label">Student Name</div><div class="info-value"><%= user ? user.name : '-' %></div></div>
-                        <div class="info-item"><div class="info-label">Father's Name</div><div class="info-value"><%= student.father_name || '-' %></div></div>
-                        <div class="info-item"><div class="info-label">Mobile No</div><div class="info-value"><%= user ? user.phone : '-' %></div></div>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <div class="info-grid">
-                        <div class="info-item"><div class="info-label">Academic Session</div><div class="info-value"><%= typeof activeYear !== 'undefined' ? activeYear.session : '-' %></div></div>
-                        <div class="info-item"><div class="info-label">Course / Semester</div><div class="info-value"><%= student.courseName ? student.courseName.name : '-' %> / <%= payment.semester ? payment.semester.name : (student.semsterName ? student.semsterName.name : '-') %></div></div>
-                        <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.txn_id %></div><div class="info-value"><%= payment.merchant_txn_id || '-' %></div></div>
-                        <div class="info-item"><div class="info-label"><%= fieldLabels.receipt.fields.atom_txn_id %></div><div class="info-value"><%= payment.atom_txn_id || '-' %></div></div>
-                        <div class="info-item"><div class="info-label">Transaction Date</div><div class="info-value"><%= new Date(payment.payment_date || payment.createdAt).toLocaleDateString('en-IN') %></div></div>
-                    </div>
-                </div>
-
-                <div class="amount-row">
-                    <div class="amount-label">Admission Fee Paid</div>
-                    <div class="amount-value">₹ <%= payment.amount ? Number(payment.amount).toFixed(2) : "0.00" %></div>
-                </div>
-
-                <div class="receipt-footer">
-                    <div class="footer-note">
-                        * This is a computer-generated receipt and does not require a physical signature.<br>
-                        * Generated on: <%= new Date().toLocaleString('en-IN') %>
-                    </div>
-                    <div class="signature-box">
-                        <div class="signature-line">Authorized Signatory</div>
-                    </div>
-                </div>
+    <div class="no-print-actions">
+        <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> Print Receipt</button>
+        <% if (typeof layout !=='undefined' && layout==='student' ) { %>
+            <a href="/student/dashboard" class="btn btn-secondary">Back to Dashboard</a>
             <% } %>
+    </div>
+
+    <div class="receipt-scroll-container">
+        <div class="receipt-slip">
+            <div class="slip-inner">
+                <div class="receipt-badge-wrap">
+                    <span class="receipt-badge">Admission Successful</span>
+                </div>
+
+                <div class="college-header-mini">
+                    <img src="/uploads/static/logo_header.png" class="logo-mini">
+                    <div>
+                        <h1 class="college-name-en">Government Women Degree College Robertsganj Sonebhadra</h1>
+                        <div class="college-name-hi">राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</div>
+                    </div>
+                    <img src="/uploads/static/logo_header_right.png" class="logo-mini">
+                </div>
+
+                <div class="receipt-title">
+                    <%= fieldLabels.header.admission_receipt_title %>
+                </div>
+
+                <% if (payment && student) { %>
+                    <div class="info-section">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Registration No</div>
+                                <div class="info-value">
+                                    <%= payment.registration_no || '-' %>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Student Name</div>
+                                <div class="info-value">
+                                    <%= user ? user.name : '-' %>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Father's Name</div>
+                                <div class="info-value">
+                                    <%= student.father_name || '-' %>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Mobile No</div>
+                                <div class="info-value">
+                                    <%= user ? user.phone : '-' %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Academic Session</div>
+                                <div class="info-value">
+                                    <%= typeof activeYear !=='undefined' ? activeYear.session : '-' %>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Course / Semester</div>
+                                <div class="info-value">
+                                    <%= student.courseName ? student.courseName.name : '-' %> / <%= payment.semester ?
+                                            payment.semester.name : (student.semsterName ? student.semsterName.name
+                                            : '-' ) %>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <%= fieldLabels.receipt.fields.txn_id %>
+                                </div>
+                                <div class="info-value">
+                                    <%= payment.merchant_txn_id || '-' %>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <%= fieldLabels.receipt.fields.atom_txn_id %>
+                                </div>
+                                <div class="info-value">
+                                    <%= payment.atom_txn_id || '-' %>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Transaction Date</div>
+                                <div class="info-value">
+                                    <%= new Date(payment.payment_date || payment.createdAt).toLocaleDateString('en-IN')
+                                        %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="amount-row">
+                        <div class="amount-label">Admission Fee Paid</div>
+                        <div class="amount-value">₹ <%= payment.amount ? Number(payment.amount).toFixed(2) : "0.00" %>
+                        </div>
+                    </div>
+
+                    <div class="receipt-footer">
+                        <div class="footer-note">
+                            * This is a computer-generated receipt and does not require a physical signature.<br>
+                            * Generated on: <%= new Date().toLocaleString('en-IN') %>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line">Authorized Signatory</div>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
         </div>
     </div>
-</div>
 
 </body>
+
 </html>
