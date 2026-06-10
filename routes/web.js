@@ -91,7 +91,7 @@ router.get('/get-semester/:courseId', LoginController.getSemester);
 router.get('/get-student/:registration_no', LoginController.getStudentByRegistrationNo);
 router.get('/registration_fees_payment', LoginController.registration_fees_payment);
 router.post('/registration_fees_payment_post', LoginController.registration_fees_payment_post);
-router.post('/payment/initiate', LoginController.initiatePayment);
+router.post('/payment/initiate1', LoginController.initiatePayment);
 router.post('/payment/response', PaymentController.paymentResponse);
 router.get('/payment/response', PaymentController.paymentResponse); // Handle GET redirects from payment gateway
 router.get('/payment/receipt', PaymentController.paymentReceipt); // Payment receipt page
