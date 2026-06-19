@@ -89,7 +89,7 @@ router.get('/', async (req, res) => {
 router.get('/get-course/:type_id', LoginController.coursesByType);
 router.get('/get-semester/:courseId', LoginController.getSemester);
 router.get('/get-student/:registration_no', LoginController.getStudentByRegistrationNo);
-router.get('/registration_fees_payment', LoginController.registration_fees_payment);
+router.get('/registration_fees_payment1', LoginController.registration_fees_payment);
 router.post('/registration_fees_payment_post', LoginController.registration_fees_payment_post);
 router.post('/payment/initiate', LoginController.initiatePayment);
 router.post('/payment/response', PaymentController.paymentResponse);
