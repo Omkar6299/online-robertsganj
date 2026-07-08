@@ -110,6 +110,12 @@ router.get('/know_your_registration', ReprintController.knowYourRegistration);
 router.get('/print_application_form', ReprintController.printApplicationForm);
 router.get('/print_application_form_show', ReprintController.showApplicationForm);
 
+// Static Pages routes
+router.get('/disclaimer', (req, res) => res.render('frontend/pages/disclaimer', { title: 'Disclaimer' }));
+router.get('/privacy-policy', (req, res) => res.render('frontend/pages/privacy_policy', { title: 'Privacy Policy' }));
+router.get('/refund-policy', (req, res) => res.render('frontend/pages/refund_policy', { title: 'Refund Policy' }));
+router.get('/terms-conditions', (req, res) => res.render('frontend/pages/terms_conditions', { title: 'Terms & Conditions' }));
+
 // Student routes (protected)
 router.get('/student/dashboard', checkAdmissionLogin, StudentDashboardController.index);
 

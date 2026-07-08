@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../layout/css_link') %>
+        <title>
+            <%= title %> || <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_en
+                    : 'Government Women Degree College Robertsganj Sonebhadra' %>
+        </title>
+</head>
+
+<body>
+    <%- include('../layout/header') %>
+
+        <main class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-primary text-white py-4 px-5">
+                            <h1 class="h2 mb-0 fw-bold">
+                                <%= title %>
+                            </h1>
+                        </div>
+                        <div class="card-body p-5">
+                            <div class="content-area">
+                                <p class="lead text-muted mb-4">These terms and conditions govern your use of this
+                                    website; by using this website, you accept these terms and conditions in full. If
+                                    you disagree with these terms and conditions or any part of these terms and
+                                    conditions, you must not use this website.</p>
+
+                                <hr class="my-4 opacity-10">
+
+                                <h4 class="fw-bold mt-4">License to use website</h4>
+                                <p>Unless otherwise stated, <%= typeof fieldLabels !=='undefined' ?
+                                        fieldLabels.header.college_name_en
+                                        : 'Government Women Degree College Robertsganj Sonebhadra' %> and/or its
+                                        licensors own the intellectual property rights in the website and material on
+                                        the website. Subject to the license below, all these intellectual property
+                                        rights are reserved.</p>
+                                <p>You may view, download for coaching purposes only, and print pages from the website
+                                    for your own personal use, subject to the restrictions set out below and elsewhere
+                                    in these terms and conditions.</p>
+
+                                <h5 class="fw-bold mt-3 text-danger">You Must Not:</h5>
+                                <ul class="list-unstyled ps-3">
+                                    <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Republish
+                                        material from this website (including republication on another website);</li>
+                                    <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Sell, rent or
+                                        sub-license material from the website;</li>
+                                    <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Show any
+                                        material from the website in public;</li>
+                                    <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Reproduce,
+                                        duplicate, copy or otherwise exploit material on this website for a commercial
+                                        purpose;</li>
+                                    <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Edit or
+                                        otherwise modify any material on the website; or</li>
+                                    <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Redistribute
+                                        material from this website except for content specifically and expressly made
+                                        available for redistribution.</li>
+                                </ul>
+
+                                <h4 class="fw-bold mt-4">Acceptable use</h4>
+                                <p>You must not use this website in any way that causes, or may cause, damage to the
+                                    website or impairment of the availability or accessibility of the website; or in any
+                                    way which is unlawful, illegal, fraudulent or harmful, or in connection with any
+                                    unlawful, illegal, fraudulent or harmful purpose or activity.</p>
+
+                                <h4 class="fw-bold mt-4">Restricted access</h4>
+                                <p>Access to certain areas of this website is restricted. <%= typeof fieldLabels
+                                        !=='undefined' ? fieldLabels.header.college_name_en
+                                        : 'Government Women Degree College Robertsganj Sonebhadra' %> reserves the right
+                                        to restrict access to other areas of this website, or indeed this entire
+                                        website, at <%= typeof fieldLabels !=='undefined' ?
+                                            fieldLabels.header.college_name_en
+                                            : 'Government Women Degree College Robertsganj Sonebhadra' %>'s discretion.
+                                </p>
+                                <p>If <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_en
+                                        : 'Government Women Degree College Robertsganj Sonebhadra' %> provides you with
+                                        a user ID and password to enable you to access restricted areas of this website
+                                        or other content or services, you must ensure that the user ID and password are
+                                        kept confidential.</p>
+                                <p>
+                                    <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_en
+                                        : 'Government Women Degree College Robertsganj Sonebhadra' %> may disable your
+                                        user ID and password in <%= typeof fieldLabels !=='undefined' ?
+                                            fieldLabels.header.college_name_en
+                                            : 'Government Women Degree College Robertsganj Sonebhadra' %>'s sole
+                                            discretion without notice or explanation.
+                                </p>
+
+                                <h4 class="fw-bold mt-4">Breaches of these terms and conditions</h4>
+                                <p>Without prejudice to <%= typeof fieldLabels !=='undefined' ?
+                                        fieldLabels.header.college_name_en
+                                        : 'Government Women Degree College Robertsganj Sonebhadra' %> other rights under
+                                        these terms and conditions, if you breach these terms and conditions in any way,
+                                        <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_en
+                                            : 'Government Women Degree College Robertsganj Sonebhadra' %> may take such
+                                            action as <%= typeof fieldLabels !=='undefined' ?
+                                                fieldLabels.header.college_name_en
+                                                : 'Government Women Degree College Robertsganj Sonebhadra' %> deems
+                                                appropriate to deal with the breach, including suspending your access to
+                                                the website, prohibiting you from accessing the website, blocking
+                                                computers using your IP address from accessing the website, contacting
+                                                your internet service provider to request that they block your access to
+                                                the website and/or bringing court proceedings against you.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../layout/footer') %>
+            <%- include('../layout/script_link') %>
+</body>
+
+</html>
