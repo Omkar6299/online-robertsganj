@@ -1,15 +1,46 @@
 <!-- Footer -->
-<footer class="footer text-white py-2">
-  <div class="container text-center small d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 flex-wrap">
-    <div>
-      &copy; 2026, <strong>राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र</strong> |
+<footer class="footer text-white py-3">
+  <div class="container text-center">
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-2 small footer-links">
+      <a href="/disclaimer" class="text-white text-decoration-none hover-warning">Disclaimer</a>
+      <a href="/privacy-policy" class="text-white text-decoration-none hover-warning">Privacy Policy</a>
+      <a href="/refund-policy" class="text-white text-decoration-none hover-warning">Refund Policy</a>
+      <a href="/terms-conditions" class="text-white text-decoration-none hover-warning">Terms & Conditions</a>
     </div>
-    <div>
-      Powered By
-      <a href="http://thetabyte.com/" target="_blank" class="thetaByte text-warning text-decoration-none">
-        Thetabyte Solutions Pvt. Ltd.
-      </a>
+    <div class="small d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 flex-wrap">
+      <div>
+        &copy; 2026, <strong>
+          <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_hi
+            : 'राजकीय महिला महाविद्यालय रॉबर्ट्सगंज सोनभद्र' %>
+        </strong> |
+      </div>
+      <div>
+        Powered By
+        <a href="http://thetabyte.com/" target="_blank" class="thetaByte text-warning text-decoration-none">
+          Thetabyte Solutions Pvt. Ltd.
+        </a>
+      </div>
     </div>
   </div>
 </footer>
 
+<style>
+  .footer {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-links a {
+    transition: color 0.3s ease;
+    opacity: 0.8;
+  }
+
+  .footer-links a:hover {
+    color: #ffc107 !important;
+    opacity: 1;
+  }
+
+  .thetaByte:hover {
+    text-decoration: underline !important;
+  }
+</style>

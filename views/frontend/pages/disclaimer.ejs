@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../layout/css_link') %>
+        <title>
+            <%= title %> || <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_en
+                    : 'Government Women Degree College Robertsganj Sonebhadra' %>
+        </title>
+</head>
+
+<body>
+    <%- include('../layout/header') %>
+
+        <main class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-primary text-white py-4 px-5">
+                            <h1 class="h2 mb-0 fw-bold">
+                                <%= title %>
+                            </h1>
+                        </div>
+                        <div class="card-body p-5">
+                            <div class="content-area">
+                                <h4 class="fw-bold mb-3 text-dark">Welcome to Online Admission & Fee Submission Portal
+                                    of <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_en
+                                        : 'Government Women Degree College Robertsganj Sonebhadra' %>
+                                </h4>
+
+                                <p class="mb-4">On this Page you shall find information about admission form submission
+                                    and fee submission to the college.</p>
+
+                                <p class="mb-4">This service is being provided by <%= typeof fieldLabels !=='undefined'
+                                        ? fieldLabels.header.college_name_en
+                                        : 'Government Women Degree College Robertsganj Sonebhadra' %> in association
+                                        with <strong>ThetaByte Solutions Pvt. Ltd.</strong> to facilitate faster
+                                        dissemination and easy access to information related to admission.</p>
+
+                                <div class="alert alert-warning border-0 shadow-sm rounded-4 p-4">
+                                    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                    In case of doubt or query, applicants are requested to contact on the helpline
+                                    number or visit the college office.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../layout/footer') %>
+            <%- include('../layout/script_link') %>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../layout/css_link') %>
+        <title>
+            <%= title %> || <%= typeof fieldLabels !=='undefined' ? fieldLabels.header.college_name_en
+                    : 'Government Women Degree College Robertsganj Sonebhadra' %>
+        </title>
+</head>
+
+<body>
+    <%- include('../layout/header') %>
+
+        <main class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-primary text-white py-4 px-5">
+                            <h1 class="h2 mb-0 fw-bold">
+                                <%= title %>
+                            </h1>
+                        </div>
+                        <div class="card-body p-5">
+                            <div class="content-area">
+                                <h4 class="fw-bold mb-3 text-dark border-bottom pb-2">Transaction Fee Clause</h4>
+
+                                <p class="mb-1 fw-bold text-dark">Transaction fees charged would be borne by cardholder
+                                    for any payment.</p>
+                                <p class="mb-4 text-muted small">ट्रांजैकसन फीस कार्ड होल्डर द्वारा वहन किया जायेगा|</p>
+
+                                <p class="mb-1 fw-bold text-dark">Transaction fee charges would not be refunded/
+                                    reversed under any circumstances for any refund/ reversal /chargeback and any other
+                                    reasons.</p>
+                                <p class="mb-4 text-muted small">ट्रांजैकसन फीस किसी भी दशा में रिफन्ड नहीं किया जायेगा|
+                                </p>
+
+                                <h4 class="fw-bold mb-3 mt-5 text-dark border-bottom pb-2">Cancellation & Refund Policy
+                                </h4>
+
+                                <div class="mb-4">
+                                    <p class="mb-1 fw-bold text-dark">In case of an unsuccessful / failed attempt of
+                                        online payment if the amount is deducted from account then the fee amount will
+                                        be refunded back in the same account within 3 to 10 bank working days.</p>
+                                    <p class="text-muted small">ऑनलाइन पेमेंट असफल / फेल होने की दशा में यदि खाते से
+                                        पैसा कट जाता है तो फीस की राशि 3 से 10 बैंक कार्य दिवस के भीतर उसी खाते में वापस
+                                        कर दिया जायेगा।</p>
+                                </div>
+
+                                <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mt-4">
+                                    <p class="mb-2 fw-bold">Fee once paid by the candidate cannot be refunded in any
+                                        circumstances. After admitting into any course, admission fee or any other fee
+                                        cannot be refunded or transferred to any other course.</p>
+                                    <p class="mb-0 small fw-medium">अभ्यर्थी द्वारा प्रवेश हेतु जमा किया गया शुल्क किसी
+                                        भी दशा में वापस नहीं किया जायेगा। किसी विषय में प्रवेश लेने के पश्चात् प्रवेश
+                                        अथवा अन्य शुल्क न तो वापस किया जायेगा और न ही अन्य पाठ्यक्रम में स्थानांतरित
+                                        किया जायेगा।</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../layout/footer') %>
+            <%- include('../layout/script_link') %>
+</body>
+
+</html>
