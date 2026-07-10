@@ -77,9 +77,29 @@
                                                 <!-- Current Semester Payment -->
                                                 <div class="mb-3 border-bottom pb-2">
                                                     <small class="d-block text-muted">Current: <%= student.semsterName ? student.semsterName.name : 'Semester' %></small>
-                                                    <% if (typeof admissionPayment !== 'undefined' && admissionPayment) { %>
-                                                        <span class="badge bg-success mb-2">Paid ₹<%= admissionPayment.amount %></span><br>
-                                                        <a href="/student/admission_receipt?txn_id=<%= admissionPayment.merchant_txn_id %>" class="btn btn-sm btn-outline-success">Receipt</a>
+                                                    <% if (typeof isFullyPaid !== 'undefined' && isFullyPaid) { %>
+                                                        <span class="badge bg-success mb-2">Paid ₹<%= typeof totalPaidAmount !== 'undefined' ? totalPaidAmount : (admissionPayment ? admissionPayment.amount : 0) %></span><br>
+                                                        <% if (typeof currentAdmissionPayments !== 'undefined' && currentAdmissionPayments.length > 0) { %>
+                                                            <% currentAdmissionPayments.forEach(function(pay, idx) { %>
+                                                                <a href="/student/admission_receipt?txn_id=<%= pay.merchant_txn_id %>" class="btn btn-sm btn-outline-success me-1 mt-1">Receipt <%= currentAdmissionPayments.length > 1 ? '#' + (idx + 1) : '' %></a>
+                                                            <% }) %>
+                                                        <% } else if (typeof admissionPayment !== 'undefined' && admissionPayment) { %>
+                                                            <a href="/student/admission_receipt?txn_id=<%= admissionPayment.merchant_txn_id %>" class="btn btn-sm btn-outline-success">Receipt</a>
+                                                        <% } %>
+                                                    <% } else if (typeof hasDue !== 'undefined' && hasDue) { %>
+                                                        <div class="mb-2">
+                                                            <span class="badge bg-success me-1">Paid ₹<%= totalPaidAmount %></span>
+                                                            <span class="badge bg-warning text-dark">Due ₹<%= dueAmount %></span>
+                                                        </div>
+                                                        <small class="text-danger d-block mb-2">Fee increased due to subject/category change.</small>
+                                                        <% if (typeof currentAdmissionPayments !== 'undefined' && currentAdmissionPayments.length > 0) { %>
+                                                            <div class="mb-2">
+                                                                <% currentAdmissionPayments.forEach(function(pay, idx) { %>
+                                                                    <a href="/student/admission_receipt?txn_id=<%= pay.merchant_txn_id %>" class="btn btn-sm btn-outline-success me-1 mb-1">Receipt <%= currentAdmissionPayments.length > 1 ? '#' + (idx + 1) : '' %></a>
+                                                                <% }) %>
+                                                            </div>
+                                                        <% } %>
+                                                        <a href="/student/fees_payment?semester_id=<%= student.year %>" class="btn btn-warning btn-sm fw-bold">Pay Due Fee (₹<%= dueAmount %>)</a>
                                                     <% } else if (student.declaration_status !== '1') { %>
                                                         <span class="text-info small">Registration Pending</span><br>
                                                         <button class="btn btn-sm btn-secondary mt-1" disabled title="Please complete and submit your registration first">Pay Fee</button>

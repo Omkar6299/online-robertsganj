@@ -1,5 +1,6 @@
 import { Student, User, Course, AcademicYear, Semester, StudentAdmissionFeeDetail } from '../../models/index.js';
 import { Op } from 'sequelize';
+import FeeService from '../../utils/services/FeeService.js';
 
 export const index = async (req, res) => {
     try {
@@ -26,10 +27,10 @@ export const index = async (req, res) => {
         let nextSemester = null;
 
         if (!student) {
-            // Find most recent record from any year for this user
-            previousYearStudent = await Student.findOne({
+            // Locate student profile reliably across any academic year / even semester ordered by ID DESC
+            student = await Student.findOne({
                 where: { user_id: String(userId) },
-                order: [['created_at', 'DESC']],
+                order: [['id', 'DESC']],
                 include: [
                     { model: User, as: 'user' },
                     { model: Course, as: 'courseName' },
@@ -37,27 +38,54 @@ export const index = async (req, res) => {
                     { model: AcademicYear, as: 'academicYear' }
                 ]
             });
-            
-            // If no record at all, they shouldn't be here (session should have failed)
-            if (!previousYearStudent) {
+
+            if (!student) {
                 req.flash('error', 'Student record not found.');
                 return res.redirect('/admission_login');
             }
         }
 
-        // Check for successful admission fee payment in the current record (Verified Table)
-        let currentAdmissionPayment = null;
+        // Check for all successful admission fee payments for this semester
+        let currentAdmissionPayments = [];
+        let totalPaidAmount = 0;
+        let calculatedTotalFee = 0;
+        let dueAmount = 0;
+        let hasDue = false;
+        let isFullyPaid = false;
+
         if (student) {
-            currentAdmissionPayment = await StudentAdmissionFeeDetail.findOne({
+            currentAdmissionPayments = await StudentAdmissionFeeDetail.findAll({
                 where: {
                     user_id: String(userId),
                     status: 'Success',
                     semester_id: String(student.year)
-                }
+                },
+                order: [['created_at', 'ASC']]
             });
 
-            // If current semester is paid, look for the NEXT semester
-            if (currentAdmissionPayment) {
+            totalPaidAmount = currentAdmissionPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+
+            // Attempt dynamic fee calculation to check for differential due fee
+            try {
+                calculatedTotalFee = await FeeService.getCalculatedFee(student, student.year);
+                if (totalPaidAmount >= calculatedTotalFee && totalPaidAmount > 0) {
+                    isFullyPaid = true;
+                    dueAmount = 0;
+                } else if (totalPaidAmount > 0 && totalPaidAmount < calculatedTotalFee) {
+                    hasDue = true;
+                    dueAmount = Number((calculatedTotalFee - totalPaidAmount).toFixed(2));
+                } else if (totalPaidAmount === 0) {
+                    dueAmount = calculatedTotalFee;
+                }
+            } catch (feeErr) {
+                console.warn('Dashboard fee calculation warning for student:', student.id, feeErr.message);
+                if (totalPaidAmount > 0) {
+                    isFullyPaid = true;
+                }
+            }
+
+            // If current semester is fully paid, look for the NEXT semester
+            if (isFullyPaid) {
                 const currentSem = student.semsterName;
                 if (currentSem) {
                     const nextOrder = parseInt(currentSem.order) + 1;
@@ -89,8 +117,14 @@ export const index = async (req, res) => {
             title: 'Student Dashboard',
             student,
             previousYearStudent,
-            user: student ? student.user : previousYearStudent.user,
-            admissionPayment: currentAdmissionPayment,
+            user: student ? student.user : null,
+            admissionPayment: currentAdmissionPayments.length > 0 ? currentAdmissionPayments[0] : null,
+            currentAdmissionPayments,
+            totalPaidAmount,
+            calculatedTotalFee,
+            dueAmount,
+            hasDue,
+            isFullyPaid,
             nextSemester,
             nextSemesterPayment,
             activeYear

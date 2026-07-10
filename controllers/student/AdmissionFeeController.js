@@ -17,10 +17,10 @@ export const initiatePayment = async (req, res) => {
             return flashErrorAndRedirect(req, res, 'No active academic year found.', '/student/dashboard');
         }
 
-        const student = await Student.findOne({
+        let student = await Student.findOne({
             where: {
                 user_id: String(userId),
-                academic_year: String(activeYear.id)
+                academic_year: String(activeYear ? activeYear.id : '')
             },
             include: [
                 { model: User, as: 'user' },
@@ -30,8 +30,20 @@ export const initiatePayment = async (req, res) => {
         });
 
         if (!student) {
-            await t.rollback();
-            return flashErrorAndRedirect(req, res, 'Student record not found.', '/student/dashboard');
+            student = await Student.findOne({
+                where: { user_id: String(userId) },
+                order: [['id', 'DESC']],
+                include: [
+                    { model: User, as: 'user' },
+                    { model: Semester, as: 'semsterName' }
+                ],
+                transaction: t
+            });
+
+            if (!student) {
+                await t.rollback();
+                return flashErrorAndRedirect(req, res, 'Student record not found.', '/student/dashboard');
+            }
         }
 
         // SECURITY CHECK: No payment allowed before final submission in ANY case
@@ -50,25 +62,10 @@ export const initiatePayment = async (req, res) => {
             return flashErrorAndRedirect(req, res, 'Your admission is not yet approved by the administrator.', '/student/dashboard');
         }
 
-        // Check if already paid for THIS semester using the verified table
-        const existingPayment = await StudentAdmissionFeeDetail.findOne({
-            where: {
-                user_id: String(userId),
-                semester_id: String(targetSemesterId),
-                status: 'Success'
-            },
-            transaction: t
-        });
-
-        if (existingPayment) {
-            await t.rollback();
-            return flashErrorAndRedirect(req, res, 'Fee for this semester has already been paid successfully.', '/student/dashboard');
-        }
-
         // DYNAMIC FEE CALCULATION
         let feeAmount = 0;
         try {
-            console.log('Initiating fee calculation for student:', student.id, 'Session:', activeYear.id, 'Metadata:', {
+            console.log('Initiating fee calculation for student:', student.id, 'Semester:', targetSemesterId, 'Metadata:', {
                 course: student.course_id,
                 category: student.category,
                 gender: student.gender,
@@ -79,6 +76,31 @@ export const initiatePayment = async (req, res) => {
             console.error('Fee Calculation Error for Student ID:', student.id, 'Error:', feeError.message);
             await t.rollback();
             return flashErrorAndRedirect(req, res, feeError.message || 'Could not calculate your admission fee. Please contact administrator.', '/student/dashboard');
+        }
+
+        // Check already paid total for THIS semester using the verified table
+        const existingPayments = await StudentAdmissionFeeDetail.findAll({
+            where: {
+                user_id: String(userId),
+                semester_id: String(targetSemesterId),
+                status: 'Success'
+            },
+            transaction: t
+        });
+
+        const totalPaidAmount = existingPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+
+        let payableAmount = feeAmount;
+        let isDuePayment = false;
+
+        if (totalPaidAmount > 0) {
+            if (totalPaidAmount >= feeAmount) {
+                await t.rollback();
+                return flashErrorAndRedirect(req, res, 'Fee for this semester has already been fully paid successfully.', '/student/dashboard');
+            } else {
+                payableAmount = Number((feeAmount - totalPaidAmount).toFixed(2));
+                isDuePayment = true;
+            }
         }
 
         // Generate unique 10-digit numeric admission transaction ID
@@ -96,8 +118,8 @@ export const initiatePayment = async (req, res) => {
             semester_id: String(targetSemesterId),
             semester_type: semesterType,
             challan_id: '',
-            academic_year: String(activeYear.id),
-            amount: String(feeAmount),
+            academic_year: String(student.academic_year || (activeYear ? activeYear.id : '')),
+            amount: String(payableAmount),
             payment_mode: '',
             payment_method: 'atom',
             status: 'initiated',
@@ -108,7 +130,9 @@ export const initiatePayment = async (req, res) => {
             bank_transaction_id: '',
             merchant_txn_id: admissionTxnId,
             atom_txn_id: '',
-            remark: `Fee payment initiated for Semester ${targetSemesterId}`
+            remark: isDuePayment
+                ? `Remaining Due Fee payment initiated for Semester ${targetSemesterId} (Total Fee: ₹${feeAmount}, Already Paid: ₹${totalPaidAmount}, Due: ₹${payableAmount})`
+                : `Admission Fee payment initiated for Semester ${targetSemesterId} (Amount: ₹${payableAmount})`
         }, { transaction: t });
 
 
@@ -129,7 +153,7 @@ export const initiatePayment = async (req, res) => {
         // Prepare payment data for Atom
         const paymentData = PaymentService.preparePaymentData({
             transactionId: admissionTxnId,
-            amount: feeAmount,
+            amount: payableAmount,
             email: student.user.email,
             mobile: student.user.phone,
             returnUrl: `${req.protocol}://${req.get('host')}/student/admission_payment_response`,
@@ -232,7 +256,7 @@ export const paymentResponse = async (req, res) => {
                 atom_txn_id: parsedResponse.atomTxnId || '',
                 txnCompleteDate: parsedResponse.txnCompleteDate || '',
                 transaction_date: parsedResponse.txnCompleteDate || new Date().toISOString(),
-                remark: isSuccess ? 'Payment Successful' : `Payment Failed: ${parsedResponse.message}`
+                remark: isSuccess ? (feeLogByTxnId.remark ? `${feeLogByTxnId.remark} - Successful` : 'Payment Successful') : `Payment Failed: ${parsedResponse.message}`
             }, { transaction: t });
             console.log('StudentFeeDetail updated to:', finalStatus);
         }
@@ -396,12 +420,24 @@ export const generateReceipt = async (req, res) => {
             return flashErrorAndRedirect(req, res, 'Receipt not found or payment not successful.', '/student/dashboard');
         }
 
+        let studentRecord = payment.student;
+        if (!studentRecord) {
+            studentRecord = await Student.findOne({
+                where: { user_id: String(userId) },
+                order: [['id', 'DESC']],
+                include: [
+                    { model: Course, as: 'courseName' },
+                    { model: Semester, as: 'semsterName' }
+                ]
+            });
+        }
+
         const activeYear = await AcademicYear.findByPk(payment.academic_year);
 
         res.render('student_panel/admission/admission_fee_receipt', {
             title: 'Admission Fee Receipt',
             payment,
-            student: payment.student,
+            student: studentRecord,
             user: payment.user,
             activeYear,
             layout: 'student'
