@@ -117,7 +117,7 @@
                                                                         <i class="bi bi-eye"></i>
                                                                     </a>
                                                                     <% if (student.admission_status === 'Approved' && (!student.admissionFeeDetails || student.admissionFeeDetails.length === 0)) { %>
-                                                                        <a href="/admin/form_verification/print_approval?registration_no=<%= student.registration_no %>" target="_blank" class="btn btn-sm btn-primary" title="Print Approval Form">
+                                                                        <a href="/admin/form_verification/print_approval?registration_no=<%= student.registration_no %>&academic_year=<%= student.academic_year %>" target="_blank" class="btn btn-sm btn-primary" title="Print Approval Form">
                                                                             <i class="bi bi-printer"></i>
                                                                         </a>
                                                                     <% } %>

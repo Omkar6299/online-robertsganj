@@ -15,6 +15,10 @@ const StudentWeightage = sequelize.define('StudentWeightage', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    academic_year: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     weightage_id: {
         type: DataTypes.BIGINT.UNSIGNED,
         allowNull: false

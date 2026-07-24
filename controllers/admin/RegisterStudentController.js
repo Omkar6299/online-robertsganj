@@ -600,7 +600,7 @@ export const edit = async (req, res) => {
         });
         const weightages = await Weightage.findAll();
 
-        const studentWeightages = await StudentWeightage.findAll({ where: { registration_no: student.registration_no } });
+        const studentWeightages = await StudentWeightage.findAll({ where: { registration_no: student.registration_no, academic_year: student.academic_year } });
         const selectedWeightageIds = studentWeightages.map(sw => sw.weightage_id.toString());
 
         const courses = await Course.findAll({ order: [['name', 'ASC']] });
@@ -710,12 +710,13 @@ export const update = async (req, res) => {
         });
 
         // Update Weightages
-        await StudentWeightage.destroy({ where: { registration_no: student.registration_no } });
+        await StudentWeightage.destroy({ where: { registration_no: student.registration_no, academic_year: student.academic_year } });
         const weightageJson = {};
         if (weightage_ids && Array.isArray(weightage_ids)) {
             const weightageRecords = weightage_ids.map(wId => ({
                 user_id: String(student.user_id),
                 registration_no: student.registration_no,
+                academic_year: student.academic_year,
                 weightage_id: wId,
                 status: true
             }));
@@ -727,6 +728,7 @@ export const update = async (req, res) => {
             await StudentWeightage.create({
                 user_id: String(student.user_id),
                 registration_no: student.registration_no,
+                academic_year: student.academic_year,
                 weightage_id: weightage_ids,
                 status: true
             });
@@ -735,7 +737,7 @@ export const update = async (req, res) => {
         await student.update({ weightage: weightageJson });
 
         // Update Educationals
-        await Educational.destroy({ where: { registration_no: student.registration_no } });
+        await Educational.destroy({ where: { registration_no: student.registration_no, academic_year: student.academic_year } });
         const educationRecords = [];
         if (board) {
             for (const qualId in board) {
@@ -743,6 +745,7 @@ export const update = async (req, res) => {
                     educationRecords.push({
                         user_id: String(student.user_id),
                         registration_no: student.registration_no,
+                        academic_year: student.academic_year,
                         class_name: qualId,
                         school_name: qual_name ? qual_name[qualId] : '',
                         board_name: board[qualId],

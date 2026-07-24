@@ -637,7 +637,7 @@ export const showApplicationForm = async (req, res) => {
 
     // Fetch associated data needed for the preview
     const educationals = await Educational.findAll({
-      where: { registration_no: student.registration_no },
+      where: { registration_no: student.registration_no, academic_year: String(academic_year) },
       include: [{ model: Qualification, as: 'qualification' }]
     });
 

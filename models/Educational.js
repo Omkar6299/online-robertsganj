@@ -15,6 +15,10 @@ const Educational = sequelize.define('Educational', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  academic_year: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   class_name: {
     type: DataTypes.STRING,
     allowNull: false
