@@ -376,6 +376,7 @@
                                             <div class="card-body p-4">
                                                 <h6 class="fw-bold mb-3 text-warning-emphasis"><i class="bi bi-shield-check me-2"></i>Final Determination</h6>
                                                 <form action="/admin/form_verification_post/<%= student.registration_no %>" method="POST" class="row g-3 align-items-end">
+                                                    <input type="hidden" name="academic_year" value="<%= student.academic_year %>">
                                                     <div class="col-md-5">
                                                         <label for="admission_status" class="form-label fw-semibold">Update Admission Status <span class="text-danger">*</span></label>
                                                         <select name="admission_status" id="admission_status" class="form-select border-warning-subtle" required>
@@ -403,7 +404,7 @@
                                                 <h5 class="text-success fw-bold">Application Approved</h5>
                                                 <p class="text-secondary">This application has been verified and approved. No further edits or status updates are permitted.</p>
                                                 <div class="d-flex justify-content-center gap-2 mt-2">
-                                                    <a href="/admin/form_verification/print_approval?registration_no=<%= student.registration_no %>" target="_blank" class="btn btn-primary px-4 fw-bold">
+                                                    <a href="/admin/form_verification/print_approval?registration_no=<%= student.registration_no %>&academic_year=<%= student.academic_year %>" target="_blank" class="btn btn-primary px-4 fw-bold">
                                                         <i class="bi bi-printer me-2"></i>Print Approval Form
                                                     </a>
                                                     <a href="/admin/register_student_list" class="btn btn-outline-success px-4 fw-bold">Return to List</a>

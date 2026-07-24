@@ -419,7 +419,7 @@ export const educationalDetailsPost = async (req, res) => {
         console.log('DEBUG: educationalDetailsPost req.body:', JSON.stringify(req.body, null, 2));
 
         // Delete existing records to replace them (scoped to current session user_id)
-        await Educational.destroy({ where: { user_id: String(userId) } });
+        await Educational.destroy({ where: { user_id: String(userId), academic_year: String(activeAcademicYear.id) } });
 
         const educationRecords = [];
         if (board) {
@@ -428,6 +428,7 @@ export const educationalDetailsPost = async (req, res) => {
                     educationRecords.push({
                         user_id: String(userId),
                         registration_no: student.registration_no,
+                        academic_year: String(activeAcademicYear.id),
                         class_name: qualId,
                         school_name: qual_name[qualId], // Using school_name to store qualification name as requested
                         board_name: board[qualId],
@@ -638,7 +639,7 @@ export const weightageDetailsPost = async (req, res) => {
         console.log('DEBUG: weightageDetailsPost weightage_ids:', JSON.stringify(weightage_ids, null, 2));
 
         // Delete existing selections (scoped to current session user_id)
-        await StudentWeightage.destroy({ where: { user_id: String(userId) } });
+        await StudentWeightage.destroy({ where: { user_id: String(userId), academic_year: String(activeAcademicYear.id) } });
 
         const weightageJson = {};
         if (weightage_ids && Array.isArray(weightage_ids)) {
@@ -647,6 +648,7 @@ export const weightageDetailsPost = async (req, res) => {
                 weightageRecords.push({
                     user_id: String(userId),
                     registration_no: student.registration_no,
+                    academic_year: String(activeAcademicYear.id),
                     weightage_id: weightageId,
                     status: true
                 });
@@ -660,6 +662,7 @@ export const weightageDetailsPost = async (req, res) => {
             await StudentWeightage.create({
                 user_id: String(userId),
                 registration_no: student.registration_no,
+                academic_year: String(activeAcademicYear.id),
                 weightage_id: weightage_ids,
                 status: true
             });
@@ -933,7 +936,7 @@ export const printApplicationForm = async (req, res) => {
         }
 
         const educationals = await Educational.findAll({
-            where: { registration_no: student.registration_no },
+            where: { registration_no: student.registration_no, academic_year: student.academic_year },
             include: [{ model: Qualification, as: 'qualification' }]
         });
 

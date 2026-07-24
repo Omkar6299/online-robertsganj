@@ -20,7 +20,7 @@ import ExcelJS from 'exceljs';
 
 export const index = async (req, res) => {
     try {
-        const { course_id, status, academic_year_id } = req.query;
+        const { course_id, status, academic_year_id, search, semester_id } = req.query;
 
         // Get active academic year for default filter if none provided
         const activeYear = await AcademicYear.findOne({ where: { status: 'Active' } });
@@ -38,12 +38,25 @@ export const index = async (req, res) => {
         if (status && status !== '') {
             where.admission_status = status;
         }
+        if (semester_id && semester_id !== '') {
+            where.year = semester_id;
+        }
+
+        if (search && search.trim() !== '') {
+            const searchTerm = `%${search.trim()}%`;
+            where[Op.or] = [
+                { registration_no: { [Op.like]: searchTerm } },
+                { '$user.name$': { [Op.like]: searchTerm } },
+                { '$user.phone$': { [Op.like]: searchTerm } }
+            ];
+        }
 
         const students = await Student.findAll({
             where,
             include: [
                 { model: User, as: 'user' },
                 { model: Course, as: 'courseName' },
+                { model: Semester, as: 'semsterName' },
                 {
                     model: StudentAdmissionFeeDetail,
                     as: 'admissionFeeDetails',
@@ -59,13 +72,17 @@ export const index = async (req, res) => {
         // Fetch academic years for filter dropdown
         const academicYears = await AcademicYear.findAll({ order: [['session', 'DESC']] });
 
+        // Fetch semesters for filter dropdown
+        const semesters = await Semester.findAll({ order: [['name', 'ASC']] });
+
         res.render('admin_panel/student/register_student_list', {
             title: 'Registered Students',
             students,
             courses,
             academicYears,
+            semesters,
             activeYearId: currentYearId,
-            filters: { course_id: course_id || '', status: status || '', academic_year_id: currentYearId }
+            filters: { course_id: course_id || '', status: status || '', academic_year_id: currentYearId, search: search || '', semester_id: semester_id || '' }
         });
     } catch (error) {
         handleError(req, res, error, 'An error occurred while loading student list.', '/admin/dashboard');
@@ -600,7 +617,7 @@ export const edit = async (req, res) => {
         });
         const weightages = await Weightage.findAll();
 
-        const studentWeightages = await StudentWeightage.findAll({ where: { registration_no: student.registration_no } });
+        const studentWeightages = await StudentWeightage.findAll({ where: { registration_no: student.registration_no, academic_year: student.academic_year } });
         const selectedWeightageIds = studentWeightages.map(sw => sw.weightage_id.toString());
 
         const courses = await Course.findAll({ order: [['name', 'ASC']] });
@@ -710,12 +727,13 @@ export const update = async (req, res) => {
         });
 
         // Update Weightages
-        await StudentWeightage.destroy({ where: { registration_no: student.registration_no } });
+        await StudentWeightage.destroy({ where: { registration_no: student.registration_no, academic_year: student.academic_year } });
         const weightageJson = {};
         if (weightage_ids && Array.isArray(weightage_ids)) {
             const weightageRecords = weightage_ids.map(wId => ({
                 user_id: String(student.user_id),
                 registration_no: student.registration_no,
+                academic_year: student.academic_year,
                 weightage_id: wId,
                 status: true
             }));
@@ -727,6 +745,7 @@ export const update = async (req, res) => {
             await StudentWeightage.create({
                 user_id: String(student.user_id),
                 registration_no: student.registration_no,
+                academic_year: student.academic_year,
                 weightage_id: weightage_ids,
                 status: true
             });
@@ -735,7 +754,7 @@ export const update = async (req, res) => {
         await student.update({ weightage: weightageJson });
 
         // Update Educationals
-        await Educational.destroy({ where: { registration_no: student.registration_no } });
+        await Educational.destroy({ where: { registration_no: student.registration_no, academic_year: student.academic_year } });
         const educationRecords = [];
         if (board) {
             for (const qualId in board) {
@@ -743,6 +762,7 @@ export const update = async (req, res) => {
                     educationRecords.push({
                         user_id: String(student.user_id),
                         registration_no: student.registration_no,
+                        academic_year: student.academic_year,
                         class_name: qualId,
                         school_name: qual_name ? qual_name[qualId] : '',
                         board_name: board[qualId],
@@ -780,6 +800,10 @@ export const updateStatus = async (req, res) => {
         const student = await Student.findByPk(id);
         if (!student) {
             return flashErrorAndRedirect(req, res, 'Student not found.', '/admin/register_student_list');
+        }
+
+        if (student.declaration_status !== '1') {
+            return flashErrorAndRedirect(req, res, 'Cannot update admission status. Student has not finally submitted their application.', `/admin/students/${id}/edit`);
         }
 
         await student.update({ admission_status });

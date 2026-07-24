@@ -116,7 +116,7 @@ export const index = async (req, res) => {
 export const updateStatus = async (req, res) => {
   try {
     const { registration_no } = req.params;
-    const { admission_status } = req.body;
+    const { admission_status, academic_year } = req.body;
 
     // Validate admission status
     const validStatuses = ['Pending', 'Approved', 'Disapproved'];
@@ -126,7 +126,7 @@ export const updateStatus = async (req, res) => {
 
     // Find student by registration number
     const student = await Student.findOne({
-      where: { registration_no: registration_no }
+      where: { registration_no: registration_no, academic_year: academic_year }
     });
 
     if (!student) {
@@ -140,7 +140,7 @@ export const updateStatus = async (req, res) => {
 
     if (admission_status === 'Approved') {
       req.flash('success', 'Student admission approved successfully. Generating approval form...');
-      return res.redirect(`/admin/form_verification/print_approval?registration_no=${registration_no}`);
+      return res.redirect(`/admin/form_verification/print_approval?registration_no=${registration_no}&academic_year=${academic_year}`);
     }
 
     flashSuccessAndRedirect(req, res, `Student admission status updated to ${admission_status} successfully.`, `/admin/form_verification?registration_no=${registration_no}`);
@@ -151,14 +151,14 @@ export const updateStatus = async (req, res) => {
 
 export const printApprovalForm = async (req, res) => {
   try {
-    const { registration_no, academic_year_id } = req.query;
+    const { registration_no, academic_year } = req.query;
 
     if (!registration_no) {
       return flashErrorAndRedirect(req, res, 'Registration number is required.', '/admin/form_verification');
     }
 
     const student = await Student.findOne({
-      where: { registration_no: registration_no },
+      where: { registration_no: registration_no, academic_year: academic_year },
       include: [
         { model: User, as: 'user' },
         { model: Course, as: 'courseName' },

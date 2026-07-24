@@ -517,6 +517,7 @@ export const getStudentByRegistrationNo = async (req, res) => {
 
     const student = await Student.findOne({
       where: { registration_no: registration_no },
+      order: [['created_at', 'DESC']],
       include: [
         {
           model: User,
