@@ -33,8 +33,8 @@
                             <!-- Filter Bar -->
                             <div class="card shadow-sm mb-3">
                                 <div class="card-body py-2">
-                                    <form action="/admin/register_student_list" method="GET" class="row g-2 align-items-end">
-                                        <div class="col-md-3">
+                                    <form id="filterForm" action="/admin/register_student_list" method="GET" class="row g-2 align-items-end">
+                                        <div class="col-md-2">
                                             <label class="form-label mb-1 small fw-semibold">Academic Year</label>
                                             <select name="academic_year_id" class="form-select form-select-sm">
                                                 <% if (typeof academicYears !== 'undefined') { academicYears.forEach(function(year) { %>
@@ -42,7 +42,7 @@
                                                 <% }); } %>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <label class="form-label mb-1 small fw-semibold">Course</label>
                                             <select name="course_id" class="form-select form-select-sm">
                                                 <option value="">-- All Courses --</option>
@@ -51,7 +51,16 @@
                                                 <% }); } %>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">Semester</label>
+                                            <select name="semester_id" class="form-select form-select-sm">
+                                                <option value="">-- All Semesters --</option>
+                                                <% if (typeof semesters !== 'undefined') { semesters.forEach(function(semester) { %>
+                                                    <option value="<%= semester.id %>" <%= (typeof filters !== 'undefined' && filters.semester_id == semester.id) ? 'selected' : '' %>><%= semester.name %></option>
+                                                <% }); } %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
                                             <label class="form-label mb-1 small fw-semibold">Status</label>
                                             <select name="status" class="form-select form-select-sm">
                                                 <option value="">-- All Statuses --</option>
@@ -59,6 +68,10 @@
                                                 <option value="Approved" <%= (typeof filters !== 'undefined' && filters.status === 'Approved') ? 'selected' : '' %>>Approved</option>
                                                 <option value="Disapproved" <%= (typeof filters !== 'undefined' && filters.status === 'Disapproved') ? 'selected' : '' %>>Disapproved</option>
                                             </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-1 small fw-semibold">Search</label>
+                                            <input type="text" name="search" class="form-control form-control-sm" placeholder="Reg No, Name, Mobile" value="<%= typeof filters !== 'undefined' ? filters.search : '' %>" oninput="handleSearch()">
                                         </div>
                                         <div class="col-md-auto">
                                             <button type="submit" class="btn btn-sm btn-primary">
@@ -69,6 +82,16 @@
                                             </a>
                                         </div>
                                     </form>
+
+                                    <script>
+                                        let searchTimeout;
+                                        function handleSearch() {
+                                            clearTimeout(searchTimeout);
+                                            searchTimeout = setTimeout(() => {
+                                                document.getElementById('filterForm').submit();
+                                            }, 500);
+                                        }
+                                    </script>
                                 </div>
                             </div>
 
@@ -86,6 +109,7 @@
                                                     <th>Registration No</th>
                                                     <th>Student Name</th>
                                                     <th>Course</th>
+                                                    <th>Semester</th>
                                                     <th>Email</th>
                                                     <th>Phone</th>
                                                     <th>Status</th>
@@ -100,6 +124,7 @@
                                                             <td><%= student.registration_no || '-' %></td>
                                                             <td><%= student.user && student.user.name ? student.user.name : '-' %></td>
                                                             <td><%= student.courseName && student.courseName.name ? student.courseName.name : '-' %></td>
+                                                            <td><%= student.semsterName && student.semsterName.name ? student.semsterName.name : '-' %></td>
                                                             <td><%= student.user && student.user.email ? student.user.email : '-' %></td>
                                                             <td><%= student.user && student.user.phone ? student.user.phone : '-' %></td>
                                                             <td>
