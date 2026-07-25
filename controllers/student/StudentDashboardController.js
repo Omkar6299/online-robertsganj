@@ -6,10 +6,18 @@ export const index = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
 
-        // Get active academic year
-        const activeYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        // Resolve target academic session (from session or fallback to Active year)
+        const sessionYearId = req.session.admission_academic_year;
+        let targetYear = null;
+        if (sessionYearId) {
+            targetYear = await AcademicYear.findByPk(sessionYearId);
+        }
+        if (!targetYear) {
+            targetYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        }
+        const activeYear = targetYear || await AcademicYear.findOne({ where: { status: 'Active' } });
 
-        // Check for student in active year
+        // Check for student in target academic session
         let student = await Student.findOne({
             where: {
                 user_id: String(userId),

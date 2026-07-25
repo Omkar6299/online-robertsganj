@@ -38,12 +38,20 @@ const getS3Key = (url) => {
     }
 };
 
+const getTargetAcademicYear = async (req, options = {}) => {
+    if (req.session && req.session.admission_academic_year) {
+        const selectedYear = await AcademicYear.findByPk(req.session.admission_academic_year, options);
+        if (selectedYear) return selectedYear;
+    }
+    return await AcademicYear.findOne({ where: { status: 'Active' }, ...options });
+};
+
 export const registrationForm = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
 
-        // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        // Get target academic year for session
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Get student record
         const student = await Student.findOne({
@@ -186,17 +194,31 @@ export const registrationForm = async (req, res) => {
             stepsOrder = stepsOrder.filter(step => step !== 'weightage');
         }
 
-        let activeTab = req.query.tab || 'personal';
+        // Determine the maximum allowed tab based on completion status
+        let maxAllowedTab = 'personal';
+        if (student.personal_status === '1') maxAllowedTab = 'address';
+        if (student.address_status === '1') maxAllowedTab = 'educational';
+        if (student.educational_status === '1') maxAllowedTab = 'subject';
+        if (student.subject_status === '1') maxAllowedTab = 'other';
+        if (student.additional_status === '1') maxAllowedTab = isReRegistration ? 'photo' : 'weightage';
+        if (!isReRegistration && student.weightage_status === '1') maxAllowedTab = 'photo';
+        if (student.photographsign_status === '1') maxAllowedTab = 'declaration';
 
-        // Automatic tab detection if not manually specified
-        if (!req.query.tab) {
-            if (student.photographsign_status === '1') activeTab = 'declaration';
-            else if (student.weightage_status === '1' || (isReRegistration && student.additional_status === '1')) activeTab = 'photo';
-            else if (student.additional_status === '1') activeTab = 'weightage';
-            else if (student.subject_status === '1') activeTab = 'other';
-            else if (student.educational_status === '1') activeTab = 'subject';
-            else if (student.address_status === '1') activeTab = 'educational';
-            else if (student.personal_status === '1') activeTab = 'address';
+        let activeTab = req.query.tab;
+
+        // If a tab is manually specified, validate it
+        if (activeTab) {
+            const requestedIndex = stepsOrder.indexOf(activeTab);
+            const maxAllowedIndex = stepsOrder.indexOf(maxAllowedTab);
+
+            // If the tab is invalid or beyond what is allowed, redirect back to the max allowed tab
+            if (requestedIndex === -1 || requestedIndex > maxAllowedIndex) {
+                req.flash('error', 'Please complete the required previous steps first.');
+                return res.redirect('/student/registration?tab=' + maxAllowedTab);
+            }
+        } else {
+            // Automatic tab detection if not manually specified
+            activeTab = maxAllowedTab;
         }
 
         const currentYear = new Date().getFullYear();
@@ -252,7 +274,7 @@ export const personalDetailsPost = async (req, res) => {
         }
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Update Student record
         const student = await Student.findOne({
@@ -303,7 +325,7 @@ export const addressDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete personal details first
         const student = await Student.findOne({ 
@@ -384,7 +406,7 @@ export const educationalDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete address details first
         const student = await Student.findOne({ 
@@ -475,7 +497,7 @@ export const subjectDetailsPost = async (req, res) => {
         const { major1_id, major2_id, minor_id, research_project_id, skill_id, cocurricular_id } = req.body;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         const student = await Student.findOne({ 
             where: { 
@@ -534,7 +556,7 @@ export const otherDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation
         const student = await Student.findOne({ 
@@ -604,7 +626,7 @@ export const weightageDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete subject details first
         const student = await Student.findOne({ 
@@ -693,7 +715,7 @@ export const photoSignPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete weightage details first
         const student = await Student.findOne({ 
@@ -737,8 +759,15 @@ export const photoSignPost = async (req, res) => {
                 const docType = await DocumentType.findOne({ where: { code: docTypeCode } });
                 
                 if (docType) {
-                    const filePath = file.location || file.path || file.filename;
+                    let filePath = file.location || file.path || file.filename;
                     const storageType = file.location ? 'S3' : 'Local';
+
+                    if (storageType === 'Local' && file.path) {
+                        const publicIndex = file.path.indexOf('public');
+                        if (publicIndex !== -1) {
+                            filePath = file.path.substring(publicIndex + 7).replace(/\\/g, '/');
+                        }
+                    }
 
                     // Find if document already exists to delete old one (as requested)
                     const oldDoc = await StudentDocument.findOne({
@@ -753,17 +782,20 @@ export const photoSignPost = async (req, res) => {
                         try {
                             if (oldDoc.storage_type === 'S3') {
                                 const { s3, DeleteObjectCommand } = await import('../middleware/uploadMiddleware.js');
-                                const key = getS3Key(oldDoc.file_path);
-                                if (key) {
+                                const oldKey = getS3Key(oldDoc.file_path);
+                                const newKey = getS3Key(filePath);
+                                if (oldKey && oldKey !== newKey) {
                                     await s3.send(new DeleteObjectCommand({
                                         Bucket: process.env.AWS_BUCKET_NAME,
-                                        Key: key
+                                        Key: oldKey
                                     }));
-                                    console.log(`Deleted old S3 file: ${key}`);
+                                    console.log(`Deleted old S3 file: ${oldKey}`);
                                 }
                             } else {
-                                const fullPath = path.join(process.cwd(), 'public', oldDoc.file_path);
-                                if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+                                if (oldDoc.file_path !== filePath) {
+                                    const fullPath = path.join(process.cwd(), 'public', oldDoc.file_path);
+                                    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+                                }
                             }
                         } catch (e) { console.error('Old file deletion failed:', e); }
                         
@@ -824,7 +856,7 @@ export const declarationPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete photo & sign first
         const student = await Student.findOne({ 
@@ -880,7 +912,7 @@ export const declarationPost = async (req, res) => {
 export const printApplicationForm = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         let Payment;
         try {
@@ -968,7 +1000,7 @@ export const printApplicationForm = async (req, res) => {
 export const printReceipt = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         const payment = await Payment.findOne({
             where: {

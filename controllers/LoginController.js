@@ -189,7 +189,8 @@ export const admission_login_post = async (req, res) => {
 
     req.session.admission_user_id = user.id;
     req.session.admission_name = user.name;
-    
+    req.session.admission_academic_year = activeAcademicYear.id;
+
     // Save session before redirecting to avoid race conditions
     req.session.save((err) => {
       if (err) console.error('Session save error:', err);
@@ -208,33 +209,48 @@ export const admission_login_post = async (req, res) => {
 export const admission_logout = (req, res) => {
   req.session.admission_user_id = null;
   req.session.admission_name = null;
+  req.session.admission_academic_year = null;
   flashSuccessAndRedirect(req, res, 'Logged out successfully.', '/admission_login');
 };
 
-export const student_login = (req, res) => {
-  const oldInput = {
-    registration_no: req.query.registration_no || '',
-    dob: req.query.dob || ''
-  };
+export const student_login = async (req, res) => {
+  try {
+    const academicYears = await AcademicYear.findAll({ order: [['session', 'DESC']] });
+    const oldInput = {
+      academic_year: req.query.academic_year || '',
+      registration_no: req.query.registration_no || '',
+      dob: req.query.dob || ''
+    };
 
-  res.render('frontend/auth/student_login', {
-    title: 'Student Login - Robertsganj',
-    oldInput: oldInput
-  });
+    res.render('frontend/auth/student_login', {
+      title: 'Student Login - Robertsganj',
+      oldInput: oldInput,
+      academicYears
+    });
+  } catch (error) {
+    console.error('Error in student_login:', error);
+    res.render('frontend/auth/student_login', {
+      title: 'Student Login - Robertsganj',
+      oldInput: { registration_no: '', dob: '', academic_year: '' },
+      academicYears: []
+    });
+  }
 };
 
 export const student_login_post = async (req, res) => {
   try {
+    const academicYears = await AcademicYear.findAll({ order: [['session', 'DESC']] });
     const { error, value } = studentLoginSchema.validate(req.body, { abortEarly: false });
 
     if (error) {
       const errors = error.details.map(detail => detail.message);
       return flashValidationErrorsAndRender(req, res, errors, 'frontend/auth/student_login', {
-        title: 'Student Login'
+        title: 'Student Login',
+        academicYears
       });
     }
 
-    const { registration_no, dob } = value;
+    const { registration_no, dob, academic_year } = value;
 
     // Convert dob to string format (YYYY-MM-DD) if it's a Date object
     let dobString = dob;
@@ -246,29 +262,29 @@ export const student_login_post = async (req, res) => {
     }
 
     console.log('=== STUDENT LOGIN ATTEMPT ===');
+    console.log('Academic Year ID:', academic_year);
     console.log('Registration No:', registration_no);
     console.log('DOB:', dobString);
 
-    // Step 1: Get active academic year first
-    const activeAcademicYear = await AcademicYear.findOne({
-      where: { status: 'Active' }
-    });
+    // Step 1: Get selected academic year
+    const selectedAcademicYear = await AcademicYear.findByPk(academic_year);
 
-    if (!activeAcademicYear) {
-      req.flash('error', 'No active academic year found. Please contact administrator.');
+    if (!selectedAcademicYear) {
+      req.flash('error', 'Selected academic session not found. Please select a valid session.');
       return res.render('frontend/auth/student_login', {
         title: 'Student Login',
-        oldInput: req.body
+        oldInput: req.body,
+        academicYears
       });
     }
 
-    // Step 2: Find student by registration_no, dob AND active academic year
-    // This solves the multi-session conflict by picking strictly for the current session
+    // Step 2: Find student by registration_no, dob AND selected academic year
+    // This solves the multi-session conflict by picking strictly for the selected session
     const student = await Student.findOne({
       where: {
         registration_no: registration_no,
         dob: dobString,
-        academic_year: String(activeAcademicYear.id)
+        academic_year: String(selectedAcademicYear.id)
       },
       include: [{
         model: User,
@@ -278,37 +294,38 @@ export const student_login_post = async (req, res) => {
 
     if (!student || !student.user) {
       console.log('--- DEBUG: LOGIN FAILED ---');
-      console.log('Search Criteria:', { registration_no, dobString, active_year: activeAcademicYear.id });
-      
+      console.log('Search Criteria:', { registration_no, dobString, selected_year: selectedAcademicYear.id });
+
       // Fallback search to provide better debug info to console
       const anyStudentWithRegNo = await Student.findAll({
         where: { registration_no: registration_no }
       });
-      
+
       if (anyStudentWithRegNo.length > 0) {
         console.log(`Found ${anyStudentWithRegNo.length} record(s) for Registration NO: ${registration_no}`);
         anyStudentWithRegNo.forEach((s, index) => {
           console.log(`Record ${index + 1}: Session=${s.academic_year}, DOB in DB=${s.dob}`);
         });
-        
+
         // Specific mismatch detection
-        const sessionMismatch = anyStudentWithRegNo.some(s => s.academic_year !== String(activeAcademicYear.id));
-        const dobMismatch = anyStudentWithRegNo.some(s => s.academic_year === String(activeAcademicYear.id) && s.dob !== dobString);
-        
+        const sessionMismatch = anyStudentWithRegNo.some(s => s.academic_year !== String(selectedAcademicYear.id));
+        const dobMismatch = anyStudentWithRegNo.some(s => s.academic_year === String(selectedAcademicYear.id) && s.dob !== dobString);
+
         if (dobMismatch) {
-          console.log('RESULT: DOB Mismatch detected for the active session.');
-        } else if (sessionMismatch && anyStudentWithRegNo.every(s => s.academic_year !== String(activeAcademicYear.id))) {
-          console.log('RESULT: Student exists but NOT in the active session.');
+          console.log('RESULT: DOB Mismatch detected for the selected session.');
+        } else if (sessionMismatch && anyStudentWithRegNo.every(s => s.academic_year !== String(selectedAcademicYear.id))) {
+          console.log('RESULT: Student exists but NOT in the selected session.');
         }
       } else {
         console.log('RESULT: No student found with this Registration Number at all.');
       }
       console.log('---------------------------');
 
-      req.flash('error', 'Invalid Registration Number or Date of Birth for the active session.');
+      req.flash('error', `Invalid Registration Number or Date of Birth for session ${selectedAcademicYear.session}.`);
       return res.render('frontend/auth/student_login', {
         title: 'Student Login',
-        oldInput: req.body
+        oldInput: req.body,
+        academicYears
       });
     }
 
@@ -316,7 +333,6 @@ export const student_login_post = async (req, res) => {
     console.log('User found via student:', { user_id: user.id, name: user.name });
 
     // Step 3: Check if payment record exists with status 'Success' for this user
-    // Since each session has a separate User, we only search for payment for this specific user
     const payment = await Payment.findOne({
       where: {
         user_id: String(user.id),
@@ -325,10 +341,11 @@ export const student_login_post = async (req, res) => {
     });
 
     if (!payment) {
-      req.flash('error', 'Successful registration payment not found for the current session.');
+      req.flash('error', `Successful registration payment not found for session ${selectedAcademicYear.session}.`);
       return res.render('frontend/auth/student_login', {
         title: 'Student Login',
-        oldInput: req.body
+        oldInput: req.body,
+        academicYears
       });
     }
 
@@ -336,6 +353,7 @@ export const student_login_post = async (req, res) => {
     console.log('=== ALL CHECKS PASSED - STUDENT LOGIN SUCCESSFUL ===');
     req.session.admission_user_id = user.id;
     req.session.admission_name = user.name;
+    req.session.admission_academic_year = selectedAcademicYear.id;
 
     // Save session before redirecting to avoid race conditions
     req.session.save((err) => {
@@ -346,8 +364,10 @@ export const student_login_post = async (req, res) => {
   } catch (error) {
     console.error('=== STUDENT LOGIN ERROR ===');
     console.error(error);
+    const academicYears = await AcademicYear.findAll({ order: [['session', 'DESC']] }).catch(() => []);
     handleError(req, res, error, 'An error occurred. Please try again.', null, 'frontend/auth/student_login', {
-      title: 'Student Login'
+      title: 'Student Login',
+      academicYears
     });
   }
 };
@@ -640,12 +660,12 @@ export const registration_fees_payment_post = async (req, res) => {
       console.log('DEBUG: Environment:', environment);
       let regProductId = res.locals.siteSettings?.atom_reg_product_id || siteconfig.atom_registration_product_id || 'SONEBHADRA';
       console.log('DEBUG: Product ID:', regProductId);
-      
+
       // Atom Demo environment only supports 'AIPAY' product ID
       if (environment === 'demo') {
         regProductId = 'AIPAY';
       }
-      
+
       console.log('DEBUG: Hashing password for phone:', value.phone);
       const hashedPassword = await hashPassword(value.phone);
       console.log('DEBUG: Password hashed');

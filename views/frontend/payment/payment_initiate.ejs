@@ -42,6 +42,27 @@
     </div>
 
     <% if (typeof atomTokenId !== 'undefined' && atomTokenId) { %>
+        <% if (String(atomTokenId).startsWith('DEMO_BYPASS_')) { %>
+            <script>
+                document.querySelector('.loading-container h4').innerText = 'Local Demo Bypass: Processing Mock Payment...';
+                document.querySelector('.loading-container .text-muted').innerText = 'Simulating successful payment response for local testing.';
+                const cancelContainer = document.getElementById('cancel-container');
+                if (cancelContainer) {
+                    cancelContainer.innerHTML = '<p class="text-muted small mt-3">If not automatically redirected:</p>' +
+                        '<form id="demoBypassForm" method="POST" action="<%= typeof data !== "undefined" && data.return_url ? data.return_url : "/payment/response" %>">' +
+                        '<input type="hidden" name="encData" value="<%= atomTokenId %>">' +
+                        '<input type="hidden" name="transaction" value="<%= typeof data !== "undefined" && data.txnId ? data.txnId : String(atomTokenId).replace("DEMO_BYPASS_", "") %>">' +
+                        '<button type="submit" class="btn btn-success btn-sm rounded-pill">Click to Simulate Payment Success</button>' +
+                        '</form>';
+                    cancelContainer.style.display = 'block';
+                }
+                
+                setTimeout(function() {
+                    const form = document.getElementById('demoBypassForm');
+                    if (form) form.submit();
+                }, 1200);
+            </script>
+        <% } else { %>
         <!-- Atom Paynetz AIPAY JavaScript SDK -->
         <script>
             // Prepare payment options
@@ -125,6 +146,7 @@
                 loadAtomSDK();
             }
         </script>
+        <% } %>
     <% } else { %>
         <script>
             alert('Payment token generation failed. Please try again.');

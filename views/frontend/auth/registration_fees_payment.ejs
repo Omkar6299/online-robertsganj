@@ -250,26 +250,18 @@
                             // Also set the previous registration number field if it exists
                             $('#previous_registration_no').val(registrationNo);
 
-                            // Wait for courses to load, then set course
+                            // Wait for courses to load, then set course (leaving semester for manual selection)
                             setTimeout(function() {
                                 if ($('#course_id option[value="' + data.course_id + '"]').length > 0) {
                                     $('#course_id').val(data.course_id).trigger('change');
-
-                                    // Wait for semesters to load, then set semester
-                                    setTimeout(function() {
-                                        if ($('#semester_id option[value="' + data.semester_id + '"]').length > 0) {
-                                            $('#semester_id').val(data.semester_id);
-                                        } else {
-                                            console.warn('Semester ID ' + data.semester_id + ' not found in dropdown');
-                                        }
-                                    }, 800); // Increased timeout to ensure semesters are loaded
+                                    // Semesters dropdown will be loaded by the course change event without pre-selection
                                 } else {
                                     console.warn('Course ID ' + data.course_id + ' not found in dropdown');
                                     alert('Course not found. Please select course manually.');
                                 }
                             }, 800); // Increased timeout to ensure courses are loaded
 
-                            alert('Student details loaded successfully!');
+                            alert('Student details loaded successfully! Please select your semester.');
                         } else {
                             alert(response.message || 'Student not found with this registration number.');
                         }

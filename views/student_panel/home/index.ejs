@@ -45,6 +45,9 @@
                                                     </small>
                                                     <small class="text-secondary d-block">
                                                         <strong>Session:</strong> <%= student.academicYear ? student.academicYear.session : 'N/A' %>
+                                                        <% if (student.academicYear) { %>
+                                                            <span class="badge <%= student.academicYear.status === 'Active' ? 'bg-success' : 'bg-secondary' %> ms-1"><%= student.academicYear.status %></span>
+                                                        <% } %>
                                                     </small>
                                                 </div>
                                                 <% if (student.declaration_status === '1') { %>

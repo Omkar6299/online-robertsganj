@@ -24,6 +24,12 @@ export const admissionLoginSchema = Joi.object({
 });
 
 export const studentLoginSchema = Joi.object({
+  academic_year: Joi.alternatives().try(
+    Joi.number().integer(),
+    Joi.string().trim()
+  ).required().messages({
+    'any.required': 'Please select an academic session.'
+  }),
   registration_no: Joi.string().trim().required().messages({
     'any.required': 'Registration number is required.'
   }),

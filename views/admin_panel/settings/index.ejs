@@ -56,6 +56,7 @@
                                                         <% } else if (setting.type === 'select' && setting.key === 'atom_environment') { %>
                                                             <select name="settings[<%= setting.key %>]" class="form-select">
                                                                 <option value="live" <%= setting.value === 'live' ? 'selected' : '' %>>Live</option>
+                                                                <option value="demo" <%= setting.value === 'demo' ? 'selected' : '' %>>Demo (Local Bypass)</option>
                                                             </select>
                                                         <% } else if (setting.type === 'number') { %>
                                                             <input type="number" step="any" name="settings[<%= setting.key %>]" value="<%= setting.value %>" class="form-control">
