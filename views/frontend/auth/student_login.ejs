@@ -38,6 +38,26 @@
                             <% } %>
 
                             <form action="/student_login_post" method="POST" id="studentLoginForm">
+                                <% var selectedYear = (typeof oldInput !== 'undefined' && oldInput && oldInput.academic_year) ? String(oldInput.academic_year) : ''; %>
+                                <div class="mb-3">
+                                    <label for="academic_year" class="form-label">Academic Session <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="academic_year" name="academic_year" required>
+                                        <option value="">-- Select Academic Session --</option>
+                                        <% if (typeof academicYears !== 'undefined' && academicYears.length > 0) { %>
+                                            <% academicYears.forEach(function(year) { %>
+                                                <% var isSelected = selectedYear ? (selectedYear === String(year.id)) : (year.status === 'Active'); %>
+                                                <option value="<%= year.id %>" <%= isSelected ? 'selected' : '' %>>
+                                                    <%= year.session %> (<%= year.status %>)
+                                                </option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                    <small class="form-text text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Select the session you want to log into (Active or Inactive).
+                                    </small>
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="registration_no" class="form-label">Registration Number <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="registration_no" name="registration_no"

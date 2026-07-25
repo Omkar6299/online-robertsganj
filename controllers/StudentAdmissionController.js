@@ -38,12 +38,20 @@ const getS3Key = (url) => {
     }
 };
 
+const getTargetAcademicYear = async (req, options = {}) => {
+    if (req.session && req.session.admission_academic_year) {
+        const selectedYear = await AcademicYear.findByPk(req.session.admission_academic_year, options);
+        if (selectedYear) return selectedYear;
+    }
+    return await AcademicYear.findOne({ where: { status: 'Active' }, ...options });
+};
+
 export const registrationForm = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
 
-        // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        // Get target academic year for session
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Get student record
         const student = await Student.findOne({
@@ -252,7 +260,7 @@ export const personalDetailsPost = async (req, res) => {
         }
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Update Student record
         const student = await Student.findOne({
@@ -303,7 +311,7 @@ export const addressDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete personal details first
         const student = await Student.findOne({ 
@@ -384,7 +392,7 @@ export const educationalDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete address details first
         const student = await Student.findOne({ 
@@ -475,7 +483,7 @@ export const subjectDetailsPost = async (req, res) => {
         const { major1_id, major2_id, minor_id, research_project_id, skill_id, cocurricular_id } = req.body;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         const student = await Student.findOne({ 
             where: { 
@@ -534,7 +542,7 @@ export const otherDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation
         const student = await Student.findOne({ 
@@ -604,7 +612,7 @@ export const weightageDetailsPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete subject details first
         const student = await Student.findOne({ 
@@ -693,7 +701,7 @@ export const photoSignPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete weightage details first
         const student = await Student.findOne({ 
@@ -824,7 +832,7 @@ export const declarationPost = async (req, res) => {
         const userId = req.session.admission_user_id;
 
         // Get active academic year
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         // Validation: Must complete photo & sign first
         const student = await Student.findOne({ 
@@ -880,7 +888,7 @@ export const declarationPost = async (req, res) => {
 export const printApplicationForm = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         let Payment;
         try {
@@ -968,7 +976,7 @@ export const printApplicationForm = async (req, res) => {
 export const printReceipt = async (req, res) => {
     try {
         const userId = req.session.admission_user_id;
-        const activeAcademicYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+        const activeAcademicYear = await getTargetAcademicYear(req);
 
         const payment = await Payment.findOne({
             where: {

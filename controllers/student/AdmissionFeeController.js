@@ -5,16 +5,24 @@ import FeeService from '../../utils/services/FeeService.js';
 import siteconfig from '../../config/siteconfig.js';
 import { handleError, flashErrorAndRedirect, flashSuccessAndRedirect } from '../../utils/responseHelper.js';
 
+const getTargetAcademicYear = async (req, options = {}) => {
+    if (req.session && req.session.admission_academic_year) {
+        const selectedYear = await AcademicYear.findByPk(req.session.admission_academic_year, options);
+        if (selectedYear) return selectedYear;
+    }
+    return await AcademicYear.findOne({ where: { status: 'Active' }, ...options });
+};
+
 export const initiatePayment = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const userId = req.session.admission_user_id;
         const requestedSemesterId = req.query.semester_id;
-        const activeYear = await AcademicYear.findOne({ where: { status: 'Active' }, transaction: t });
+        const activeYear = await getTargetAcademicYear(req, { transaction: t });
 
         if (!activeYear) {
             await t.rollback();
-            return flashErrorAndRedirect(req, res, 'No active academic year found.', '/student/dashboard');
+            return flashErrorAndRedirect(req, res, 'No valid academic session found.', '/student/dashboard');
         }
 
         let student = await Student.findOne({
