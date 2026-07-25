@@ -194,17 +194,31 @@ export const registrationForm = async (req, res) => {
             stepsOrder = stepsOrder.filter(step => step !== 'weightage');
         }
 
-        let activeTab = req.query.tab || 'personal';
+        // Determine the maximum allowed tab based on completion status
+        let maxAllowedTab = 'personal';
+        if (student.personal_status === '1') maxAllowedTab = 'address';
+        if (student.address_status === '1') maxAllowedTab = 'educational';
+        if (student.educational_status === '1') maxAllowedTab = 'subject';
+        if (student.subject_status === '1') maxAllowedTab = 'other';
+        if (student.additional_status === '1') maxAllowedTab = isReRegistration ? 'photo' : 'weightage';
+        if (!isReRegistration && student.weightage_status === '1') maxAllowedTab = 'photo';
+        if (student.photographsign_status === '1') maxAllowedTab = 'declaration';
 
-        // Automatic tab detection if not manually specified
-        if (!req.query.tab) {
-            if (student.photographsign_status === '1') activeTab = 'declaration';
-            else if (student.weightage_status === '1' || (isReRegistration && student.additional_status === '1')) activeTab = 'photo';
-            else if (student.additional_status === '1') activeTab = 'weightage';
-            else if (student.subject_status === '1') activeTab = 'other';
-            else if (student.educational_status === '1') activeTab = 'subject';
-            else if (student.address_status === '1') activeTab = 'educational';
-            else if (student.personal_status === '1') activeTab = 'address';
+        let activeTab = req.query.tab;
+
+        // If a tab is manually specified, validate it
+        if (activeTab) {
+            const requestedIndex = stepsOrder.indexOf(activeTab);
+            const maxAllowedIndex = stepsOrder.indexOf(maxAllowedTab);
+
+            // If the tab is invalid or beyond what is allowed, redirect back to the max allowed tab
+            if (requestedIndex === -1 || requestedIndex > maxAllowedIndex) {
+                req.flash('error', 'Please complete the required previous steps first.');
+                return res.redirect('/student/registration?tab=' + maxAllowedTab);
+            }
+        } else {
+            // Automatic tab detection if not manually specified
+            activeTab = maxAllowedTab;
         }
 
         const currentYear = new Date().getFullYear();
@@ -745,8 +759,15 @@ export const photoSignPost = async (req, res) => {
                 const docType = await DocumentType.findOne({ where: { code: docTypeCode } });
                 
                 if (docType) {
-                    const filePath = file.location || file.path || file.filename;
+                    let filePath = file.location || file.path || file.filename;
                     const storageType = file.location ? 'S3' : 'Local';
+
+                    if (storageType === 'Local' && file.path) {
+                        const publicIndex = file.path.indexOf('public');
+                        if (publicIndex !== -1) {
+                            filePath = file.path.substring(publicIndex + 7).replace(/\\/g, '/');
+                        }
+                    }
 
                     // Find if document already exists to delete old one (as requested)
                     const oldDoc = await StudentDocument.findOne({
@@ -761,17 +782,20 @@ export const photoSignPost = async (req, res) => {
                         try {
                             if (oldDoc.storage_type === 'S3') {
                                 const { s3, DeleteObjectCommand } = await import('../middleware/uploadMiddleware.js');
-                                const key = getS3Key(oldDoc.file_path);
-                                if (key) {
+                                const oldKey = getS3Key(oldDoc.file_path);
+                                const newKey = getS3Key(filePath);
+                                if (oldKey && oldKey !== newKey) {
                                     await s3.send(new DeleteObjectCommand({
                                         Bucket: process.env.AWS_BUCKET_NAME,
-                                        Key: key
+                                        Key: oldKey
                                     }));
-                                    console.log(`Deleted old S3 file: ${key}`);
+                                    console.log(`Deleted old S3 file: ${oldKey}`);
                                 }
                             } else {
-                                const fullPath = path.join(process.cwd(), 'public', oldDoc.file_path);
-                                if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+                                if (oldDoc.file_path !== filePath) {
+                                    const fullPath = path.join(process.cwd(), 'public', oldDoc.file_path);
+                                    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+                                }
                             }
                         } catch (e) { console.error('Old file deletion failed:', e); }
                         

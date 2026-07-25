@@ -190,7 +190,7 @@ export const admission_login_post = async (req, res) => {
     req.session.admission_user_id = user.id;
     req.session.admission_name = user.name;
     req.session.admission_academic_year = activeAcademicYear.id;
-    
+
     // Save session before redirecting to avoid race conditions
     req.session.save((err) => {
       if (err) console.error('Session save error:', err);
@@ -295,22 +295,22 @@ export const student_login_post = async (req, res) => {
     if (!student || !student.user) {
       console.log('--- DEBUG: LOGIN FAILED ---');
       console.log('Search Criteria:', { registration_no, dobString, selected_year: selectedAcademicYear.id });
-      
+
       // Fallback search to provide better debug info to console
       const anyStudentWithRegNo = await Student.findAll({
         where: { registration_no: registration_no }
       });
-      
+
       if (anyStudentWithRegNo.length > 0) {
         console.log(`Found ${anyStudentWithRegNo.length} record(s) for Registration NO: ${registration_no}`);
         anyStudentWithRegNo.forEach((s, index) => {
           console.log(`Record ${index + 1}: Session=${s.academic_year}, DOB in DB=${s.dob}`);
         });
-        
+
         // Specific mismatch detection
         const sessionMismatch = anyStudentWithRegNo.some(s => s.academic_year !== String(selectedAcademicYear.id));
         const dobMismatch = anyStudentWithRegNo.some(s => s.academic_year === String(selectedAcademicYear.id) && s.dob !== dobString);
-        
+
         if (dobMismatch) {
           console.log('RESULT: DOB Mismatch detected for the selected session.');
         } else if (sessionMismatch && anyStudentWithRegNo.every(s => s.academic_year !== String(selectedAcademicYear.id))) {
@@ -660,12 +660,12 @@ export const registration_fees_payment_post = async (req, res) => {
       console.log('DEBUG: Environment:', environment);
       let regProductId = res.locals.siteSettings?.atom_reg_product_id || siteconfig.atom_registration_product_id || 'SONEBHADRA';
       console.log('DEBUG: Product ID:', regProductId);
-      
+
       // Atom Demo environment only supports 'AIPAY' product ID
       if (environment === 'demo') {
         regProductId = 'AIPAY';
       }
-      
+
       console.log('DEBUG: Hashing password for phone:', value.phone);
       const hashedPassword = await hashPassword(value.phone);
       console.log('DEBUG: Password hashed');

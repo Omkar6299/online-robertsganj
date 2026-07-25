@@ -21,7 +21,7 @@ class PaymentService {
    * Get payment gateway configuration based on environment
    */
   getConfig(env = null) {
-    const environment = env || process.env.NTTDATA_ENV || siteconfig.atom_environment || 'demo';
+    const environment = env || siteconfig.atom_environment || process.env.NTTDATA_ENV || 'demo';
 
     if (environment === 'live') {
       return {
@@ -184,6 +184,11 @@ class PaymentService {
    */
   async createTokenId(paymentData) {
     try {
+      if (paymentData.environment === 'demo' || paymentData.environment === 'bypass') {
+        console.log('=== ATOM DEMO / BYPASS MODE ACTIVE: Simulating Token for Txn:', paymentData.txnId, '===');
+        return 'DEMO_BYPASS_' + paymentData.txnId;
+      }
+
       // Build JSON payload for Atom API
       const jsonData = JSON.stringify({
         payInstrument: {
@@ -474,6 +479,7 @@ class PaymentService {
     const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
     return {
+      environment: environment || siteconfig.atom_environment || 'demo',
       login: config.login,
       password: config.password,
       amount: amount,
@@ -505,6 +511,33 @@ class PaymentService {
       if (!encData) {
         console.error('No encrypted data provided for parsing');
         return null;
+      }
+
+      if (typeof encData === 'string' && encData.startsWith('DEMO_BYPASS_')) {
+        const txnId = encData.replace('DEMO_BYPASS_', '');
+        console.log('=== ATOM DEMO / BYPASS MODE ACTIVE: Parsing mock successful payment response for Txn:', txnId, '===');
+        const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        return {
+          success: true,
+          statusCode: 'OTS0000',
+          message: 'SUCCESS (Local Demo Bypass)',
+          transactionId: txnId,
+          atomTxnId: 'ATOM_DEMO_' + Math.floor(Math.random() * 1000000000),
+          bankTxnId: 'BANK_DEMO_' + Math.floor(Math.random() * 1000000000),
+          amount: null,
+          txnInitDate: now,
+          txnCompleteDate: now,
+          cardType: 'DEMO_BYPASS',
+          udf1: null,
+          udf2: null,
+          udf3: null,
+          udf4: null,
+          udf5: null,
+          registration_no: null,
+          student_id: null,
+          user_id: null,
+          rawResponse: { note: 'Mock successful response from local demo bypass' }
+        };
       }
 
       const config = this.getConfig(env);

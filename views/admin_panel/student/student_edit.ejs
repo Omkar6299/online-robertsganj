@@ -632,36 +632,7 @@
                         </div>
                     </form>
 
-                    <!-- Status Update Section -->
-                    <div class="status-section">
-                        <h6><i class="bi bi-shield-check me-2"></i>Update Application Status</h6>
-                        <p class="text-muted small mb-3">Change the admission status for this application. This action will take effect immediately.</p>
-                        
-                        <% if (student.declaration_status !== '1') { %>
-                            <div class="alert alert-warning d-flex align-items-center mb-0" role="alert">
-                                <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
-                                <div>
-                                    <strong>Cannot update status.</strong> The student has not finally submitted their application form.
-                                </div>
-                            </div>
-                        <% } else { %>
-                            <form action="/admin/students/<%= student.id %>/update-status" method="POST" class="row g-3 align-items-end">
-                                <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Application Status <span class="text-danger">*</span></label>
-                                    <select name="admission_status" class="form-select" required>
-                                        <option value="Pending" <%= student.admission_status === 'Pending' ? 'selected' : '' %>>⏳ Pending</option>
-                                        <option value="Approved" <%= student.admission_status === 'Approved' ? 'selected' : '' %>>✅ Approved</option>
-                                        <option value="Disapproved" <%= student.admission_status === 'Disapproved' ? 'selected' : '' %>>❌ Disapproved</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-auto">
-                                    <button type="submit" class="btn btn-warning px-4">
-                                        <i class="bi bi-arrow-repeat me-1"></i> Update Status
-                                    </button>
-                                </div>
-                            </form>
-                        <% } %>
-                    </div>
+
 
                 </div>
             </div>
