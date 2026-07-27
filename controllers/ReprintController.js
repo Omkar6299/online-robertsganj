@@ -240,14 +240,14 @@ export const showPaymentReceipt = async (req, res) => {
 
     console.log('Formatted DOB:', dobFormatted);
 
-    // Find user by phone
-    const user = await User.findOne({
+    // Find users by phone
+    const users = await User.findAll({
       where: {
         phone: phone
       }
     });
 
-    if (!user) {
+    if (!users || users.length === 0) {
       const courseTypes = await CourseType.findAll({
         where: { status: '1' },
         order: [['name', 'ASC']]
@@ -267,24 +267,13 @@ export const showPaymentReceipt = async (req, res) => {
       });
     }
 
-    console.log('User found:', user.id, user.name, user.email);
-
-    // Find all students for this user to check DOB format
-    const allStudents = await Student.findAll({
-      where: {
-        user_id: user.id.toString()
-      }
-    });
-
-    console.log('All students for user:', allStudents.length);
-    allStudents.forEach(s => {
-      console.log(`Student ID: ${s.id}, DOB: ${s.dob}, Course Type: ${s.course_type_id}, Course: ${s.course_id}, Year: ${s.year}`);
-    });
+    const userIds = users.map(u => u.id.toString());
+    console.log('Users found with phone:', phone, 'User IDs:', userIds);
 
     // Try to find student record matching the criteria - try multiple DOB formats
     let student = await Student.findOne({
       where: {
-        user_id: user.id.toString(),
+        user_id: userIds,
         academic_year: String(academic_year),
         course_type_id: String(course_type_id),
         course_id: String(course_id),
@@ -298,7 +287,7 @@ export const showPaymentReceipt = async (req, res) => {
       console.log('Trying with original DOB format:', dob);
       student = await Student.findOne({
         where: {
-          user_id: user.id.toString(),
+          user_id: userIds,
           academic_year: String(academic_year),
           course_type_id: String(course_type_id),
           course_id: String(course_id),
@@ -313,7 +302,7 @@ export const showPaymentReceipt = async (req, res) => {
       console.log('Trying without DOB match...');
       student = await Student.findOne({
         where: {
-          user_id: user.id.toString(),
+          user_id: userIds,
           academic_year: String(academic_year),
           course_type_id: String(course_type_id),
           course_id: String(course_id),
@@ -333,7 +322,7 @@ export const showPaymentReceipt = async (req, res) => {
 
       console.log('Student not found with provided criteria');
       console.log('Search criteria:', {
-        user_id: user.id.toString(),
+        user_ids: userIds,
         academic_year: String(academic_year),
         course_type_id: String(course_type_id),
         course_id: String(course_id),
@@ -350,12 +339,13 @@ export const showPaymentReceipt = async (req, res) => {
       });
     }
 
-    console.log('Student found:', student.id, student.registration_no, 'DOB:', student.dob);
+    const user = users.find(u => u.id.toString() === student.user_id.toString());
+    console.log('Student found:', student.id, student.registration_no, 'DOB:', student.dob, 'Belongs to User:', user.id);
 
     // Find all successful payments for this user in this academic year
     const payments = await Payment.findAll({
       where: {
-        user_id: user.id.toString(),
+        user_id: student.user_id.toString(),
         academic_year: String(academic_year),
         status: 'Success',
         fee_type: 'form_fee'
