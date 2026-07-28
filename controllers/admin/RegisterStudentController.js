@@ -569,15 +569,6 @@ export const edit = async (req, res) => {
             return res.redirect('/admin/register_student_list');
         }
 
-        // BLOCK EDIT IF PAID
-        const paidStatus = await StudentAdmissionFeeDetail.findOne({
-            where: { student_id: id, semester_id: String(student.year), status: 'Success' }
-        });
-
-        if (paidStatus) {
-            return flashErrorAndRedirect(req, res, 'Student details cannot be edited after successful payment.', '/admin/register_student_list');
-        }
-
         const educationals = await Educational.findAll({
             where: { user_id: String(student.user_id) },
             include: [{ model: Qualification, as: 'qualification' }]
@@ -661,15 +652,6 @@ export const update = async (req, res) => {
 
         if (!student) {
             return flashErrorAndRedirect(req, res, 'Student not found.', '/admin/register_student_list');
-        }
-
-        // BLOCK UPDATE IF PAID
-        const paidStatus = await StudentAdmissionFeeDetail.findOne({
-            where: { student_id: id, semester_id: String(student.year), status: 'Success' }
-        });
-
-        if (paidStatus) {
-            return flashErrorAndRedirect(req, res, 'Student details cannot be updated after successful payment.', '/admin/register_student_list');
         }
 
         const {
