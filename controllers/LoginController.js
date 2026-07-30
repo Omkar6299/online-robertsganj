@@ -853,7 +853,7 @@ export const registration_fees_payment_post = async (req, res) => {
         // This ensures the current registration doesn't overwrite old academic year user data
         user = await User.create({
           name: value.name,
-          email: existingStudent.user.email, // Keep consistent email
+          email: value.email, // Use the email provided in the form (allows updating or fixing empty old emails)
           phone: value.phone,
           password: hashedPassword,
           transaction_id: merchTxnId,
