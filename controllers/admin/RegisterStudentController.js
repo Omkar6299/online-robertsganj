@@ -17,6 +17,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { sequelize } from '../../config/database.js';
 import { handleError, flashSuccessAndRedirect, flashErrorAndRedirect } from '../../utils/responseHelper.js';
 import ExcelJS from 'exceljs';
+import FeeService from '../../utils/services/FeeService.js';
 
 export const index = async (req, res) => {
     try {
@@ -170,25 +171,96 @@ export const admittedStudents = async (req, res) => {
             }
         }
 
-        // Map flat results back to nested structure for EJS compatibility
-        const students = raw_data.map(student => ({
-            ...student,
-            user: {
-                name: student.student_name,
-                phone: student.student_phone,
-                email: student.student_email
-            },
-            courseName: {
-                name: student.course_name
-            },
-            semsterName: {
-                name: student.semester_name
-            },
-            admissionFeeDetails: [{
-                created_at: student.admission_date,
-                amount: student.paid_amount
-            }]
-        }));
+        // Dynamic Fee Calculation and Caching
+        const feeCache = new Map();
+        const students = [];
+
+        // Fetch Student Models in bulk to ensure we have course_id, major1_id, etc. which might be missing in SP raw_data
+        const regNos = raw_data.map(s => s.registration_no).filter(no => no);
+        const studentModels = await Student.findAll({
+            where: { registration_no: { [Op.in]: regNos } },
+            attributes: ['id', 'registration_no', 'user_id', 'course_id', 'category', 'gender', 'major1_id', 'major2_id', 'minor_id', 'year']
+        });
+        const studentModelMap = new Map(studentModels.map(sm => [sm.registration_no, sm]));
+
+        // Fetch all successful payments to calculate true total paid amount
+        const userIds = studentModels.map(sm => String(sm.user_id)).filter(id => id);
+        let payments = [];
+        if (userIds.length > 0) {
+            payments = await StudentAdmissionFeeDetail.findAll({
+                where: {
+                    user_id: { [Op.in]: userIds },
+                    status: 'Success'
+                },
+                attributes: ['user_id', 'semester_id', 'amount']
+            });
+        }
+        
+        const paymentMap = new Map();
+        for (const p of payments) {
+            const key = `${p.user_id}-${p.semester_id}`;
+            const amount = parseFloat(p.amount) || 0;
+            paymentMap.set(key, (paymentMap.get(key) || 0) + amount);
+        }
+
+        for (let student of raw_data) {
+            let requiredAmount = 0;
+            
+            // Try to find the full student record for accurate fee calculation
+            const studentRecord = studentModelMap.get(student.registration_no);
+            
+            if (studentRecord) {
+                // Create a unique cache key based on variables that affect the fee
+                const cacheKey = `${studentRecord.course_id}-${studentRecord.year || student.semester_id}-${studentRecord.category}-${studentRecord.gender}-${studentRecord.major1_id || ''}-${studentRecord.major2_id || ''}-${studentRecord.minor_id || ''}`;
+                
+                if (feeCache.has(cacheKey)) {
+                    requiredAmount = feeCache.get(cacheKey);
+                } else {
+                    try {
+                        requiredAmount = await FeeService.getCalculatedFee(studentRecord, studentRecord.year || student.semester_id || currentYearId);
+                        feeCache.set(cacheKey, requiredAmount);
+                    } catch (err) {
+                        // Suppress log to prevent terminal spam for incomplete student profiles
+                        // console.warn(`Fee calculation bypassed for student ${studentRecord.id} due to missing metadata`);
+                        requiredAmount = parseFloat(student.paid_amount) || 0; // Fallback
+                    }
+                }
+            } else {
+                requiredAmount = parseFloat(student.paid_amount) || 0; // Fallback if no model found
+            }
+            
+            let paidAmount = parseFloat(student.paid_amount) || 0;
+            if (studentRecord) {
+                const pKey = `${studentRecord.user_id}-${studentRecord.year || student.semester_id}`;
+                if (paymentMap.has(pKey)) {
+                    paidAmount = paymentMap.get(pKey);
+                }
+            }
+            
+            let balance = requiredAmount - paidAmount;
+
+            students.push({
+                ...student,
+                user: {
+                    name: student.student_name,
+                    phone: student.student_phone,
+                    email: student.student_email
+                },
+                courseName: {
+                    name: student.course_name
+                },
+                semsterName: {
+                    name: student.semester_name
+                },
+                admissionFeeDetails: [{
+                    created_at: student.admission_date,
+                    amount: paidAmount
+                }],
+                required_amount: requiredAmount,
+                paid_amount: paidAmount,
+                balance: balance > 0 ? balance : 0
+            });
+        }
 
         const courses = await Course.findAll({ order: [['name', 'ASC']] });
         const semesters = await Semester.findAll({
@@ -259,6 +331,77 @@ export const exportAdmittedStudents = async (req, res) => {
         // Filter out any non-object entries (like OkPacket) just in case
         students = students.filter(s => s && typeof s === 'object' && (s.user_id || s.registration_no));
 
+        // Fetch Student Models in bulk to ensure we have course_id, major1_id, etc. which might be missing in SP raw_data
+        const regNos = students.map(s => s.registration_no).filter(no => no);
+        const studentModels = await Student.findAll({
+            where: { registration_no: { [Op.in]: regNos } },
+            attributes: ['id', 'registration_no', 'user_id', 'course_id', 'category', 'gender', 'major1_id', 'major2_id', 'minor_id', 'year']
+        });
+        const studentModelMap = new Map(studentModels.map(sm => [sm.registration_no, sm]));
+
+        // Fetch all successful payments to calculate true total paid amount
+        const userIds = studentModels.map(sm => String(sm.user_id)).filter(id => id);
+        let payments = [];
+        if (userIds.length > 0) {
+            payments = await StudentAdmissionFeeDetail.findAll({
+                where: {
+                    user_id: { [Op.in]: userIds },
+                    status: 'Success'
+                },
+                attributes: ['user_id', 'semester_id', 'amount']
+            });
+        }
+        
+        const paymentMap = new Map();
+        for (const p of payments) {
+            const key = `${p.user_id}-${p.semester_id}`;
+            const amount = parseFloat(p.amount) || 0;
+            paymentMap.set(key, (paymentMap.get(key) || 0) + amount);
+        }
+
+        // Dynamic Fee Calculation and Caching for Export
+        const feeCache = new Map();
+        for (let i = 0; i < students.length; i++) {
+            let student = students[i];
+            let requiredAmount = 0;
+            
+            // Try to find the full student record for accurate fee calculation
+            const studentRecord = studentModelMap.get(student.registration_no);
+            
+            if (studentRecord) {
+                const cacheKey = `${studentRecord.course_id}-${studentRecord.year || student.semester_id}-${studentRecord.category}-${studentRecord.gender}-${studentRecord.major1_id || ''}-${studentRecord.major2_id || ''}-${studentRecord.minor_id || ''}`;
+                
+                if (feeCache.has(cacheKey)) {
+                    requiredAmount = feeCache.get(cacheKey);
+                } else {
+                    try {
+                        requiredAmount = await FeeService.getCalculatedFee(studentRecord, studentRecord.year || student.semester_id || currentYearId);
+                        feeCache.set(cacheKey, requiredAmount);
+                    } catch (err) {
+                        // Suppress log to prevent terminal spam for incomplete student profiles
+                        // console.warn(`Fee calculation bypassed for student ${studentRecord.id} during export due to missing metadata`);
+                        requiredAmount = parseFloat(student.paid_amount) || 0; 
+                    }
+                }
+            } else {
+                requiredAmount = parseFloat(student.paid_amount) || 0; // Fallback if no model found
+            }
+            
+            let paidAmount = parseFloat(student.paid_amount) || 0;
+            if (studentRecord) {
+                const pKey = `${studentRecord.user_id}-${studentRecord.year || student.semester_id}`;
+                if (paymentMap.has(pKey)) {
+                    paidAmount = paymentMap.get(pKey);
+                }
+            }
+            
+            let balance = requiredAmount - paidAmount;
+            
+            students[i].required_amount = requiredAmount;
+            students[i].paid_amount = paidAmount;
+            students[i].balance = balance > 0 ? balance : 0;
+        }
+
         // Fetch education details for all students
         const studentIds = students.map(s => String(s.user_id));
         const allEducationals = await Educational.findAll({
@@ -310,7 +453,9 @@ export const exportAdmittedStudents = async (req, res) => {
             { header: 'District', key: 'permanent_district', width: 15 },
             { header: 'Tehsil', key: 'permanent_tehsil', width: 15 },
             { header: 'Pincode', key: 'permanent_pincode', width: 10 },
+            { header: 'Required Amount', key: 'required_amount', width: 15 },
             { header: 'Paid Amount', key: 'paid_amount', width: 12 },
+            { header: 'Balance', key: 'balance', width: 12 },
             { header: 'Subject 1', key: 'major1_name', width: 20 },
             { header: 'Subject 2', key: 'major2_name', width: 20 },
             { header: 'Subject 3', key: 'minor_name', width: 20 },
@@ -364,7 +509,9 @@ export const exportAdmittedStudents = async (req, res) => {
                 permanent_district: student.permanent_district,
                 permanent_tehsil: student.permanent_tehsil,
                 permanent_pincode: student.permanent_pincode,
+                required_amount: student.required_amount,
                 paid_amount: student.paid_amount,
+                balance: student.balance,
                 major1_name: student.major1_name || '-',
                 major2_name: student.major2_name || '-',
                 minor_name: student.minor_name || '-',

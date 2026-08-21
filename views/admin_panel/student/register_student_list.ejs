@@ -146,11 +146,9 @@
                                                                             <i class="bi bi-printer"></i>
                                                                         </a>
                                                                     <% } %>
-                                                                    <% if (!student.admissionFeeDetails || student.admissionFeeDetails.length === 0) { %>
-                                                                        <a href="/admin/students/<%= student.id %>/edit" class="btn btn-sm btn-warning" title="Edit Student">
-                                                                            <i class="bi bi-pencil-square"></i>
-                                                                        </a>
-                                                                    <% } %>
+                                                                    <a href="/admin/students/<%= student.id %>/edit" class="btn btn-sm btn-warning" title="Edit Student">
+                                                                        <i class="bi bi-pencil-square"></i>
+                                                                    </a>
                                                                 </div>
                                                             </td>
                                                         </tr>
