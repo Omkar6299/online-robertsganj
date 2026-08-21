@@ -106,6 +106,7 @@ export const reRegister = async (req, res) => {
                 id: undefined,
                 user_id: String(newUser.id),
                 registration_no: previousStudent.registration_no,
+                academic_year: String(activeYear.id),
                 created_at: undefined,
                 updated_at: undefined
             }));

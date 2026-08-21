@@ -343,17 +343,29 @@ export const syncTransactionStatus = async (req, res) => {
  */
 export const fetchStudentDetails = async (req, res) => {
     try {
-        const { id } = req.query;
+        const { id, academic_year_id } = req.query;
         if (!id) return res.json({ success: false, message: 'ID required' });
+
+        let currentYearId = academic_year_id;
+        if (!currentYearId) {
+            const activeYear = await AcademicYear.findOne({ where: { status: 'Active' } });
+            currentYearId = activeYear ? activeYear.id : null;
+        }
+
+        const whereClause = {
+            [sequelize.Sequelize.Op.or]: [
+                { user_id: id },
+                { registration_no: id }
+            ]
+        };
+
+        if (currentYearId) {
+            whereClause.academic_year = String(currentYearId);
+        }
 
         // 1. Try to find in students table
         let student = await Student.findOne({
-            where: {
-                [sequelize.Sequelize.Op.or]: [
-                    { user_id: id },
-                    { registration_no: id }
-                ]
-            },
+            where: whereClause,
             include: [
                 { model: User, as: 'user' },
                 { model: Course, as: 'courseName' }

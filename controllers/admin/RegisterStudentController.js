@@ -522,7 +522,10 @@ export const show = async (req, res) => {
 
         // Fetch educational details
         const educationals = await Educational.findAll({
-            where: { user_id: String(student.user_id) },
+            where: { 
+                user_id: String(student.user_id),
+                academic_year: student.academic_year
+            },
             include: [{ model: Qualification, as: 'qualification' }]
         });
 
@@ -570,7 +573,10 @@ export const edit = async (req, res) => {
         }
 
         const educationals = await Educational.findAll({
-            where: { user_id: String(student.user_id) },
+            where: { 
+                user_id: String(student.user_id),
+                academic_year: student.academic_year
+            },
             include: [{ model: Qualification, as: 'qualification' }]
         });
 
