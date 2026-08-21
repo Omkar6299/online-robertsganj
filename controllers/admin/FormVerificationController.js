@@ -80,7 +80,10 @@ export const index = async (req, res) => {
 
       // Fetch educational details
       const educationals = await Educational.findAll({
-        where: { user_id: String(student.user_id) },
+        where: { 
+          user_id: String(student.user_id),
+          academic_year: student.academic_year 
+        },
         include: [{ model: Qualification, as: 'qualification' }]
       });
 

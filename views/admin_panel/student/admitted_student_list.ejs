@@ -178,6 +178,9 @@
                                                     <th>Course</th>
                                                     <th>Semester</th>
                                                     <th>Phone</th>
+                                                    <th>Required Fee</th>
+                                                    <th>Paid Fee</th>
+                                                    <th>Balance</th>
                                                     <th>Admission Date</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -194,6 +197,15 @@
                                                             <td><%= student.courseName && student.courseName.name ? student.courseName.name : '-' %></td>
                                                             <td><%= student.semester_name || (student.semsterName && student.semsterName.name ? student.semsterName.name : '-') %></td>
                                                             <td><%= student.user && student.user.phone ? student.user.phone : '-' %></td>
+                                                            <td>₹<%= student.required_amount !== undefined ? student.required_amount : '-' %></td>
+                                                            <td>₹<%= student.paid_amount !== undefined ? student.paid_amount : '-' %></td>
+                                                            <td>
+                                                                <% if (student.balance > 0) { %>
+                                                                    <span class="text-danger fw-bold">₹<%= student.balance %></span>
+                                                                <% } else { %>
+                                                                    <span class="text-success">₹0</span>
+                                                                <% } %>
+                                                            </td>
                                                             <td>
                                                                 <% 
                                                                     let admissionDate = student.created_at;
@@ -203,7 +215,11 @@
                                                                 %>
                                                                 <%= admissionDate ? new Date(admissionDate).toLocaleDateString('en-IN') : '-' %>
                                                                 <br>
-                                                                <small class="text-success"><i class="bi bi-check-circle-fill"></i> Paid</small>
+                                                                <% if (student.balance > 0) { %>
+                                                                    <small class="text-danger"><i class="bi bi-exclamation-circle-fill"></i> Due Fee</small>
+                                                                <% } else { %>
+                                                                    <small class="text-success"><i class="bi bi-check-circle-fill"></i> Paid</small>
+                                                                <% } %>
                                                             </td>
                                                             <td>
                                                                 <a href="/admin/students/<%= student.id %>" class="btn btn-sm btn-info" title="View Application">
